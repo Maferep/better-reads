@@ -1,5 +1,6 @@
 const express = require('express');
 const busboy = require('busboy');
+const fs = require('fs')
 var http = require('http');
 const { argv } = require('node:process');
 const postLogin = require("./src/postLogin.js");
@@ -32,7 +33,7 @@ app.get('/', isAuthenticated, function (req, res) {
 })
 
 app.get('/', function (req, res) {
-  res.redirect('login.html')
+  res.redirect('login')
 })
 
 app.get('/logout', function (req, res, next) {
@@ -54,11 +55,28 @@ app.get('/logout', function (req, res, next) {
   })
 })
 
+app.get('/login', isAuthenticated, function(req, res) {
+  res.redirect('/')
+})
+
+app.get('/login', function(req, res) {
+  page = fs.readFileSync('./pages/login.html')
+  res.end(page)
+})
 
 app.post('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
 app.post('/login', postLogin.postLogin)
+
+app.get('/register', isAuthenticated, function(req, res) {
+  res.redirect('/')
+})
+
+app.get('/register', function(req, res) {
+  page = fs.readFileSync('./pages/register.html')
+  res.end(page)
+})
 
 app.post('/register', isAuthenticated, function(req, res) {
   res.redirect('/')
