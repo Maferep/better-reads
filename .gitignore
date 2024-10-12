@@ -2,3 +2,4 @@ node_modules
 user_uploads
 .ssl
 *foobar.db
+*sessions.db
