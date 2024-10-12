@@ -1,0 +1,36 @@
+.container {
+  position: relative;
+  background-color: yellow;
+  width: 200px;
+  height: 200px;
+}
+
+.box1 {
+  top: 100px;
+  left: 100px;
+  background-color: rgb(231, 132, 132);
+  color:rebeccapurple;
+  z-index: 1;
+}
+
+.box2 {
+  top: 50px;
+  left: 50px;
+  background-color: blue;
+  color:skyblue;
+  z-index: 2;
+}
+
+.box3 {
+  background-color: green;
+  color:mediumspringgreen;
+  z-index: 3;
+}
+
+
+.box1, .box2, .box3 {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  font-family: 'Courier New', Courier, monospace;
+}
