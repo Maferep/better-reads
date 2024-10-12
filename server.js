@@ -60,6 +60,9 @@ app.post('/login', isAuthenticated, function(req, res) {
 })
 app.post('/login', postLogin.postLogin)
 
+app.post('/register', isAuthenticated, function(req, res) {
+  res.redirect('/')
+})
 app.post('/register', postRegister.postRegister)
 
 // unsecured endpoint
