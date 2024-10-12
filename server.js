@@ -2,11 +2,11 @@ const express = require('express');
 const busboy = require('busboy');
 var http = require('http');
 const { argv } = require('node:process');
-var session = require('express-session')
 const postLogin = require("./src/postLogin.js");
 const postRegister = require("./src/postRegister.js");
-const { initDb } = require("./src/database.js");
+const { initDb, initSessions } = require("./src/database.js");
 var escapeHtml = require('escape-html')
+
 
 // database
 initDb()
@@ -16,15 +16,8 @@ var port = argv[2]
 if (port == undefined) port = 80;
 
 const app = express();
+initSessions(app)
 app.use(express.urlencoded({ extended: true }));
-
-var sess = {
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: {}
-}
-app.use(session(sess))
 
 // middleware to test if authenticated
 function isAuthenticated (req, res, next) {
@@ -64,12 +57,6 @@ app.get('/', function (req, res) {
 app.post('/login', postLogin.postLogin)
 
 app.post('/register', postRegister.postRegister)
-
-if (app.get('env') === 'production') {
-	app.set('trust proxy', 1) // trust first proxy
-	sess.cookie.secure = true // serve secure cookies
-}
-app.use(session(sess))
 
 // unsecured endpoint
 app.use(express.static('static'))
