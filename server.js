@@ -31,6 +31,10 @@ app.get('/', isAuthenticated, function (req, res) {
     ' <a href="/logout">Logout</a>')
 })
 
+app.get('/', function (req, res) {
+  res.redirect('login.html')
+})
+
 app.get('/logout', function (req, res, next) {
   // logout logic
 
@@ -50,10 +54,10 @@ app.get('/logout', function (req, res, next) {
   })
 })
 
-app.get('/', function (req, res) {
-  res.redirect('login.html')
-})
 
+app.post('/login', isAuthenticated, function(req, res) {
+  res.redirect('/')
+})
 app.post('/login', postLogin.postLogin)
 
 app.post('/register', postRegister.postRegister)
