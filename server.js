@@ -57,8 +57,7 @@ app.get('/login', isAuthenticated, function(req, res) {
 })
 
 app.get('/login', function(req, res) {
-  page = fs.readFileSync('./pages/login.html')
-  res.end(page)
+  res.render('login', { username: "guest" })
 })
 
 app.post('/login', isAuthenticated, function(req, res) {
@@ -71,8 +70,7 @@ app.get('/register', isAuthenticated, function(req, res) {
 })
 
 app.get('/register', function(req, res) {
-  page = fs.readFileSync('./pages/register.html')
-  res.end(page)
+  res.render('register', { username: "guest" })
 })
 
 app.post('/register', isAuthenticated, function(req, res) {

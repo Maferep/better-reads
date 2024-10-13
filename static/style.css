@@ -10,7 +10,9 @@
     background-size: 600px 600px;
     background-repeat: repeat;
   }
-  
+  form {
+    padding-top: 5vw;
+  }
   
   a {
     text-decoration: none;
