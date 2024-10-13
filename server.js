@@ -5,9 +5,7 @@ var http = require('http');
 const { argv } = require('node:process');
 const postLogin = require("./src/postLogin.js");
 const postRegister = require("./src/postRegister.js");
-const ejs = require('ejs')
 const { initDb, initSessions } = require("./src/database.js");
-var escapeHtml = require('escape-html')
 
 
 // database

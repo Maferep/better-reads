@@ -1,36 +1,83 @@
-.container {
-  position: relative;
-  background-color: yellow;
-  width: 200px;
-  height: 200px;
-}
+/* CSS is how you can add style to your website, such as colors, fonts, and positioning of your
+   HTML content. To learn how to do something, just try searching Google for questions like
+   "how to change link color." */
 
-.box1 {
-  top: 100px;
-  left: 100px;
-  background-color: rgb(231, 132, 132);
-  color:rebeccapurple;
-  z-index: 1;
-}
-
-.box2 {
-  top: 50px;
-  left: 50px;
-  background-color: blue;
-  color:skyblue;
-  z-index: 2;
-}
-
-.box3 {
-  background-color: green;
-  color:mediumspringgreen;
-  z-index: 3;
-}
-
-
-.box1, .box2, .box3 {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  font-family: 'Courier New', Courier, monospace;
-}
+   body {
+    color: #01010f;
+    font-family: "Sans";
+    background-color: #bed3eb;
+    margin: 0;
+    background-size: 600px 600px;
+    background-repeat: repeat;
+  }
+  
+  
+  a {
+    text-decoration: none;
+    color: lavender;
+    
+  }
+  
+  a:hover {
+    text-decoration:underline;
+  }
+  
+  li { 
+    list-style-type: none;
+  }
+  
+  #container {
+    padding-top: 0.5vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10%
+  }
+  
+  #text-container {
+    padding-top: 4rem;
+    padding-left: 10vw;
+    padding-right: 10vw;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 700px;
+    gap: 10%;
+  }
+  
+  #text {
+    background:#000000FF;
+    padding-top: 2rem;
+    padding-left: 6vw;
+    padding-right: 4vw;
+    padding-bottom: 4rem;
+    border-radius: 2em;
+    font-size: calc(1.3vh + 7px);
+    max-width: 60em;
+  }
+  
+  #navbar {
+    background:  #141540FF;
+    position: fixed;
+    width: 100%;
+  }
+  
+  #navbar * {
+    display: inline-block;
+    padding: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.4em;
+    font-size: calc(1.7vh + 3px);
+  }
+  
+  #navbar :hover {
+    color: #EEEEFF;
+  }
+  
+  svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    opacity: 0.6;
+  }
