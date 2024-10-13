@@ -26,7 +26,7 @@ function isAuthenticated (req, res, next) {
 }
 
 app.get('/', isAuthenticated, async function (req, res) {
-  res.render("index", { username: req.session.user })
+  res.render("index", { username: req.session.user, loggedIn: true })
 })
 
 app.get('/', function (req, res) {
@@ -57,7 +57,7 @@ app.get('/login', isAuthenticated, function(req, res) {
 })
 
 app.get('/login', function(req, res) {
-  res.render('login', { username: "guest" })
+  res.render('login', { username: "guest", loggedIn: false })
 })
 
 app.post('/login', isAuthenticated, function(req, res) {
@@ -70,7 +70,7 @@ app.get('/register', isAuthenticated, function(req, res) {
 })
 
 app.get('/register', function(req, res) {
-  res.render('register', { username: "guest" })
+  res.render('register', { username: "guest", loggedIn: false })
 })
 
 app.post('/register', isAuthenticated, function(req, res) {
