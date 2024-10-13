@@ -5,6 +5,7 @@ var http = require('http');
 const { argv } = require('node:process');
 const postLogin = require("./src/postLogin.js");
 const postRegister = require("./src/postRegister.js");
+const ejs = require('ejs')
 const { initDb, initSessions } = require("./src/database.js");
 var escapeHtml = require('escape-html')
 
@@ -26,10 +27,11 @@ function isAuthenticated (req, res, next) {
   else next('route')
 }
 
-app.get('/', isAuthenticated, function (req, res) {
+app.get('/', isAuthenticated, async function (req, res) {
   // this is only called when there is an authentication user due to isAuthenticated
-  res.send('hello, ' + escapeHtml(req.session.user) + '!' +
-    ' <a href="/logout">Logout</a>')
+  rendered = await ejs.renderFile("./pages/index.ejs", {username: req.session.user})
+  console.log(rendered)
+  res.end(rendered)
 })
 
 app.get('/', function (req, res) {
