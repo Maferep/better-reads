@@ -20,7 +20,7 @@ if (port == undefined) port = 80;
 const app = express();
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
-
+app.set('view engine', 'ejs');
 // middleware to test if authenticated
 function isAuthenticated (req, res, next) {
   if (req.session.user) next()
@@ -28,10 +28,7 @@ function isAuthenticated (req, res, next) {
 }
 
 app.get('/', isAuthenticated, async function (req, res) {
-  // this is only called when there is an authentication user due to isAuthenticated
-  rendered = await ejs.renderFile("./pages/index.ejs", {username: req.session.user})
-  console.log(rendered)
-  res.end(rendered)
+  res.render("index", { username: req.session.user })
 })
 
 app.get('/', function (req, res) {
