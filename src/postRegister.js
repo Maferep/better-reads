@@ -10,8 +10,8 @@ function postRegister (req, res) {
     const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
     res.end("Registered!");
   } catch (e) {
-    console.error(e)
-    res.end("Failed to register");
+    console.log("Username exists. Redirecting...")
+    res.redirect("/register?username_exists=1")
   }
 }
 

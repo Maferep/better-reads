@@ -72,7 +72,9 @@ app.get('/register', isAuthenticated, function(req, res) {
 })
 
 app.get('/register', function(req, res) {
-  res.render('register', { username: "guest", loggedIn: false })
+  const _usernameExists = req.query.username_exists == 1;
+  console.log("Existing name", _usernameExists)
+  res.render('register', { username: "guest", loggedIn: false, usernameExists: _usernameExists })
 })
 
 app.post('/register', isAuthenticated, function(req, res) {
