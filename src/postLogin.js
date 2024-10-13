@@ -7,8 +7,9 @@ function postLogin (req, res) {
   try {
     const rows = db.prepare('SELECT *  FROM insecure_users WHERE username=? AND insecure_password=?').all(username, password);
     if (rows.length == 0) {
-      console.log(rows)
-      res.end("Invalid credentials");
+      console.log("Wrong cred. Redirecting...")
+      res.redirect("/login?wrong_cred=1")
+      return
     } else {
       // successful login!
       // regenerate session to prevent session fixation

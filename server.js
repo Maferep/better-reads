@@ -57,7 +57,9 @@ app.get('/login', isAuthenticated, function(req, res) {
 })
 
 app.get('/login', function(req, res) {
-  res.render('login', { username: "guest", loggedIn: false })
+  const _hasWrongCred = req.query.wrong_cred == 1;
+  console.log("Has wrong cred?", _hasWrongCred)
+  res.render('login', { username: "guest", loggedIn: false, hasWrongCred: _hasWrongCred})
 })
 
 app.post('/login', isAuthenticated, function(req, res) {

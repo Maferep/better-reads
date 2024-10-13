@@ -10,9 +10,6 @@
     background-size: 600px 600px;
     background-repeat: repeat;
   }
-  form {
-    padding-top: 5vw;
-  }
   
   a {
     text-decoration: none;
@@ -33,40 +30,18 @@
   }
   
   #container {
-    padding-top: 0.5vw;
+    padding-top: 5em;
     padding-left: 2vw;
     padding-right: 2vw;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10%
   }
-  
-  #text-container {
-    padding-top: 4rem;
-    padding-left: 10vw;
-    padding-right: 10vw;
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 700px;
-    gap: 10%;
-  }
-  
-  #text {
-    background:#000000FF;
-    padding-top: 2rem;
-    padding-left: 6vw;
-    padding-right: 4vw;
-    padding-bottom: 4rem;
-    border-radius: 2em;
-    font-size: calc(1.3vh + 7px);
-    max-width: 60em;
-  }
-  
+
   #navbar {
     background:  #141540FF;
     position: fixed;
     width: 100%;
     display: flex;
+
+    padding-top: 0;
   }
   
   #navbar * {
