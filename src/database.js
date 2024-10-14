@@ -2,12 +2,16 @@ const Database = require('better-sqlite3');
 var session = require('express-session')
 const SqliteStore = require("better-sqlite3-session-store")(session)
 function initDb () {
-  const db = new Database('foobar.db', { verbose: console.log }); // create if no connection found
-  db.prepare('CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))').run();
+  const db = new Database('database_files/foobar.db', { verbose: console.log }); // create if no connection found
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))'
+  db.prepare(db_stmt).run();
+
+  const db_books = 'CREATE TABLE IF NOT EXISTS books (id int PRIMARY KEY, book_name varchar(255) UNIQUE, description varchar(255), isbn varchar(255))'
+  db.prepare(db_books).run();
 }
 
 function initSessions (app) {
-	const db_sessions = new Database("sessions.db", { verbose: console.log });
+	const db_sessions = new Database('database_files/sessions.db', { verbose: console.log });
 	app.use(
 	session({
 		store: new SqliteStore({

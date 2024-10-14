@@ -1,7 +1,7 @@
 const Database = require('better-sqlite3');
 function postLogin (req, res) {
   // TODO: validate input
-  const db = new Database('foobar.db', { verbose: console.log }); 
+  const db = new Database('database_files/foobar.db', { verbose: console.log }); 
   const username = req.body.name
   const password = req.body.password
   try {
