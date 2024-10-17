@@ -1,12 +1,10 @@
-const express = require('express');
-const busboy = require('busboy');
-const fs = require('fs')
-var http = require('http');
-const { argv } = require('node:process');
-const postLogin = require("./src/postLogin.js");
-const postRegister = require("./src/postRegister.js");
-const { initDb, initSessions } = require("./src/database.js");
-
+import express from 'express';
+import http from 'http';
+import { argv } from 'node:process';
+import postLogin from "./src/postLogin.js";
+import postRegister from "./src/postRegister.js";
+import { initDb, initSessions } from "./src/database.js";
+import handlebars from "express-handlebars";
 
 // database
 initDb()
@@ -16,9 +14,14 @@ var port = argv[2]
 if (port == undefined) port = 80;
 
 const app = express();
+
+//Incializamos el motor de plantillas
+app.engine("handlebars", handlebars.engine());
+//Establecemos el motor de renderizado
+app.set("view engine", "handlebars");
+
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
 // middleware to test if authenticated
 function isAuthenticated (req, res, next) {
   if (req.session.user) next()
@@ -65,7 +68,7 @@ app.get('/login', function(req, res) {
 app.post('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
-app.post('/login', postLogin.postLogin)
+app.post('/login', postLogin)
 
 app.get('/register', isAuthenticated, function(req, res) {
   res.redirect('/')
@@ -80,9 +83,8 @@ app.get('/register', function(req, res) {
 app.post('/register', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
-app.post('/register', postRegister.postRegister)
+app.post('/register', postRegister)
 
-// unsecured endpoint
 app.use(express.static('static'))
 
 // http

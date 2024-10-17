@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+import Database from 'better-sqlite3';
 function postLogin (req, res) {
   // TODO: validate input
   const db = new Database('database_files/foobar.db', { verbose: console.log }); 
@@ -42,4 +42,4 @@ function postLogin (req, res) {
   }
 }
 
-module.exports = {postLogin}
+export default postLogin

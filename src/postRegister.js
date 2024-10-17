@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+import Database from 'better-sqlite3';
 function postRegister (req, res) {
   const db = new Database('database_files/foobar.db', { verbose: console.log }); 
   const id = Math.floor(Math.random()*10000000);
@@ -16,4 +16,4 @@ function postRegister (req, res) {
   }
 }
 
-module.exports = {postRegister}
+export default postRegister

@@ -7,22 +7,21 @@
   </head>
   <body>
     <div id="navbar">
-      <% if(!loggedIn){ %>
+      {{#if loggedIn}}
+      <div><a href="/logout">Logout</a></div>
+      <div><a href="/">hello,  {{username}}! </a></div>
+      {{else}}
       <div><a href="/register">Register</a></div>
       <div><a href="/login">Login</a></div>
-      <% } else{ %>  
-      <div><a href="/logout">Logout</a></div>
-      <div><a href="/">hello, <%=username%>! </a></div>
-      <% } %>
+      {{/if}}
       <div id="logo"><a href="/">Logo!</a></div>
     </div>
     <div id="container">
-      <h1>Sign up</h1>
-      <% if(usernameExists){ %>
-        <div>Username already exists.</div><br>
-      <% } else { %> 
-      <% } %>
-    <form action="register" method="post">
+      <h1>Login</h1>
+      {{#if hasWrongCred}}
+      <div>Wrong username or password.</div><br>
+      {{/if}}
+    <form action="login" method="post">
       <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
       <input type="text" name="name" minlength="8" /><br>
       <input type="password" name="password" id="password" minlength="8"/><br>
@@ -30,6 +29,6 @@
         <span>Send</span>
       </button>
     </form>
-    </div>
+  </div>
   </body>
 </html>

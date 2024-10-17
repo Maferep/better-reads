@@ -1,6 +1,8 @@
-const Database = require('better-sqlite3');
-var session = require('express-session')
-const SqliteStore = require("better-sqlite3-session-store")(session)
+import Database from 'better-sqlite3';
+import session from 'express-session';
+import _SqliteStore from "better-sqlite3-session-store";
+var SqliteStore = _SqliteStore(session)
+
 function initDb () {
   const db = new Database('database_files/foobar.db', { verbose: console.log }); // create if no connection found
   const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))'
@@ -26,4 +28,4 @@ function initSessions (app) {
 	})
 	)
 }
-module.exports = { initDb, initSessions }
+export { initDb, initSessions }
