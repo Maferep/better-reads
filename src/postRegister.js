@@ -8,7 +8,8 @@ function postRegister (req, res) {
   // TODO check existing sql const check = db.prepare('')
   try {
     const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
-    res.end("Registered!");
+    res.redirect("/");
+    return
   } catch (e) {
     console.log("Username exists. Redirecting...")
     res.redirect("/register?username_exists=1")
