@@ -20,8 +20,6 @@ app.set("view engine", "handlebars");
 
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
-// middleware to test if authenticated
-
 app.use(express.static('static'))
 app.use(router)
 // http
