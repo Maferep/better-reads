@@ -1,9 +1,9 @@
 import express from 'express';
 import http from 'http';
 import { argv } from 'node:process';
-import { initDb, initSessions } from "./src/database.js";
+import { initDb, initSessions } from "./database.js";
 import handlebars from "express-handlebars";
-import router from "./src/routes/router.js"
+import router from "./routes/router.js"
 // database
 initDb()
 
