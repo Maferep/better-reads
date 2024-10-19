@@ -19,15 +19,16 @@ router.get('/', function (req, res) {
 })
 
 router.get('/browse', function (req, res) {
-  const rows = fetchBooks(10, 0);
-  let serialized = '';
-  for (let row of rows) {
-    for(let prop in row){
-      serialized = serialized + row[prop] + '\n';
-    }
-    serialized = serialized + '\n';
-  }
-  res.end(serialized);
+  const amount = 10;
+  const offset = 0;
+  const rows = fetchBooks(amount, offset);
+  res.render("browse", {
+    username: req.session.user, 
+    loggedIn: true, 
+    title: "Home page",
+    style: "style.css",
+    bookEntries: rows
+  });
 })
 
 router.use(authRouter)

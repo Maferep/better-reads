@@ -1,0 +1,20 @@
+<body>
+  {{> navbar }}
+  <div id="container">
+    <h1>Browse</h1>
+    <table>
+      <tr>
+        <th>Book</th>
+        <th>Description</th>
+        <th>Rating</th>
+      </tr>
+      {{#each bookEntries}}
+      <tr>
+        <td>{{book_name}}</td>
+        <td>{{description}}</td>
+        <td>⭐⭐⭐⭐⭐</td>
+      </tr>
+      {{/each}}
+    </table> 
+  </div>
+</body>
