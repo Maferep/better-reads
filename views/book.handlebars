@@ -1,0 +1,16 @@
+<body>
+  <div id="navbar">
+    {{#if loggedIn}}
+    <div><a href="/logout">Logout</a></div>
+    <div><a href="/">hello, {{username}}! </a></div>
+    {{else}}
+    <div><a href="/register">Register</a></div>
+    <div><a href="/login">Login</a></div>
+    {{/if}}
+    <div id="logo"><a href="/">Logo!</a></div>
+  </div>
+  <div id="container">
+    <h1>{{bookName}}</h1>
+    <p>{{bookDescription}}</p>
+  </div>
+</body>

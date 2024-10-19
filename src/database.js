@@ -70,4 +70,14 @@ function fetchBooks(amount, offset) {
   return rows
 }
 
-export { initDb, initSessions, fetchBooks }
+function fetchBook(bookId) {
+  const db = new Database('database_files/betterreads.db', {verbose: console.log });
+  const fetchQuery = 'SELECT * FROM books WHERE id=?'
+  const rows = db.prepare(fetchQuery).all(bookId)
+  console.log("book fetched:", rows)
+
+  if (rows.length == 0) return null;
+  return rows[0]
+}
+
+export { initDb, initSessions, fetchBooks, fetchBook }
