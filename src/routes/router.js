@@ -7,7 +7,11 @@ import Database from 'better-sqlite3';
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
-  res.render("index", { username: req.session.user, loggedIn: true })
+  res.render("index", { 
+    username: req.session.user, 
+    loggedIn: true, 
+    title: "Home page",
+    style: "style.css" })
 })
 
 router.get('/', function (req, res) {

@@ -1,34 +1,26 @@
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>better reads</title>
-    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
-  </head>
-  <body>
-    <div id="navbar">
-      {{#if loggedIn}}
-      <div><a href="/logout">Logout</a></div>
-      <div><a href="/">hello,  {{username}}! </a></div>
-      {{else}}
-      <div><a href="/register">Register</a></div>
-      <div><a href="/login">Login</a></div>
-      {{/if}}
-      <div id="logo"><a href="/">Logo!</a></div>
-    </div>
-    <div id="container">
-      <h1>Login</h1>
-      {{#if hasWrongCred}}
-      <div>Wrong username or password.</div><br>
-      {{/if}}
-    <form action="login" method="post">
-      <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
-      <input type="text" name="name" minlength="8" /><br>
-      <input type="password" name="password" id="password" minlength="8"/><br>
-      <button type="submit">
-        <span>Send</span>
-      </button>
-    </form>
+<body>
+  <div id="navbar">
+    {{#if loggedIn}}
+    <div><a href="/logout">Logout</a></div>
+    <div><a href="/">hello,  {{username}}! </a></div>
+    {{else}}
+    <div><a href="/register">Register</a></div>
+    <div><a href="/login">Login</a></div>
+    {{/if}}
+    <div id="logo"><a href="/">Logo!</a></div>
   </div>
-  </body>
-</html>
+  <div id="container">
+    <h1>Login</h1>
+    {{#if hasWrongCred}}
+    <div>Wrong username or password.</div><br>
+    {{/if}}
+  <form action="login" method="post">
+    <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
+    <input type="text" name="name" minlength="8" /><br>
+    <input type="password" name="password" id="password" minlength="8"/><br>
+    <button type="submit">
+      <span>Send</span>
+    </button>
+  </form>
+</div>
+</body>
