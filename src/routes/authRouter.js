@@ -37,7 +37,7 @@ authRouter.post('/login', isAuthenticated, function(req, res) {
 })
 authRouter.post('/login', function (req, res) {
   // TODO: validate input
-  const db = new Database('database_files/foobar.db', { verbose: console.log }); 
+  const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
   const username = req.body.name
   const password = req.body.password
   try {
@@ -93,7 +93,7 @@ authRouter.post('/register', isAuthenticated, function(req, res) {
 })
 
 authRouter.post('/register', function  (req, res) {
-  const db = new Database('database_files/foobar.db', { verbose: console.log }); 
+  const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
   const id = Math.floor(Math.random()*10000000);
   // TODO: validate input
   const username = req.body.name
