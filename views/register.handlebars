@@ -1,14 +1,5 @@
 <body>
-  <div id="navbar">
-    {{#if loggedIn}}
-    <div><a href="/logout">Logout</a></div>
-    <div><a href="/">hello, {{username}}! </a></div>
-    {{else}}
-    <div><a href="/register">Register</a></div>
-    <div><a href="/login">Login</a></div>
-    {{/if}}
-    <div id="logo"><a href="/">Logo!</a></div>
-  </div>
+  {{> navbar }}
   <div id="container">
     <h1>Sign up</h1>
     {{#if usernameExists}}
