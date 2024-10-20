@@ -52,15 +52,18 @@ function createReviewDb(db) {
   // add pragma foreign keys
   db.pragma('foreign_keys = ON');
 
+  // delete rable reviews if it exists
+  db.prepare(/* sql */`DROP TABLE IF EXISTS reviews`).run();
+
   //The table has the columns: review_id, book_id, user_id, rating, review_text
-  const db_reviews = 'CREATE TABLE IF NOT EXISTS reviews ('   +
-                        'review_id BIGINT PRIMARY KEY,'       +
-                        'book_id INT,' +
-                        'user_id INT,' +
-                        'rating INT,'                     +
-                        'review_text VARCHAR(255),' +
-                        'FOREIGN KEY (book_id) REFERENCES books(id),' +
-                        'FOREIGN KEY (user_id) REFERENCES insecure_users(id));';
+  const db_reviews = /* sql */`CREATE TABLE IF NOT EXISTS reviews (
+                        review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        book_id INT,
+                        user_id INT,
+                        rating INT,
+                        review_text VARCHAR(255),
+                        FOREIGN KEY (book_id) REFERENCES books(id),
+                        FOREIGN KEY (user_id) REFERENCES insecure_users(id));`;
 
 
   db.prepare(db_reviews).run();
@@ -101,4 +104,10 @@ function fetchBook(bookId) {
   return rows[0]
 }
 
-export { initDb, initSessions, fetchBooks, fetchBook }
+function addReview(bookId, userId, rating, reviewText) {
+  const db = new Database('database_files/betterreads.db', { verbose: console.log });
+  const insertReview = /* sql */`INSERT INTO reviews (book_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)`;
+  db.prepare(insertReview).run(bookId, userId, rating, reviewText);
+}
+
+export { initDb, initSessions, fetchBooks, fetchBook, addReview}

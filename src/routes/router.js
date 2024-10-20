@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { fetchBook, fetchBooks } from '../database.js';
+import { addReview, fetchBook, fetchBooks } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -54,19 +54,27 @@ router.get('/book/:id', async function (req, res) {
 })
 
 router.post('/book/:id/review', (req, res) => {
-  const bookId = req.params.id;
-  const rating = req.body.rating;
-  const reviewText = req.body.reviewText;
 
-  console.log(req)
+  try {
+    const bookId = req.params.id;
+    const rating = req.body.rating;
+    const reviewText = req.body.reviewText;
 
-  // get user
-  const user = req.session.userId;
+    console.log(req)
 
-  console.log('Review submitted by', user, 'for book', bookId, 'with rating', rating, 'and review', reviewText);
+    // get user
+    const userId = req.session.userId;
 
+    console.log('Review submitted by', userId, 'for book', bookId, 'with rating', rating, 'and review', reviewText);
 
-  res.json({ success: true, message: 'Review submitted successfully!' });
+    addReview(bookId, userId, rating, reviewText);
+    res.json({ success: true, message: 'Review submitted successfully!' });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: 'An error occurred while submitting the review' });
+  }
+
 })
 
 router.use(authRouter)
