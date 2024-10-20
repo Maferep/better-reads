@@ -14,6 +14,9 @@ function initDb () {
 
   // create book database
   createBookDb(db);
+
+  // create review database
+  createReviewDb(db);
 }
 
 function createBookDb(db) {
@@ -43,6 +46,24 @@ function createBookDb(db) {
       "The Voyage of the Dawn Treader[a] is a portal fantasy novel for children written by C. S. Lewis, published by Geoffrey Bles in 1952. It was the third published of seven novels in The Chronicles of Narnia (1950–1956). Macmillan US published an American edition within the calendar year,[1][3] with substantial revisions which were retained in the United States until 1994. It is volume five in recent editions, which are sequenced according to the novels' internal chronology.",
       "978-0-06-081922-6");
   }
+}
+
+function createReviewDb(db) {
+  // add pragma foreign keys
+  db.pragma('foreign_keys = ON');
+
+  //The table has the columns: review_id, book_id, user_id, rating, review_text
+  const db_reviews = 'CREATE TABLE IF NOT EXISTS reviews ('   +
+                        'review_id BIGINT PRIMARY KEY,'       +
+                        'book_id INT,' +
+                        'user_id INT,' +
+                        'rating INT,'                     +
+                        'review_text VARCHAR(255),' +
+                        'FOREIGN KEY (book_id) REFERENCES books(id),' +
+                        'FOREIGN KEY (user_id) REFERENCES insecure_users(id));';
+
+
+  db.prepare(db_reviews).run();
 }
 
 function initSessions (app) {

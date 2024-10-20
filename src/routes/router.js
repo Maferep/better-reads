@@ -55,8 +55,15 @@ router.get('/book/:id', async function (req, res) {
 
 router.post('/book/:id/review', (req, res) => {
   const bookId = req.params.id;
-  console.log("REVIEW libro:", bookId)
-  console.log(req.body)
+  const rating = req.body.rating;
+  const reviewText = req.body.reviewText;
+
+  console.log(req)
+
+  // get user
+  const user = req.session.userId;
+
+  console.log('Review submitted by', user, 'for book', bookId, 'with rating', rating, 'and review', reviewText);
 
 
   res.json({ success: true, message: 'Review submitted successfully!' });
