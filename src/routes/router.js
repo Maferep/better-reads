@@ -32,8 +32,10 @@ router.get('/browse', function (req, res) {
 
 router.get('/book/:id', async function (req, res) {
   const bookId = req.params.id;
+
  //Busco el libro por ID en la base de datos
   const bookRow = fetchBook(bookId)
+
   
   const estaAutenticado = Boolean(req.session.user);
 
@@ -51,6 +53,14 @@ router.get('/book/:id', async function (req, res) {
     style: "../style.css"})
 })
 
-router.use(authRouter)
+router.post('/book/:id/review', (req, res) => {
+  const bookId = req.params.id;
+  console.log("REVIEW libro:", bookId)
+  console.log(req.body)
 
+
+  res.json({ success: true, message: 'Review submitted successfully!' });
+})
+
+router.use(authRouter)
 export default router;
