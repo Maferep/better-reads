@@ -100,12 +100,15 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
 
     // Get the form data
     const formData = new FormData(this);
-
+    const urlEncodedData = new URLSearchParams(formData).toString();
 
     // Send form data using Fetch API
     fetch(window.location.pathname + "/review", {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: urlEncodedData
     })
     .then(response => response.json()) // assuming the server returns JSON
     .then(data => {
