@@ -25,8 +25,12 @@ function loadFromCSV(path, callback) {
 
   fs.createReadStream(path)
     .pipe(csv())
-    .on('data', (data) => rows.push(data))
+    .on('data', (data) => {
+      data["isbn"] = "-",
+      rows.push(data);
+    })
     .on('end', () => {
+      // TODO: call here fetchISBN to fetch all
       callback(rows);
     })
     .on('error', (err) => {
@@ -34,15 +38,18 @@ function loadFromCSV(path, callback) {
     });
 }
 
-async function fetchISBN(infoLink) {
+function fetchISBN(infoLink, callback) {
+  // TODO: fetch in batch manner, not individually
   const url = new URL(infoLink);
   const book_id = url.searchParams.get("id");
   const books_api = `https://www.googleapis.com/books/v1/volumes/${book_id}`
-  let res = await axios.get(books_api);
-
-  const ISBN_10 = 0; 
-  const ISBN_13 = 1;
-  return res.data["volumeInfo"]["industryIdentifiers"][ISBN_10]["identifier"];
+  axios.get(books_api, (res) => {
+    const ISBN_10 = 0; 
+    const ISBN_13 = 1;
+    console.log(res.data);
+    isbn = res.data["volumeInfo"]["industryIdentifiers"][ISBN_10]["identifier"];
+    callback(isbn);
+  });
 }
 
 function createBookDb(db, datasetPath) {
@@ -72,8 +79,7 @@ function createBookDb(db, datasetPath) {
         insert_books.run(
           book["Title"], 
           book["description"],
-          //fetchISBN(book["infoLink"]), // too slow 
-          "-",
+          book["isbn"],
         );
       }
     });
