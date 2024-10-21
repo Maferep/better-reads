@@ -70,7 +70,9 @@ function createReviewDb(db) {
 }
 
 function initSessions (app) {
-  const db_sessions = new Database('database_files/sessions.db', { verbose: console.log });
+  // const db_sessions = new Database('database_files/sessions.db', { verbose: console.log });
+  const db_sessions = new Database('database_files/sessions.db', {});
+
   app.use(
   session({
     store: new SqliteStore({

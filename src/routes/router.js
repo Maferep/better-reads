@@ -31,12 +31,16 @@ router.get('/browse', function (req, res) {
 })
 
 router.get('/book/:id', async function (req, res) {
+  console.log("entro book")
+
   const bookId = req.params.id;
   
   const userId = req.session.userId;
 
  //Busco el libro por ID en la base de datos
   const bookRow = fetchBook(bookId)
+
+  console.log("Libro recibido", bookRow)
   
   const reviewsRows = fetchReviews(bookId, userId);
 
@@ -54,15 +58,19 @@ const reviewsData = {
 
   //El libro con tal id no existe
   if (bookRow == null) {
-    res.send("Book id not found")
+    res.status(404).send("Book id not found")
+    return;
   }
+
+  const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
 
   res.render("book", {
     username: req.session.user,
     loggedIn: estaAutenticado,
+    allowReview: estaAutenticado && !userSubmittedReview,
     bookName: bookRow.book_name,
     bookDescription: bookRow.description,
-    title: "Home page",
+    title: bookRow.book_name,
     style: "../style.css",
     reviews: reviewsData.reviews})
 })
@@ -74,13 +82,21 @@ router.post('/book/:id/review', (req, res) => {
     const rating = req.body.rating;
     const reviewText = req.body.reviewText;
 
-    console.log(req)
-
     // get user
     const userId = req.session.userId;
   
-    if (userAlreadySubmitedReview(bookId, userId)) {
+    if (userSubmittedReview) {
       res.status(400).json({ success: false, message: 'Ya enviaste una review para este libro' });
+      return;
+    }
+
+    if (userId == null) {
+      res.status(400).json({ success: false, message: 'Tiene que iniciar sesión para enviar una review' });
+      return;
+    }
+
+    if (rating == null) {
+      res.status(400).json({ success: false, message: 'Tiene que indicar si o si la cantidad de estrellas en la review' });
       return;
     }
 

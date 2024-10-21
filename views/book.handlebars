@@ -13,8 +13,9 @@
     <h1>{{bookName}}</h1>
     <p>{{bookDescription}}</p>
   </div>
+  {{#if allowReview}}
   <div id="review">
-  <h1>Realiza un review</h1>
+  <h2>Realiza un review</h2>
 <div id="starReview">
 <form id="reviewForm" action="" method="post">
   <fieldset class="rating">
@@ -40,9 +41,10 @@
 <div id="confirmationMessage" style="display: none;">
     <h2>Thank you for your review!</h2>
 </div>
-
-{{#if reviews.length}}
+{{/if}}
 <div id="userReviews">
+<h2>Reviews</h2>
+{{#if reviews.length}}
 {{#each reviews}}
         <div class="review">
             <div class="username">{{username}}</div>
@@ -59,12 +61,11 @@
             <div class="text">{{review_text}}</div>
         </div>
         {{/each}}
-</div>
 {{else}}
-<div id="userReviews">
     <p>No reviews yet.</p>
-</body>
 {{/if}}
+</div>
+</body>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -115,11 +116,6 @@ h1 { font-size: 1.5em; margin: 10px; }
   font-family: FontAwesome;
   display: inline-block;
   content: "\f005";
-}
-
-.rating > .half:before { 
-  content: "\f089";
-  position: absolute;
 }
 
 .rating > label { 
