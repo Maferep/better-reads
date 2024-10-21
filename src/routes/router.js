@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchReviews, userAlreadySubmitedReview } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -32,9 +32,22 @@ router.get('/browse', function (req, res) {
 
 router.get('/book/:id', async function (req, res) {
   const bookId = req.params.id;
+  
+  const userId = req.session.userId;
 
  //Busco el libro por ID en la base de datos
   const bookRow = fetchBook(bookId)
+  
+  const reviewsRows = fetchReviews(bookId, userId);
+
+const reviewsData = {
+  reviews: reviewsRows
+};
+
+  //Mofidy rating, so it is a array of 5 elements who are true or false, depending on the value
+  for (let review of reviewsData.reviews) {
+    review.rating = Array.from({ length: 5 }, (_, i) => i < review.rating);
+  }
 
   
   const estaAutenticado = Boolean(req.session.user);
@@ -50,7 +63,8 @@ router.get('/book/:id', async function (req, res) {
     bookName: bookRow.book_name,
     bookDescription: bookRow.description,
     title: "Home page",
-    style: "../style.css"})
+    style: "../style.css",
+    reviews: reviewsData.reviews})
 })
 
 router.post('/book/:id/review', (req, res) => {
@@ -64,6 +78,11 @@ router.post('/book/:id/review', (req, res) => {
 
     // get user
     const userId = req.session.userId;
+  
+    if (userAlreadySubmitedReview(bookId, userId)) {
+      res.status(400).json({ success: false, message: 'Ya enviaste una review para este libro' });
+      return;
+    }
 
     console.log('Review submitted by', userId, 'for book', bookId, 'with rating', rating, 'and review', reviewText);
 

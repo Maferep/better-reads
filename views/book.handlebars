@@ -15,36 +15,83 @@
   </div>
   <div id="review">
   <h1>Realiza un review</h1>
-
+<div id="starReview">
 <form id="reviewForm" action="" method="post">
   <fieldset class="rating">
-    <input type="radio" id="star5" name="rating" value="10" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
-    <input type="radio" id="star4half" name="rating" value="9" /><label class="half" for="star4half" title="Pretty good - 4.5 stars"></label>
-    <input type="radio" id="star4" name="rating" value="8" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
-    <input type="radio" id="star3half" name="rating" value="7" /><label class="half" for="star3half" title="Meh - 3.5 stars"></label>
-    <input type="radio" id="star3" name="rating" value="6" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
-    <input type="radio" id="star2half" name="rating" value="5" /><label class="half" for="star2half" title="Kinda bad - 2.5 stars"></label>
-    <input type="radio" id="star2" name="rating" value="4" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
-    <input type="radio" id="star1half" name="rating" value="3" /><label class="half" for="star1half" title="Meh - 1.5 stars"></label>
-    <input type="radio" id="star1" name="rating" value="2" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
-    <input type="radio" id="starhalf" name="rating" value="1" /><label class="half" for="starhalf" title="Sucks big time - 0.5 stars"></label>
+    <input type="radio" id="star5" name="rating" value="5" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
+    <input type="radio" id="star4" name="rating" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
+    <input type="radio" id="star3" name="rating" value="3" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
+    <input type="radio" id="star2" name="rating" value="2" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
+    <input type="radio" id="star1" name="rating" value="1" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
 </fieldset>
     <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
-    
-    <br><br>
-    
+</div>
+    {{!-- NO SE PORQUE NO QUEDA ABAJO¿?, agrego salto de lineas manuales --}}
+    <br><br><br>
+<div id="textReview">
 <textarea name="reviewText"></textarea>
     <button type="submit">
       <span>Send</span>
     </button>
   </form>
+</div>
 
 </div>
 <div id="confirmationMessage" style="display: none;">
     <h2>Thank you for your review!</h2>
 </div>
 
+{{#if reviews.length}}
+<div id="userReviews">
+{{#each reviews}}
+        <div class="review">
+            <div class="username">{{username}}</div>
+            <div class="stars">
+                {{#each rating}}
+                {{#if this}}
+                <label class="checked">&#9733;</label>
+                {{else}}
+                <label class="unchecked">&#9734;</label>
+                {{/if}}
+                {{/each}}
+            </div>
+
+            <div class="text">{{review_text}}</div>
+        </div>
+        {{/each}}
+</div>
+{{else}}
+<div id="userReviews">
+    <p>No reviews yet.</p>
 </body>
+{{/if}}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<style>
+
+        .review {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .username {
+            font-weight: bold;
+        }
+        .stars {
+            font-size: 2em;
+            font-family: FontAwesome;
+        }
+
+        .stars > .checked {
+            color: gold;
+        }
+
+        .stars > .unchecked {
+            color: #b5b5b5;
+        }
+    </style>
 
 {{!-- Fuente: https://codepen.io/jamesbarnett/pen/najzYK --}}
 <style>
@@ -64,7 +111,7 @@ h1 { font-size: 1.5em; margin: 10px; }
 .rating > input { display: none; } 
 .rating > label:before { 
   margin: 5px;
-  font-size: 1.25em;
+  font-size: 2em;
   font-family: FontAwesome;
   display: inline-block;
   content: "\f005";
@@ -117,7 +164,7 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
             // Show a confirmation message
             document.getElementById('confirmationMessage').style.display = 'block';
         } else {
-            alert('Error submitting review. Please try again.');
+            alert(data.message);
         }
     })
     .catch(error => {
