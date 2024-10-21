@@ -48,10 +48,17 @@ const reviewsData = {
   reviews: reviewsRows
 };
 
-  //Mofidy rating, so it is a array of 5 elements who are true or false, depending on the value
+  let sum = 0;
+
+  //Mofidy rating, so its a porcentual value, in the form of a string from 0 to 100
   for (let review of reviewsData.reviews) {
-    review.rating = Array.from({ length: 5 }, (_, i) => i < review.rating);
+    sum += review.rating;
+    review.rating = (review.rating * 20).toString();
   }
+
+  const mean = sum / reviewsData.reviews.length;
+
+  const meanText = (mean * 20).toString()
 
   
   const estaAutenticado = Boolean(req.session.user);
@@ -72,7 +79,8 @@ const reviewsData = {
     bookDescription: bookRow.description,
     title: bookRow.book_name,
     style: "../style.css",
-    reviews: reviewsData.reviews})
+    reviews: reviewsData.reviews,
+    ratingsMean: meanText,})
 })
 
 router.post('/book/:id/review', (req, res) => {
@@ -84,6 +92,8 @@ router.post('/book/:id/review', (req, res) => {
 
     // get user
     const userId = req.session.userId;
+
+    const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
   
     if (userSubmittedReview) {
       res.status(400).json({ success: false, message: 'Ya enviaste una review para este libro' });
