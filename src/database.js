@@ -1,6 +1,10 @@
 import Database from 'better-sqlite3';
 import session from 'express-session';
 import _SqliteStore from "better-sqlite3-session-store";
+import csv from 'csv-parser';
+import fs from 'fs';
+import axios from 'axios';
+
 var SqliteStore = _SqliteStore(session)
 
 function initDb () {
@@ -13,38 +17,75 @@ function initDb () {
   console.log(db_stmt)
 
   // create book database
-  createBookDb(db);
+  createBookDb(db, "./database_files/books_data.csv");
 
   // create review database
   createReviewDb(db);
 }
 
-function createBookDb(db) {
-  const db_books = 'CREATE TABLE IF NOT EXISTS books (id int PRIMARY KEY, book_name varchar(255) UNIQUE, description varchar(255), isbn varchar(255))';
-  db.prepare(db_books).run();
+function loadFromCSV(path, callback) {
+  const rows = [];
+
+  fs.createReadStream(path)
+    .pipe(csv())
+    .on('data', (data) => {
+      data["isbn"] = "-",
+      rows.push(data);
+    })
+    .on('end', () => {
+      // TODO: call here fetchISBN to fetch all
+      callback(rows);
+    })
+    .on('error', (err) => {
+      console.error('Error reading CSV file:', err);
+    });
+}
+
+function fetchISBN(infoLink, callback) {
+  // TODO: fetch in batch manner, not individually
+  const url = new URL(infoLink);
+  const book_id = url.searchParams.get("id");
+  const books_api = `https://www.googleapis.com/books/v1/volumes/${book_id}`
+  axios.get(books_api, (res) => {
+    const ISBN_10 = 0; 
+    const ISBN_13 = 1;
+    console.log(res.data);
+    isbn = res.data["volumeInfo"]["industryIdentifiers"][ISBN_10]["identifier"];
+    callback(isbn);
+  });
+}
+
+function createBookDb(db, datasetPath) {
+  db.prepare(
+    `CREATE TABLE IF NOT EXISTS books (
+      id int PRIMARY KEY, 
+      book_name TEXT UNIQUE, 
+      description TEXT, 
+      isbn TEXT
+    )`
+  ).run();
 
   const books_count = 'SELECT COUNT(*) FROM books'
-  let count =db.prepare(books_count).get(); // { 'COUNT(*)': 0 }
-  if(count['COUNT(*)'] <= 0) {
-    const insert_books = 'INSERT INTO books VALUES (?,?,?,?)';
+  let count = db.prepare(books_count).get(); // { 'COUNT(*)': 0 }
 
-    // insert temporary example books
-    const id = Math.floor(Math.random() * 10000000);
-    db.prepare(insert_books).run(
-      id,
-      "The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",
-      "The Lion, the Witch and the Wardrobe is a portal fantasy novel for children by C. S. Lewis, published by Geoffrey Bles in 1950. It is the first published and best known of seven novels in The Chronicles of Narnia. Among all the author's books, it is also the most widely held in libraries.",
-      "978-0-06-081922-4");
-    db.prepare(insert_books).run(
-      id + 1,
-      "Prince Caspian",
-      "Prince Caspian (originally published as Prince Caspian: The Return to Narnia) is a high fantasy novel for children by C. S. Lewis, published by Geoffrey Bles in 1951. It was the second published of seven novels in The Chronicles of Narnia (1950–1956), and Lewis had finished writing it in 1949, before the first book was out.[4] It is volume four in recent editions of the series, sequenced according to the internal chronology of the books. Like the others, it was illustrated by Pauline Baynes and her work has been retained in many later editions.[1][3] ",
-      "978-0-06-081922-5");
-    db.prepare(insert_books).run(
-      id + 2,
-      "The Voyage of the Dawn Treader",
-      "The Voyage of the Dawn Treader[a] is a portal fantasy novel for children written by C. S. Lewis, published by Geoffrey Bles in 1952. It was the third published of seven novels in The Chronicles of Narnia (1950–1956). Macmillan US published an American edition within the calendar year,[1][3] with substantial revisions which were retained in the United States until 1994. It is volume five in recent editions, which are sequenced according to the novels' internal chronology.",
-      "978-0-06-081922-6");
+  if (count['COUNT(*)'] <= 0) {
+    loadFromCSV(datasetPath, (books) => {
+      const insert_books = db.prepare(
+        `INSERT INTO books (
+            book_name, 
+            description, 
+            isbn
+         ) VALUES (?,?,?)`
+      );
+
+      for (const book of books) {
+        insert_books.run(
+          book["Title"], 
+          book["description"],
+          book["isbn"],
+        );
+      }
+    });
   }
 }
 

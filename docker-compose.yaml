@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      target: dev 
+    tty: true
+    volumes: 
+      - ./src:/app/src
+    ports:
+      - "80:80"
+
+

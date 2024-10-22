@@ -1,26 +1,32 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Better Reads</title>
+  <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+</head>
 <body>
   <div id="navbar">
-    {{#if loggedIn}}
-    <div><a href="/logout">Logout</a></div>
-    <div><a href="/">hello, {{username}}! </a></div>
-    {{else}}
-    <div><a href="/register">Register</a></div>
-    <div><a href="/login">Login</a></div>
-    {{/if}}
     <div id="logo"><a href="/">Logo!</a></div>
   </div>
   <div id="container">
     <h1>Sign up</h1>
     {{#if usernameExists}}
-      <div>Username already exists.</div><br>
+    <div>Username already exists.</div><br>
     {{/if}}
-  <form action="register" method="post">
-    <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
-    <input type="text" name="name" minlength="8" /><br>
-    <input type="password" name="password" id="password" minlength="8"/><br>
-    <button type="submit">
-      <span>Send</span>
-    </button>
-  </form>
+    <form action="register" method="post">
+      <div class="input-group">
+        <label for="username">Username:</label>
+        <input type="text" name="name" id="username" minlength="8" required /><br>
+      </div>
+      <div class="input-group">
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" minlength="8" required /><br>
+      </div>
+      <button type="submit">
+        <span>Sign Up</span>
+      </button>
+      <p class="redirect-link"><a href="/login">Already have an account? Login</a></p>
+    </form>
   </div>
 </body>
