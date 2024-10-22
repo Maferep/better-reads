@@ -1,20 +1,24 @@
-import Database from 'better-sqlite3';
-import session from 'express-session';
+import Database from "better-sqlite3";
+import session from "express-session";
 import _SqliteStore from "better-sqlite3-session-store";
-import csv from 'csv-parser';
-import fs from 'fs';
-import axios from 'axios';
+import csv from "csv-parser";
+import fs from "fs";
+import axios from "axios";
+import { randomInt } from "crypto";
 
-var SqliteStore = _SqliteStore(session)
+var SqliteStore = _SqliteStore(session);
 
-function initDb () {
+function initDb() {
   // Create username/password database
-  const db = new Database('database_files/betterreads.db', { verbose: console.log }); // create if no connection found
-  console.log("pre insecure users")
-  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))'
-  console.log("post insecure users")
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  }); // create if no connection found
+  console.log("pre insecure users");
+  const db_stmt =
+    "CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))";
+  console.log("post insecure users");
   db.prepare(db_stmt).run();
-  console.log(db_stmt)
+  console.log(db_stmt);
 
   // create book database
   createBookDb(db, "./database_files/books_data.csv");
@@ -28,16 +32,15 @@ function loadFromCSV(path, callback) {
 
   fs.createReadStream(path)
     .pipe(csv())
-    .on('data', (data) => {
-      data["isbn"] = "-",
-      rows.push(data);
+    .on("data", (data) => {
+      (data["isbn"] = "-"), rows.push(data);
     })
-    .on('end', () => {
+    .on("end", () => {
       // TODO: call here fetchISBN to fetch all
       callback(rows);
     })
-    .on('error', (err) => {
-      console.error('Error reading CSV file:', err);
+    .on("error", (err) => {
+      console.error("Error reading CSV file:", err);
     });
 }
 
@@ -45,9 +48,9 @@ function fetchISBN(infoLink, callback) {
   // TODO: fetch in batch manner, not individually
   const url = new URL(infoLink);
   const book_id = url.searchParams.get("id");
-  const books_api = `https://www.googleapis.com/books/v1/volumes/${book_id}`
+  const books_api = `https://www.googleapis.com/books/v1/volumes/${book_id}`;
   axios.get(books_api, (res) => {
-    const ISBN_10 = 0; 
+    const ISBN_10 = 0;
     const ISBN_13 = 1;
     console.log(res.data);
     isbn = res.data["volumeInfo"]["industryIdentifiers"][ISBN_10]["identifier"];
@@ -65,25 +68,21 @@ function createBookDb(db, datasetPath) {
     )`
   ).run();
 
-  const books_count = 'SELECT COUNT(*) FROM books'
+  const books_count = "SELECT COUNT(*) FROM books";
   let count = db.prepare(books_count).get(); // { 'COUNT(*)': 0 }
 
-  if (count['COUNT(*)'] <= 0) {
+  if (count["COUNT(*)"] <= 0) {
     loadFromCSV(datasetPath, (books) => {
       const insert_books = db.prepare(
         `INSERT INTO books (
+            id,
             book_name, 
             description, 
             isbn
-         ) VALUES (?,?,?)`
+         ) VALUES (?,?,?,?)`
       );
-
       for (const book of books) {
-        insert_books.run(
-          book["Title"], 
-          book["description"],
-          book["isbn"],
-        );
+        insert_books.run(randomInt(99999999), book["Title"], book["description"], book["isbn"]);
       }
     });
   }
@@ -91,13 +90,13 @@ function createBookDb(db, datasetPath) {
 
 function createReviewDb(db) {
   // add pragma foreign keys
-  db.pragma('foreign_keys = ON');
+  db.pragma("foreign_keys = ON");
 
   // delete table reviews if it exists
   // db.prepare(/* sql */`DROP TABLE IF EXISTS reviews`).run();
 
   //The table has the columns: review_id, book_id, user_id, rating, review_text
-  const db_reviews = /* sql */`CREATE TABLE IF NOT EXISTS reviews (
+  const db_reviews = /* sql */ `CREATE TABLE IF NOT EXISTS reviews (
                         review_id INTEGER PRIMARY KEY AUTOINCREMENT,
                         book_id INT,
                         user_id INT,
@@ -106,50 +105,55 @@ function createReviewDb(db) {
                         FOREIGN KEY (book_id) REFERENCES books(id),
                         FOREIGN KEY (user_id) REFERENCES insecure_users(id));`;
 
-
   db.prepare(db_reviews).run();
 }
 
-function initSessions (app) {
+function initSessions(app) {
   // const db_sessions = new Database('database_files/sessions.db', { verbose: console.log });
-  const db_sessions = new Database('database_files/sessions.db', {});
+  const db_sessions = new Database("database_files/sessions.db", {});
 
   app.use(
-  session({
-    store: new SqliteStore({
-    client: db_sessions, 
-    expired: {
-      clear: true,
-      intervalMs: 900000 //ms = 15min
-    }
-    }),
-    secret: "keyboard cat",
-    resave: false,
-  })
-  )
+    session({
+      store: new SqliteStore({
+        client: db_sessions,
+        expired: {
+          clear: true,
+          intervalMs: 900000, //ms = 15min
+        },
+      }),
+      secret: "keyboard cat",
+      resave: false,
+    })
+  );
 }
 
 function fetchBooks(amount, offset) {
-  const db = new Database('database_files/betterreads.db', { verbose: console.log }); // create if no connection found
-  const fetchBooks = 'SELECT * FROM books LIMIT ? OFFSET ?';
-  const rows = db.prepare(fetchBooks).all(amount, offset)
-  console.log("fetch books:", rows)
-  return rows
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  }); // create if no connection found
+  const fetchBooks = "SELECT * FROM books LIMIT ? OFFSET ?";
+  const rows = db.prepare(fetchBooks).all(amount, offset);
+  console.log("fetch books:", rows);
+  return rows;
 }
 
 function fetchBook(bookId) {
-  const db = new Database('database_files/betterreads.db', {verbose: console.log });
-  const fetchQuery = 'SELECT * FROM books WHERE id=?'
-  const rows = db.prepare(fetchQuery).all(bookId)
-  console.log("book fetched:", rows)
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const fetchQuery = "SELECT * FROM books WHERE id=?";
+  const rows = db.prepare(fetchQuery).all(bookId);
+  console.log("book fetched:", rows);
 
   if (rows.length == 0) return null;
-  return rows[0]
+  return rows[0];
 }
 
 function addReview(bookId, userId, rating, reviewText) {
-  const db = new Database('database_files/betterreads.db', { verbose: console.log });
-  const insertReview = /* sql */`INSERT INTO reviews (book_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)`;
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const insertReview = /* sql */ `INSERT INTO reviews (book_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)`;
   db.prepare(insertReview).run(bookId, userId, rating, reviewText);
 }
 
@@ -157,27 +161,38 @@ function fetchReviews(bookId, userId = null) {
   //get reviews in format {username, rating, review_text}
   //En el caso de que se provea un userId, se va a retornar todas las reviews, pero con la review de tal user ID al inicio.
 
-  const db = new Database('database_files/betterreads.db', { verbose: console.log });
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
 
   //it needs to jopin with insecure_users to get the username
-  const fetchReviews = /* sql */`SELECT insecure_users.username, reviews.rating, reviews.review_text FROM reviews
+  const fetchReviews = /* sql */ `SELECT insecure_users.username, reviews.rating, reviews.review_text FROM reviews
                                 JOIN insecure_users ON reviews.user_id = insecure_users.id
                                 WHERE reviews.book_id = ?
-                                ORDER BY CASE WHEN reviews.user_id = ? THEN 1 ELSE 0 END DESC;`
-
+                                ORDER BY CASE WHEN reviews.user_id = ? THEN 1 ELSE 0 END DESC;`;
 
   const rows = db.prepare(fetchReviews).all(bookId, userId);
 
-  console.log(rows)
+  console.log(rows);
 
   return rows;
 }
 
 function userAlreadySubmitedReview(bookId, userId) {
-  const db = new Database('database_files/betterreads.db', { verbose: console.log });
-  const query = /* sql */`SELECT 1 FROM reviews WHERE book_id = ? AND user_id = ?`;
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT 1 FROM reviews WHERE book_id = ? AND user_id = ?`;
   const rows = db.prepare(query).all(bookId, userId);
   return rows.length > 0;
 }
 
-export { initDb, initSessions, fetchBooks, fetchBook, addReview, fetchReviews, userAlreadySubmitedReview}
+export {
+  initDb,
+  initSessions,
+  fetchBooks,
+  fetchBook,
+  addReview,
+  fetchReviews,
+  userAlreadySubmitedReview,
+};
