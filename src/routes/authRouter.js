@@ -29,7 +29,12 @@ authRouter.get('/login', isAuthenticated, function(req, res) {
 authRouter.get('/login', function(req, res) {
   const _hasWrongCred = req.query.wrong_cred == 1;
   console.log("Has wrong cred?", _hasWrongCred)
-  res.render('login', { username: "guest", loggedIn: false, hasWrongCred: _hasWrongCred})
+  res.render('login', { 
+    username: "guest", 
+    loggedIn: false, 
+    hasWrongCred: _hasWrongCred, 
+    title: "Login",
+    style: "style.css" })
 })
 
 authRouter.post('/login', isAuthenticated, function(req, res) {
@@ -85,7 +90,12 @@ authRouter.get('/register', isAuthenticated, function(req, res) {
 authRouter.get('/register', function(req, res) {
   const _usernameExists = req.query.username_exists == 1;
   console.log("Existing name", _usernameExists)
-  res.render('register', { username: "guest", loggedIn: false, usernameExists: _usernameExists })
+  res.render('register', { 
+    username: "guest", 
+    loggedIn: false, 
+    usernameExists: _usernameExists,
+    title: "Home page",
+    style: "style.css"  })
 })
 
 authRouter.post('/register', isAuthenticated, function(req, res) {

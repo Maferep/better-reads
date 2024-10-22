@@ -1,0 +1,11 @@
+<div id="navbar">
+  <div><a href="/browse">Browse</a></div>
+  {{#if loggedIn}}
+  <div><a href="/logout">Logout</a></div>
+  <div><a href="/">hello, {{username}}! </a></div>
+  {{else}}
+  <div><a href="/register">Register</a></div>
+  <div><a href="/login">Login</a></div>
+  {{/if}}
+  <div id="logo"><a href="/">Logo!</a></div>
+</div>
