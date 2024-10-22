@@ -1,0 +1,237 @@
+<body>
+  <div id="navbar">
+    {{#if loggedIn}}
+    <div><a href="/logout">Logout</a></div>
+    <div><a href="/">hello, {{username}}! </a></div>
+    {{else}}
+    <div><a href="/register">Register</a></div>
+    <div><a href="/login">Login</a></div>
+    {{/if}}
+    <div id="logo"><a href="/">Logo!</a></div>
+  </div>
+  <div id="container">
+    <h1>{{bookName}}</h1>
+    <p>{{bookDescription}}</p>
+  {{#if allowReview}}
+  <div id="review">
+  <h2>Realiza un review</h2>
+<div id="starReview">
+<form id="reviewForm" action="" method="post">
+  <fieldset class="ratingInput">
+    <input type="radio" id="star5" name="rating" value="5" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
+    <input type="radio" id="star4" name="rating" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
+    <input type="radio" id="star3" name="rating" value="3" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
+    <input type="radio" id="star2" name="rating" value="2" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
+    <input type="radio" id="star1" name="rating" value="1" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
+</fieldset>
+    <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
+</div>
+    {{!-- NO SE PORQUE NO QUEDA ABAJO¿?, agrego salto de lineas manuales --}}
+    <br><br><br>
+<div id="textReview">
+<textarea name="reviewText"></textarea>
+    <button type="submit">
+      <span>Send</span>
+    </button>
+  </form>
+</div>
+
+</div>
+<div id="confirmationMessage" style="display: none;">
+    <h2>Thank you for your review!</h2>
+</div>
+{{/if}}
+<div id="userReviews">
+<h2>Reviews</h2>
+{{#if reviews.length}}
+
+
+<h3>Puntaje Promedio:</h3>
+  {{!-- Dibujar estrellas parcialmente llenas --}}
+  <div class="ratingsMean">
+                <div class="full-stars" style="width:{{ratingsMean}}%"></div>
+                <div class="empty-stars"></div>
+            </div>
+
+
+<h3>Comentarios:</h3>
+{{#each reviews}}
+        <div class="review">
+            <div class="username">{{username}}</div>
+            <div class="ratings">
+                <div class="full-stars" style="width:{{rating}}%"></div>
+                <div class="empty-stars"></div>
+            </div>
+            <div class="text">{{review_text}}</div>
+        </div>
+        {{/each}}
+{{else}}
+    <p>No reviews yet.</p>
+{{/if}}
+</div>
+
+  </div>
+</body>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{{!-- FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ --}}
+
+<style>
+    .ratings {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    color: #b1b1b1;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.ratingsMean {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    color: #b1b1b1;
+    overflow: hidden;
+    z-index: 1;
+}
+.full-stars {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #fde16d;
+}
+.empty-stars:before, .full-stars:before {
+    content:"\2605\2605\2605\2605\2605";
+}
+
+.ratings > .empty-stars:before, .ratings > .full-stars:before {
+    font-size: 2em;
+}
+.ratingsMean > .empty-stars:before, .ratingsMean > .full-stars:before {
+    font-size: 4em;
+}
+
+.empty-stars:before {
+    -webkit-text-stroke: 1px #848484;
+}
+.full-stars:before {
+    -webkit-text-stroke: 1px orange;
+}
+/* Webkit-text-stroke is not supported on firefox or IE */
+
+/* Firefox */
+ @-moz-document url-prefix() {
+    .full-stars {
+        color: #ECBE24;
+    }
+ }
+/* IE */
+ <!--[if IE]> .full-stars {
+    color: #ECBE24;
+}
+<![endif]-->
+</style>
+
+<style>
+
+        .review {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .username {
+            font-weight: bold;
+        }
+        .stars {
+            font-size: 2em;
+            font-family: FontAwesome;
+        }
+
+        .stars > .checked {
+            color: gold;
+        }
+
+        .stars > .unchecked {
+            color: #b5b5b5;
+        }
+    </style>
+
+{{!-- Fuente: https://codepen.io/jamesbarnett/pen/najzYK --}}
+<style>
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+
+fieldset, label { margin: 0; padding: 0; }
+h1 { font-size: 1.5em; margin: 10px; }
+
+
+/****** Style Star Rating Widget *****/
+
+.ratingInput { 
+  border: none;
+  float: left;
+}
+
+.ratingInput > input { display: none; } 
+.ratingInput > label:before { 
+  margin: 5px;
+  font-size: 2em;
+  font-family: FontAwesome;
+  display: inline-block;
+  content: "\f005";
+}
+
+.ratingInput > label { 
+  color: #ddd; 
+ float: right; 
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.ratingInput > input:checked ~ label, /* show gold star when clicked */
+.ratingInput:not(:checked) > label:hover, /* hover current star */
+.ratingInput:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+.ratingInput > input:checked + label:hover, /* hover current star when changing rating */
+.ratingInput > input:checked ~ label:hover,
+.ratingInput > label:hover ~ input:checked ~ label, /* lighten current selection */
+.ratingInput > input:checked ~ label:hover ~ label { color: #FFED85;  } 
+</style>
+
+
+  <script>
+document.getElementById('reviewForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission behavior
+
+
+    // Get the form data
+    const formData = new FormData(this);
+    const urlEncodedData = new URLSearchParams(formData).toString();
+
+    // Send form data using Fetch API
+    fetch(window.location.pathname + "/review", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: urlEncodedData
+    })
+    .then(response => response.json()) // assuming the server returns JSON
+    .then(data => {
+        if (data.success) {document.getElementById('reviewForm').style.display = 'none';
+
+            // Show a confirmation message
+            document.getElementById('confirmationMessage').style.display = 'block';
+
+            //reload page to show new comment
+            window.location.reload();
+
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the review.');
+    });
+});
+</script>

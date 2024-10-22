@@ -10,6 +10,7 @@ authRouter.get('/logout', function (req, res, next) {
   // this will ensure that re-using the old session id
   // does not have a logged in user
   req.session.user = null
+  req.session.userId = null
   req.session.save(function (err) {
     if (err) next(err)
       
@@ -61,6 +62,7 @@ authRouter.post('/login', function (req, res) {
         } else {
           // store user information in session, typically a user id
           req.session.user = req.body.name
+          req.session.userId = rows[0].id
           console.log("set user ", req.session.user)
           // save the session before redirection to ensure page
           // load does not happen before session is saved
