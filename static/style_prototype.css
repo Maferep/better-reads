@@ -1,0 +1,144 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+#main-layout {
+  display: flex;
+}
+
+
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0077b6;
+  padding: 10px;
+  color: white;
+}
+
+#logo a {
+  text-decoration: none;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.user-actions a {
+  margin-left: 15px;
+  text-decoration: none;
+  color: white;
+}
+
+#container {
+  width: 50%;
+  margin: 20px auto;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+#new-post {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+#new-post textarea {
+  width: 95%;
+  height: 80px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#new-post input[type="text"] {
+  width: 95%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#new-post button {
+  padding: 10px 15px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#feed .post {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+#feed .user-info {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#feed .review {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+#feed .post-actions {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+#feed .post-actions span {
+  color: #e63946;
+}
+
+#feed .post-actions a {
+  text-decoration: none;
+  color: #0077b6;
+}
+
+#sidebar {
+  width: 100px;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+#sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#sidebar ul li {
+  margin-bottom: 30px;
+}
+
+#sidebar ul li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+ .topic-link {
+      color: blue; 
+      text-decoration: none;
+}
+    
+.topic-link:hover {
+      text-decoration: underline; 
+}
+
+#book-selection {
+    width: 1600px;
+    height: 40px; 
+    font-size: 16px; 
+}
