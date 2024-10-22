@@ -1,20 +1,56 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link href="{{style}}" rel="stylesheet" type="text/css" media="all">
+</head>
 <body>
-  {{> navbar }}
-  <div id="container">
-    <h1>Browse</h1>
-    <table>
-      <tr>
-        <th>Book</th>
-        <th>Description</th>
-        <th>Rating</th>
-      </tr>
-      {{#each bookEntries}}
-      <tr>
-        <td>{{book_name}}</td>
-        <td>{{description}}</td>
-        <td>⭐⭐⭐⭐⭐</td>
-      </tr>
-      {{/each}}
-    </table> 
+  <div id="navbar">
+    <div id="logo"><a href="/">Logo!</a></div>
+    <div id="user-info">
+      {{#if loggedIn}}
+        <span>Welcome, {{username}}!</span>
+        <a href="/logout">Logout</a>
+      {{else}}
+        <a href="/login">Login</a>
+      {{/if}}
+    </div>
   </div>
+  <div id="browse-container">
+    <h1>Browse Books</h1>
+    <form id="book-form" method="get" onsubmit="return redirectToBook(event)">
+      <label for="book-select">Select a book:</label>
+      <select name="book" id="book-select" style="width: 100%;">
+        <option value="">-- Select a book --</option>
+        {{#each bookEntries}}
+          <option value="{{this.id}}">{{this.book_name}}</option>
+        {{/each}}
+      </select>
+      <button type="submit">View Book</button>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#book-select').select2({
+        placeholder: "-- Select a book --"
+      });
+    });
+
+    function redirectToBook(event) {
+      event.preventDefault(); 
+      const select = document.getElementById('book-select');
+      const bookId = select.value;
+      if (bookId) {
+    
+        window.location.href = `/book/${bookId}`;
+      } else {
+        alert("Please select a book."); 
+      }
+    }
+  </script>
 </body>
+</html>
