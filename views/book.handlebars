@@ -12,6 +12,18 @@
   <div id="container">
     <h1>{{bookName}}</h1>
     <p>{{bookDescription}}</p>
+    {{#if loggedIn}}
+    <div id="bookStateDropdown">
+    <label for="bookState">Book State:</label>
+    <select id="bookState" name="bookState">
+        <option value="none">Nothing</option>
+        <option value="reading">Reading</option>
+        <option value="finished">Finished</option>
+        <option value="plan-to-read">Plan to Read</option>
+    </select>
+    <button id="saveStateButton" type="button">Save</button>
+    </div>
+    {{/if}}
   {{#if allowReview}}
   <div id="review">
   <h2>Realiza un review</h2>
