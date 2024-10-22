@@ -1,11 +1,11 @@
 <body>
   <div id="navbar">
     {{#if loggedIn}}
-    <div><a href="/logout">Logout</a></div>
-    <div><a href="/">hello, {{username}}! </a></div>
+      <div><a href="/logout">Logout</a></div>
+      <div><a href="/">hello, {{username}}! </a></div>
     {{else}}
-    <div><a href="/register">Register</a></div>
-    <div><a href="/login">Login</a></div>
+      <div><a href="/register">Register</a></div>
+      <div><a href="/login">Login</a></div>
     {{/if}}
     <div id="logo"><a href="/">Logo!</a></div>
   </div>
@@ -13,80 +13,101 @@
     <h1>{{bookName}}</h1>
     <p>{{bookDescription}}</p>
     {{#if loggedIn}}
-    <div id="bookStateDropdown">
-    <label for="bookState">Book State:</label>
-    <select id="bookState" name="bookState">
-        <option value="none">Nothing</option>
-        <option value="reading">Reading</option>
-        <option value="finished">Finished</option>
-        <option value="plan-to-read">Plan to Read</option>
-    </select>
-    <button id="saveStateButton" type="button">Save</button>
-    </div>
+      <div id="bookStateDropdown">
+        <label for="bookState">Book State:</label>
+        <select id="bookState" name="bookState">
+          <option value="none">Nothing</option>
+          <option value="reading">Reading</option>
+          <option value="finished">Finished</option>
+          <option value="plan-to-read">Plan to Read</option>
+        </select>
+        <button id="saveStateButton" type="button">Save</button>
+      </div>
     {{/if}}
-  {{#if allowReview}}
-  <div id="review">
-  <h2>Realiza un review</h2>
-<div id="starReview">
-<form id="reviewForm" action="" method="post">
-  <fieldset class="ratingInput">
-    <input type="radio" id="star5" name="rating" value="5" /><label class = "full" for="star5" title="Awesome - 5 stars"></label>
-    <input type="radio" id="star4" name="rating" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
-    <input type="radio" id="star3" name="rating" value="3" /><label class = "full" for="star3" title="Meh - 3 stars"></label>
-    <input type="radio" id="star2" name="rating" value="2" /><label class = "full" for="star2" title="Kinda bad - 2 stars"></label>
-    <input type="radio" id="star1" name="rating" value="1" /><label class = "full" for="star1" title="Sucks big time - 1 star"></label>
-</fieldset>
-    <!-- Replace these inputs with your own. Make sure they have a "name" attribute! -->
-</div>
-    {{!-- NO SE PORQUE NO QUEDA ABAJO¿?, agrego salto de lineas manuales --}}
-    <br><br><br>
-<div id="textReview">
-<textarea name="reviewText"></textarea>
-    <button type="submit">
-      <span>Send</span>
-    </button>
-  </form>
-</div>
+    {{#if allowReview}}
+      <div id="review">
+        <h2>Realiza un review</h2>
+        <div id="starReview">
+          <form id="reviewForm" action="" method="post">
+            <fieldset class="ratingInput">
+              <input type="radio" id="star5" name="rating" value="5" /><label
+                class="full"
+                for="star5"
+                title="Awesome - 5 stars"
+              ></label>
+              <input type="radio" id="star4" name="rating" value="4" /><label
+                class="full"
+                for="star4"
+                title="Pretty good - 4 stars"
+              ></label>
+              <input type="radio" id="star3" name="rating" value="3" /><label
+                class="full"
+                for="star3"
+                title="Meh - 3 stars"
+              ></label>
+              <input type="radio" id="star2" name="rating" value="2" /><label
+                class="full"
+                for="star2"
+                title="Kinda bad - 2 stars"
+              ></label>
+              <input type="radio" id="star1" name="rating" value="1" /><label
+                class="full"
+                for="star1"
+                title="Sucks big time - 1 star"
+              ></label>
+            </fieldset>
 
-</div>
-<div id="confirmationMessage" style="display: none;">
-    <h2>Thank you for your review!</h2>
-</div>
-{{/if}}
-<div id="userReviews">
-<h2>Reviews</h2>
-{{#if reviews.length}}
-
-
-<h3>Puntaje Promedio:</h3>
-  {{!-- Dibujar estrellas parcialmente llenas --}}
-  <div class="ratingsMean">
-                <div class="full-stars" style="width:{{ratingsMean}}%"></div>
-                <div class="empty-stars"></div>
+            {{! NO SE PORQUE NO QUEDA ABAJO¿?, agrego salto de lineas manuales }}
+            <br /><br /><br />
+            <div id="textReview">
+              <textarea name="reviewText"></textarea>
+              <button type="submit">
+                <span>Send</span>
+              </button>
             </div>
+          </form>
+        </div>
+      </div>
 
+      <div id="confirmationMessage" style="display: none;">
+        <h2>Thank you for your review!</h2>
+      </div>
+    {{/if}}
+    <div id="userReviews">
+      <h2>Reviews</h2>
+      {{#if reviews.length}}
 
-<h3>Comentarios:</h3>
-{{#each reviews}}
-        <div class="review">
+        <h3>Puntaje Promedio:</h3>
+        {{! Dibujar estrellas parcialmente llenas }}
+        <div class="ratingsMean">
+          <div class="full-stars" style="width:{{ratingsMean}}%"></div>
+          <div class="empty-stars"></div>
+        </div>
+
+        <h3>Comentarios:</h3>
+        {{#each reviews}}
+          <div class="review">
             <div class="username">{{username}}</div>
             <div class="ratings">
-                <div class="full-stars" style="width:{{rating}}%"></div>
-                <div class="empty-stars"></div>
+              <div class="full-stars" style="width:{{rating}}%"></div>
+              <div class="empty-stars"></div>
             </div>
             <div class="text">{{review_text}}</div>
-        </div>
+          </div>
         {{/each}}
-{{else}}
-    <p>No reviews yet.</p>
-{{/if}}
-</div>
+      {{else}}
+        <p>No reviews yet.</p>
+      {{/if}}
+    </div>
 
   </div>
 </body>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-{{!-- FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ --}}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
 
 <style>
     .ratings {
@@ -145,7 +166,6 @@
 </style>
 
 <style>
-
         .review {
             border: 1px solid #ccc;
             padding: 10px;
@@ -166,11 +186,11 @@
         .stars > .unchecked {
             color: #b5b5b5;
         }
-    </style>
+</style>
 
-{{!-- Fuente: https://codepen.io/jamesbarnett/pen/najzYK --}}
+{{! Fuente: https://codepen.io/jamesbarnett/pen/najzYK }}
 <style>
-@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+  @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
 
 fieldset, label { margin: 0; padding: 0; }
 h1 { font-size: 1.5em; margin: 10px; }
@@ -209,8 +229,7 @@ h1 { font-size: 1.5em; margin: 10px; }
 .ratingInput > input:checked ~ label:hover ~ label { color: #FFED85;  } 
 </style>
 
-
-  <script>
+<script>
 document.getElementById('reviewForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission behavior
 
