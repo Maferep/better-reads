@@ -221,6 +221,10 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
 
             // Show a confirmation message
             document.getElementById('confirmationMessage').style.display = 'block';
+
+            //reload page to show new comment
+            window.location.reload();
+
         } else {
             alert(data.message);
         }
