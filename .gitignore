@@ -1,5 +1,7 @@
+
 node_modules
 user_uploads
 .ssl
 database_files
 .vscode
+package-lock.json
