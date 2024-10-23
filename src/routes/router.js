@@ -80,7 +80,7 @@ router.get('/book/:id', async function (req, res) {
     bookName: bookRow.book_name,
     bookDescription: bookRow.description,
     title: bookRow.book_name,
-    style: "../../style.css",
+    style: "../../style_book.css",
     reviews: reviewsData.reviews,
     ratingsMean: meanText,
     bookState: bookState,
