@@ -65,8 +65,8 @@
   }
 
 #container {
-  width: 600px;
-  height: 400px;
+  width: 70vw;
+  max-width: 600px;
   padding: 40px;
   border: 1px solid #ccc;
   border-radius: 10px;
