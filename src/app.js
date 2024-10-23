@@ -14,8 +14,15 @@ if (port == undefined) port = 80;
 
 const app = express();
 
+const hbs = handlebars.create();
+
+hbs.handlebars.registerHelper('eq', function(a, b) {
+    return a === b;
+});
+
+
 //Incializamos el motor de plantillas
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", hbs.engine);
 //Establecemos el motor de renderizado
 app.set("view engine", "handlebars");
 
