@@ -25,6 +25,9 @@ function initDb() {
 
   // create review database
   createReviewDb(db);
+
+  // create state database
+  createBookStatesDb(db);
 }
 
 function loadFromCSV(path, callback) {
@@ -108,6 +111,20 @@ function createReviewDb(db) {
   db.prepare(db_reviews).run();
 }
 
+function createBookStatesDb(db) {
+  db.pragma("foreign_keys = ON");
+
+  const db_book_states = `CREATE TABLE IF NOT EXISTS book_states (
+                        book_id INT,
+                        user_id INT,
+                        state VARCHAR(255),
+                        PRIMARY KEY (book_id, user_id),
+                        FOREIGN KEY (book_id) REFERENCES books(id),
+                        FOREIGN KEY (user_id) REFERENCES insecure_users(id));`;
+
+  db.prepare(db_book_states).run();
+}
+
 function initSessions(app) {
   // const db_sessions = new Database('database_files/sessions.db', { verbose: console.log });
   const db_sessions = new Database("database_files/sessions.db", {});
@@ -187,6 +204,30 @@ function userAlreadySubmitedReview(bookId, userId) {
   return rows.length > 0;
 }
 
+function fetchBookState(bookId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT state FROM book_states WHERE book_id = ? AND user_id = ?`;
+  const result = db.prepare(query).get(bookId, userId);
+  return result ? result.state : null;
+}
+
+function addBookState(bookId, userId, state) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  if (state === "none") {
+    const operation = /* sql */ `DELETE FROM book_states WHERE book_id = ? AND user_id = ?`;
+    db.prepare(operation).run(bookId, userId);
+  } else {
+    const operation = /* sql */ `INSERT INTO book_states (book_id, user_id, state)
+                           VALUES (?, ?, ?)
+                           ON CONFLICT(book_id, user_id) DO UPDATE SET state = ?`;
+    db.prepare(operation).run(bookId, userId, state, state);  // Pass `state` twice for the update clause
+  }
+}
+
 export {
   initDb,
   initSessions,
@@ -195,4 +236,6 @@ export {
   addReview,
   fetchReviews,
   userAlreadySubmitedReview,
+  addBookState,
+  fetchBookState,
 };

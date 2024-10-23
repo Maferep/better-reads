@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchReviews, userAlreadySubmitedReview } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -40,14 +40,15 @@ router.get('/book/:id', async function (req, res) {
 
  //Busco el libro por ID en la base de datos
   const bookRow = fetchBook(bookId)
+  const bookState = fetchBookState(bookId, userId);
 
   console.log("Libro recibido", bookRow)
   
   const reviewsRows = fetchReviews(bookId, userId);
 
-const reviewsData = {
-  reviews: reviewsRows
-};
+  const reviewsData = {
+    reviews: reviewsRows
+  };
 
   let sum = 0;
 
@@ -81,11 +82,12 @@ const reviewsData = {
     title: bookRow.book_name,
     style: "../style.css",
     reviews: reviewsData.reviews,
-    ratingsMean: meanText,})
+    ratingsMean: meanText,
+    bookState: bookState,
+  })
 })
 
 router.post('/book/:id/review', (req, res) => {
-
   try {
     const bookId = req.params.id;
     const rating = req.body.rating;
@@ -121,6 +123,13 @@ router.post('/book/:id/review', (req, res) => {
     res.status(500).json({ success: false, message: 'An error occurred while submitting the review' });
   }
 
+})
+
+router.post('/book/:id/state', (req, res) => {
+  const bookId = req.params.id;
+  const userId = req.session.userId;
+  const state = req.body.bookState;
+  addBookState(bookId, userId, state)
 })
 
 router.use(authRouter)
