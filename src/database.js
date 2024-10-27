@@ -150,14 +150,13 @@ function createPostDatabase(db) {
     const insert_posts = db.prepare(
       `INSERT INTO posts (
           author_id, book_id, text_content, date
-       ) VALUES (?,?,?,?)`
+       ) VALUES (?,?,?,DateTime('now'))`
     );
 
     insert_posts.run(
       TEST_USER_ID, 
       TEST_BOOK_ID, 
-      "This is my first post!!!!!!!!!!!!!!", 
-      "datetime(now)"
+      "This is my first post!!!!!!!!!!!!!!"
     );
   }
 }
