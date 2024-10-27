@@ -5,8 +5,9 @@ import csv from "csv-parser";
 import fs from "fs";
 import axios from "axios";
 import { randomInt } from "crypto";
-
-var SqliteStore = _SqliteStore(session);
+var SqliteStore = _SqliteStore(session)
+const TEST_USER_ID = 20000000;
+const TEST_BOOK_ID = 0; // https://www.sqlite.org/autoinc.html
 
 function initDb() {
   // Create username/password database
@@ -20,14 +21,34 @@ function initDb() {
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
-  // create book database
+  createInsecureUsersDatabase(db);
   createBookDb(db, "./database_files/books_data.csv");
 
-  // create review database
   createReviewDb(db);
-
-  // create state database
   createBookStatesDb(db);
+  createPostDatabase(db);
+
+  // create posts database
+}
+
+// this database stores passwords in plain text!
+function createInsecureUsersDatabase(db) {
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))';
+  db.prepare(db_stmt).run();
+  console.log(db_stmt);
+
+  // insert test user
+  const id = TEST_USER_ID;
+  // TODO: validate input
+  const username = "staff"
+  const password = "password"
+
+  try {
+    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
+    console.log("Created default test user.")
+  } catch (e) {
+    console.log("Database already contains default test user.")
+  }
 }
 
 function loadFromCSV(path, callback) {
@@ -75,19 +96,69 @@ function createBookDb(db, datasetPath) {
   let count = db.prepare(books_count).get(); // { 'COUNT(*)': 0 }
 
   if (count["COUNT(*)"] <= 0) {
+    const insert_books = db.prepare(
+      `INSERT INTO books (
+          id,
+          book_name, 
+          description, 
+          isbn
+       ) VALUES (?,?,?,?)`
+    );
+    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2");
     loadFromCSV(datasetPath, (books) => {
-      const insert_books = db.prepare(
-        `INSERT INTO books (
-            id,
-            book_name, 
-            description, 
-            isbn
-         ) VALUES (?,?,?,?)`
-      );
       for (const book of books) {
         insert_books.run(randomInt(99999999), book["Title"], book["description"], book["isbn"]);
       }
     });
+  } 
+}
+
+function createPostDatabase(db) {
+  /*
+  https://www.sqlite.org/foreignkeys.html
+  https://www.sqlite.org/lang_datefunc.html
+  Note that numeric arguments in parentheses that following the type name 
+  (ex: "VARCHAR(255)") are ignored by SQLite - SQLite does not impose any length restrictions 
+  (other than the large global SQLITE_MAX_LENGTH limit) on the length of strings, BLOBs or numeric values.
+
+  In the SQL statement text input to sqlite3_prepare_v2() and its variants, 
+  literals may be replaced by a parameter that matches one of following templates: ?, ...
+
+  */
+
+  const MAX_POST_LENGTH = 50000
+  const stmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS posts (
+      id int PRIMARY KEY,
+      author_id int,
+      book_id int,
+      text_content TEXT,
+      date TEXT,
+      FOREIGN KEY(author_id) REFERENCES insecure_users(id),
+      FOREIGN KEY(book_id) REFERENCES books(id))`
+  ).run();
+  
+  // TODO: add size constraint from https://stackoverflow.com/questions/17785047/string-storage-size-in-sqlite
+
+  // CREATE TEST POST FROM TEST USER
+  // we use TEST_USER_ID and a default user to ensure foreign key constraints are met
+  
+  const posts_count = 'SELECT COUNT(*) FROM posts'
+  let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_posts = db.prepare(
+      `INSERT INTO posts (
+          author_id, book_id, text_content, date
+       ) VALUES (?,?,?,?)`
+    );
+
+    insert_posts.run(
+      TEST_USER_ID, 
+      TEST_BOOK_ID, 
+      "This is my first post!!!!!!!!!!!!!!", 
+      "datetime(now)"
+    );
   }
 }
 
