@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -18,18 +18,34 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
-router.get('/browse', function (req, res) {
-  const amount = 10;
+
+router.get('/browse', async function (req, res) {
+  const searchTerm = req.query.search || "";
+  const amount = 10; 
   const offset = 0;
-  const rows = fetchBooks(amount, offset);
+
+  const rows = await searchBooks(searchTerm, amount, offset);
+
   res.render("browse", {
-    username: req.session.user, 
-    loggedIn: true, 
-    title: "Home page",
+    username: req.session.user,
+    loggedIn: true,
+    title: "Browse Books",
     style: "style.css",
     bookEntries: rows
   });
-})
+});
+
+
+router.get('/browse/search', async function (req, res) {
+  const searchTerm = req.query.search || "";
+  const amount = 10;
+  const offset = 0;
+
+  const rows = await searchBooks(searchTerm, amount, offset);
+  
+
+  res.json({ bookEntries: rows });
+});
 
 router.get('/book/:id', async function (req, res) {
   console.log("entro book")
