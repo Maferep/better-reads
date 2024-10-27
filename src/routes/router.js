@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -131,6 +131,17 @@ router.post('/book/:id/state', (req, res) => {
   const state = req.body.bookState;
   addBookState(bookId, userId, state)
 })
+
+// post a post (not a review) to be shown on the feed
+
+router.post('/post', (req, res) => {
+  const userId = req.session.userId;
+  const postContent = req.body["post-content"];
+  const topic = req.body.topic;
+  createPost(userId, postContent, topic);
+  res.redirect('/')
+})
+
 
 router.use(authRouter)
 export default router;

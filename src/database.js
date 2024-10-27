@@ -298,6 +298,21 @@ function addBookState(bookId, userId, state) {
   }
 }
 
+// TODO: ui needs to only let you talk about specific books so we can use a valid book id
+function createPost(userId, content, topic) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `INSERT INTO posts (
+        author_id, book_id, text_content, date
+     ) VALUES (?,?,?,DateTime('now'))`
+  db.prepare(operation).run(
+    userId, 
+    TEST_BOOK_ID,
+    "About ''''" + topic + "'''': " + content
+  );
+}
+
 export {
   initDb,
   initSessions,
@@ -308,4 +323,5 @@ export {
   userAlreadySubmitedReview,
   addBookState,
   fetchBookState,
+  createPost
 };
