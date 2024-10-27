@@ -298,6 +298,25 @@ function addBookState(bookId, userId, state) {
   }
 }
 
+function searchBooks(query, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  
+
+  const searchQuery = `
+    SELECT * FROM books 
+    WHERE book_name LIKE ?
+    LIMIT ? OFFSET ?`;
+
+  const searchTerm = `%${query}%`;
+
+  const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
+  console.log("search results:", rows);
+
+  return rows;
+}
+
 export {
   initDb,
   initSessions,
@@ -308,4 +327,5 @@ export {
   userAlreadySubmitedReview,
   addBookState,
   fetchBookState,
+  searchBooks,
 };
