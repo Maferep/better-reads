@@ -8,6 +8,7 @@ import { randomInt } from "crypto";
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
+const TEST_POST_ID = 1;
 
 function initDb() {
   // Create username/password database
@@ -27,6 +28,7 @@ function initDb() {
   createReviewDb(db);
   createBookStatesDb(db);
   createPostDatabase(db);
+  createCommentDb(db);
 
   // create posts database
 }
@@ -180,6 +182,39 @@ function createPostDatabase(db) {
   }
 }
 
+function createCommentDb(db) {
+  /*
+  */
+
+  const MAX_COMMENT_LENGTH = 50000
+  const stmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS comments (
+      id int PRIMARY KEY,
+      parent int,
+      text_content TEXT,
+      date TEXT,
+      likes int,
+      FOREIGN KEY(parent) REFERENCES posts(id))`
+  ).run();
+  
+  // create comment
+  
+  const posts_count = 'SELECT COUNT(*) FROM comments'
+  let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_posts = db.prepare(
+      `INSERT INTO comments (
+          parent, text_content, date, likes
+       ) VALUES (?,?,DateTime('now'), 0)`
+    );
+
+    insert_posts.run(
+      1, 
+      "\"This post is rubbish, mate\""
+    );
+  }
+}
 
 function createReviewDb(db) {
   // add pragma foreign keys
