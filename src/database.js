@@ -83,17 +83,22 @@ function fetchISBN(infoLink, callback) {
 }
 
 function createBookDb(db, datasetPath) {
+  // Create or modify the table structure to include authors, genres, and image fields.
   db.prepare(
     `CREATE TABLE IF NOT EXISTS books (
-      id int PRIMARY KEY, 
+      id INTEGER PRIMARY KEY, 
       book_name TEXT UNIQUE, 
       description TEXT, 
-      isbn TEXT
+      isbn TEXT, 
+      authors TEXT,
+      genre TEXT,
+      image TEXT
     )`
   ).run();
 
+  // Check if the table already contains data
   const books_count = "SELECT COUNT(*) FROM books";
-  let count = db.prepare(books_count).get(); // { 'COUNT(*)': 0 }
+  let count = db.prepare(books_count).get();
 
   if (count["COUNT(*)"] <= 0) {
     const insert_books = db.prepare(
@@ -101,13 +106,26 @@ function createBookDb(db, datasetPath) {
           id,
           book_name, 
           description, 
-          isbn
-       ) VALUES (?,?,?,?)`
+          isbn,
+            authors,
+            genre,
+            image
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
-    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2");
+    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
     loadFromCSV(datasetPath, (books) => {
+
+      // Populate the database with data from the CSV file
       for (const book of books) {
-        insert_books.run(randomInt(99999999), book["Title"], book["description"], book["isbn"]);
+        insert_books.run(
+          randomInt(99999999), // Random ID for each book
+          book["Title"], 
+          book["description"], 
+          book["isbn"],
+          JSON.stringify(book["authors"]), // Store authors as a JSON string
+          JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
+          book["image"] // Direct image link
+        );
       }
     });
   } 
@@ -161,6 +179,7 @@ function createPostDatabase(db) {
     );
   }
 }
+
 
 function createReviewDb(db) {
   // add pragma foreign keys

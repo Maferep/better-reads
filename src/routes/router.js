@@ -18,10 +18,8 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
-
 router.get('/browse', async function (req, res) {
-  const searchTerm = req.query.search || "";
-  const amount = 10; 
+  const amount = 10;
   const offset = 0;
 
   const rows = await searchBooks(searchTerm, amount, offset);
@@ -89,12 +87,23 @@ router.get('/book/:id', async function (req, res) {
 
   const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
 
+
+
+  let authors = bookRow.authors.replace("[","").replace("]","")
+  let genres = bookRow.genre.replace("[","").replace("]","")
+
+  authors != '""' ? authors : authors = "No authors found"
+  genres != '""' ? genres : genres = "No genres found"
+
   res.render("book", {
     username: req.session.user,
     loggedIn: estaAutenticado,
     allowReview: estaAutenticado && !userSubmittedReview,
     bookName: bookRow.book_name,
     bookDescription: bookRow.description,
+    bookAuthor: authors, // Cambiado a authors
+    bookGenre: genres,   // Cambiado a genres
+    bookCover: bookRow.image,
     title: bookRow.book_name,
     style: "../../style_book.css",
     reviews: reviewsData.reviews,
