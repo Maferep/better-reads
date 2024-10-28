@@ -112,7 +112,7 @@ function createBookDb(db, datasetPath) {
             image
        ) VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
-    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2");
+    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
     loadFromCSV(datasetPath, (books) => {
 
       // Populate the database with data from the CSV file

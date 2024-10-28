@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState,
+        fetchReviews, userAlreadySubmitedReview, addBookState,
+        createPost, searchBooks, fetchPosts } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
-  let posts = [{
+  let posts_manual = [{
     username: "Maleriandro",
     topic: "The best book ever",
     content: "This book is the best book ever, I love it so much, I would recommend it to everyone",
@@ -16,16 +18,16 @@ router.get('/', isAuthenticated, async function (req, res) {
     number_comments: 0,
   }]
 
+  let posts = fetchPosts();
 
 
 
-
-  res.render("index_copy", { 
+  res.render("index", { 
     username: req.session.user, 
     loggedIn: true, 
     title: "Home page",
     style: "style.css",
-    posts: posts
+    posts: posts_manual
    })
 })
 
