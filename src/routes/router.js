@@ -188,7 +188,7 @@ router.post('/post', (req, res) => {
 // test: curl -X POST http://localhost/post/1/like
 router.post('/post/:id/like', (req, res) => {
   const postId = req.params.id;
-  const userId = "dsfjklsdfj";
+  const userId = req.session.userId;
   const result = incrementLikes(postId, userId)
   res.redirect(`/?result=${result}`); // TODO: avoid reload
 });

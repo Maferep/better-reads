@@ -29,6 +29,7 @@ function initDb() {
   createBookStatesDb(db);
   createPostDatabase(db);
   createCommentDb(db);
+  createLikeDb(db);
 
   // create posts database
 }
@@ -222,6 +223,38 @@ function createCommentDb(db) {
   }
 }
 
+function createLikeDb(db) {
+  /*
+  */
+
+  const MAX_COMMENT_LENGTH = 50000
+  const stmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS likes (
+      id INTEGER PRIMARY KEY,
+      post_id INTEGER,
+      user_id INTEGER,
+      date TEXT,
+      FOREIGN KEY(post_id) REFERENCES posts(id),
+      FOREIGN KEY(user_id) REFERENCES insecure_users(id))`
+  ).run();
+  
+  let count = 'SELECT COUNT(*) FROM likes'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_likes = db.prepare(
+      `INSERT INTO likes (
+          post_id, user_id, date
+       ) VALUES (?,?,DateTime('now'))`
+    );
+
+    insert_likes.run(
+      1,
+      20000000
+    );
+  }
+}
+
 function createReviewDb(db) {
   // add pragma foreign keys
   db.pragma("foreign_keys = ON");
@@ -388,18 +421,37 @@ function fetchPosts() {
   return rows;
 }
 
-function incrementLikes(postId, userId) {
+function incrementLikes(postId, userId) { // TODO: run inside transaction to ensure correctness
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
-  const info = db.prepare(operation).run(postId);
-  console.log("LIKE INCREMENT WAS ATTEMPTED:")
-  console.log(info.changes)
-  if(!(info.changes > 0)) {
-    return "fail"
+  // check post already liked
+  const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
+  let id = findLike.get(postId, userId);
+  if (id == undefined) {
+    // add to db
+      const addLike = db.prepare(`INSERT INTO likes (
+        post_id, user_id, date
+    ) VALUES (?,?,DateTime('now'))`);
+
+    let info = addLike.run(postId, userId);
+    console.log(info.changes)
+    if(!(info.changes > 0)) {
+      return "fail to add like"
+    }
+
+    // increment counter
+    const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
+    info = db.prepare(operation).run(postId);
+    console.log("LIKE INCREMENT WAS ATTEMPTED:")
+    console.log(info.changes)
+    if(!(info.changes > 0)) {
+    return "fail to increment"
+    } else {
+    return "success to increment"
+    }
   } else {
-    return "success"
+    console.log(`Like already exists for ${post_id}`);
   }
 }
 
