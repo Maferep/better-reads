@@ -114,11 +114,13 @@ function createBookDb(db, datasetPath) {
     );
     insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
     loadFromCSV(datasetPath, (books) => {
+      let id = 0
 
       // Populate the database with data from the CSV file
       for (const book of books) {
+        id += 1;
         insert_books.run(
-          randomInt(99999999), // Random ID for each book
+          id,
           book["Title"], 
           book["description"], 
           book["isbn"],
