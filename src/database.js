@@ -333,10 +333,19 @@ function createPost(userId, content, topic) {
   );
 }
 
-function incrementLikes(userId, postId) {
-  const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=postId`
-  db.prepare(operation).run();
-  
+function incrementLikes(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
+  const info = db.prepare(operation).run(postId);
+  console.log("LIKE INCREMENT WAS ATTEMPTED:")
+  console.log(info.changes)
+  if(!(info.changes > 0)) {
+    return "fail"
+  } else {
+    return "success"
+  }
 }
 
 function searchBooks(query, limit, offset) {
@@ -370,4 +379,5 @@ export {
   fetchBookState,
   createPost,
   searchBooks,
+  incrementLikes
 };
