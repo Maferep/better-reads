@@ -193,6 +193,15 @@ router.post('/post/:id/like', isAuthenticated, (req, res) => {
   res.redirect(`/?result=${result}`); // TODO: avoid reload
 });
 
+// Endpoint for checking if user likes a post
+router.get('/post/:id/like', isAuthenticated, (req, res) => {
+  const postId = req.params.id;
+  const userId = req.session.userId;
+  const result = hasLiked(postId, userId)
+  res.redirect(`/?result=${result}`); // TODO: avoid reload
+});
+
+
 
 
 router.use(authRouter)

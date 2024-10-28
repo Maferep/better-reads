@@ -15,13 +15,6 @@ function initDb() {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   }); // create if no connection found
-  console.log("pre insecure users");
-  const db_stmt =
-    "CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))";
-  console.log("post insecure users");
-  db.prepare(db_stmt).run();
-  console.log(db_stmt);
-
   createInsecureUsersDatabase(db);
   createBookDb(db, "./database_files/books_data.csv");
 
@@ -36,7 +29,7 @@ function initDb() {
 
 // this database stores passwords in plain text!
 function createInsecureUsersDatabase(db) {
-  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))';
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
@@ -89,9 +82,9 @@ function createBookDb(db, datasetPath) {
   // Create or modify the table structure to include authors, genres, and image fields.
   db.prepare(
     `CREATE TABLE IF NOT EXISTS books (
-      id INTEGER PRIMARY KEY, 
-      book_name TEXT UNIQUE, 
-      description TEXT, 
+      id INTEGER PRIMARY KEY NOT NULL, 
+      book_name TEXT UNIQUE NOT NULL, 
+      description TEXT  NOT NULL, 
       isbn TEXT, 
       authors TEXT,
       genre TEXT,
@@ -156,12 +149,12 @@ function createPostDatabase(db) {
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY,
-      author_id int,
-      book_id int,
-      text_content TEXT,
-      date TEXT,
-      likes int,
+      id INTEGER PRIMARY KEY  NOT NULL,
+      author_id int NOT NULL,
+      book_id int NOT NULL,
+      text_content TEXT  NOT NULL,
+      date TEXT NOT NULL,
+      likes int NOT NULL,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
@@ -196,11 +189,11 @@ function createCommentDb(db) {
   const MAX_COMMENT_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS comments (
-      id INTEGER PRIMARY KEY,
-      parent INTEGER,
-      text_content TEXT,
-      date TEXT,
-      likes int,
+      id INTEGER PRIMARY KEY NOT NULL,
+      parent INTEGER NOT NULL,
+      text_content TEXT NOT NULL,
+      date TEXT NOT NULL,
+      likes int NOT NULL,
       FOREIGN KEY(parent) REFERENCES posts(id))`
   ).run();
   
@@ -230,10 +223,10 @@ function createLikeDb(db) {
   const MAX_COMMENT_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS likes (
-      id INTEGER PRIMARY KEY,
-      post_id INTEGER,
-      user_id INTEGER,
-      date TEXT,
+      id INTEGER PRIMARY KEY NOT NULL,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      date TEXT NOT NULL,
       FOREIGN KEY(post_id) REFERENCES posts(id),
       FOREIGN KEY(user_id) REFERENCES insecure_users(id))`
   ).run();
@@ -454,6 +447,21 @@ function incrementLikes(postId, userId) { // TODO: run inside transaction to ens
     console.log(`Like already exists for ${post_id}`);
   }
 }
+
+function hasLiked(postId, userId) { // TODO: run inside transaction to ensure correctness
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  // check post already liked
+  const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
+  let id = findLike.get(postId, userId);
+  if (id == undefined) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 
 function searchBooks(query, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
