@@ -2,5 +2,6 @@
 node_modules
 user_uploads
 .ssl
-database_files
+database_files/*
 .vscode
+database_files/books_data.csv

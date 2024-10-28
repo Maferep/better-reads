@@ -202,12 +202,21 @@ router.post('/post', (req, res) => {
 
 // Endpoint for liking a post
 // test: curl -X POST http://localhost/post/1/like
-router.post('/post/:id/like', (req, res) => {
+router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
-  const userId = "dsfjklsdfj";
+  const userId = req.session.userId;
   const result = incrementLikes(postId, userId)
   res.redirect(`/?result=${result}`); // TODO: avoid reload
 });
+
+// Endpoint for checking if user likes a post
+router.get('/post/:id/like', isAuthenticated, (req, res) => {
+  const postId = req.params.id;
+  const userId = req.session.userId;
+  const result = hasLiked(postId, userId)
+  res.redirect(`/?result=${result}`); // TODO: avoid reload
+});
+
 
 
 

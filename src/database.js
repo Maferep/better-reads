@@ -8,32 +8,28 @@ import { start } from "repl";
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
+const TEST_POST_ID = 1;
 
 function initDb() {
   // Create username/password database
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   }); // create if no connection found
-  console.log("pre insecure users");
-  const db_stmt =
-    "CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))";
-  console.log("post insecure users");
-  db.prepare(db_stmt).run();
-  console.log(db_stmt);
-
   createInsecureUsersDatabase(db);
   createBookDb(db, "./database_files/books_data.csv");
 
   createReviewDb(db);
   createBookStatesDb(db);
   createPostDatabase(db);
+  createCommentDb(db);
+  createLikeDb(db);
 
   // create posts database
 }
 
 // this database stores passwords in plain text!
 function createInsecureUsersDatabase(db) {
-  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))';
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
@@ -86,9 +82,9 @@ function createBookDb(db, datasetPath) {
   // Create or modify the table structure to include authors, genres, and image fields.
   db.prepare(
     `CREATE TABLE IF NOT EXISTS books (
-      id INTEGER PRIMARY KEY, 
-      book_name TEXT UNIQUE, 
-      description TEXT, 
+      id INTEGER PRIMARY KEY NOT NULL, 
+      book_name TEXT UNIQUE NOT NULL, 
+      description TEXT  NOT NULL, 
       isbn TEXT, 
       authors TEXT,
       genre TEXT,
@@ -153,12 +149,12 @@ function createPostDatabase(db) {
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS posts (
-      id int PRIMARY KEY,
-      author_id int,
-      book_id int,
-      text_content TEXT,
-      date INTEGER,
-      likes int,
+      id INTEGER PRIMARY KEY  NOT NULL,
+      author_id int NOT NULL,
+      book_id int NOT NULL,
+      text_content TEXT  NOT NULL,
+      date INTEGER NOT NULL,
+      likes int NOT NULL,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
@@ -198,6 +194,71 @@ function sleepFor(sleepDuration){
   }
 }
 
+function createCommentDb(db) {
+  /*
+  */
+
+  const MAX_COMMENT_LENGTH = 50000
+  const stmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY NOT NULL,
+      parent INTEGER NOT NULL,
+      text_content TEXT NOT NULL,
+      date TEXT NOT NULL,
+      likes int NOT NULL,
+      FOREIGN KEY(parent) REFERENCES posts(id))`
+  ).run();
+  
+  // create comment
+  
+  let count = 'SELECT COUNT(*) FROM comments'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_comments = db.prepare(
+      `INSERT INTO comments (
+          parent, text_content, date, likes
+       ) VALUES (?,?,DateTime('now'), 0)`
+    );
+
+    insert_comments.run(
+      1, 
+      "This post is rubbish mate"
+    );
+  }
+}
+
+function createLikeDb(db) {
+  /*
+  */
+
+  const MAX_COMMENT_LENGTH = 50000
+  const stmt = db.prepare(
+    `CREATE TABLE IF NOT EXISTS likes (
+      id INTEGER PRIMARY KEY NOT NULL,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      FOREIGN KEY(post_id) REFERENCES posts(id),
+      FOREIGN KEY(user_id) REFERENCES insecure_users(id))`
+  ).run();
+  
+  let count = 'SELECT COUNT(*) FROM likes'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_likes = db.prepare(
+      `INSERT INTO likes (
+          post_id, user_id, date
+       ) VALUES (?,?,DateTime('now'))`
+    );
+
+    insert_likes.run(
+      1,
+      20000000
+    );
+  }
+}
 
 function createReviewDb(db) {
   // add pragma foreign keys
@@ -398,20 +459,54 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
 }
 
-function incrementLikes(postId, userId) {
+function incrementLikes(postId, userId) { // TODO: run inside transaction to ensure correctness
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
-  const info = db.prepare(operation).run(postId);
-  console.log("LIKE INCREMENT WAS ATTEMPTED:")
-  console.log(info.changes)
-  if(!(info.changes > 0)) {
-    return "fail"
+  // check post already liked
+  const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
+  let id = findLike.get(postId, userId);
+  if (id == undefined) {
+    // add to db
+      const addLike = db.prepare(`INSERT INTO likes (
+        post_id, user_id, date
+    ) VALUES (?,?,DateTime('now'))`);
+
+    let info = addLike.run(postId, userId);
+    console.log(info.changes)
+    if(!(info.changes > 0)) {
+      return "fail to add like"
+    }
+
+    // increment counter
+    const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
+    info = db.prepare(operation).run(postId);
+    console.log("LIKE INCREMENT WAS ATTEMPTED:")
+    console.log(info.changes)
+    if(!(info.changes > 0)) {
+    return "fail to increment"
+    } else {
+    return "success to increment"
+    }
   } else {
-    return "success"
+    console.log(`Like already exists for ${post_id}`);
   }
 }
+
+function hasLiked(postId, userId) { // TODO: run inside transaction to ensure correctness
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  // check post already liked
+  const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
+  let id = findLike.get(postId, userId);
+  if (id == undefined) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 
 function searchBooks(query, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
