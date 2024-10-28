@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState,
-        fetchReviews, userAlreadySubmitedReview, addBookState,
-        createPost, searchBooks, fetchPosts } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -41,7 +39,7 @@ router.get('/browse', async function (req, res) {
   const amount = 10;
   const offset = 0;
 
-  const rows = await searchBooks(searchTerm, amount, offset);
+  const rows = await searchBooks("", amount, offset);
 
   res.render("browse", {
     username: req.session.user,
@@ -129,7 +127,7 @@ router.get('/book/:id', async function (req, res) {
     ratingsMean: meanText,
     bookState: bookState,
   })
-})
+});
 
 router.post('/book/:id/review', (req, res) => {
   try {
@@ -184,7 +182,17 @@ router.post('/post', (req, res) => {
   const topic = req.body.topic;
   createPost(userId, postContent, topic);
   res.redirect('/')
-})
+});
+
+// Endpoint for liking a post
+// test: curl -X POST http://localhost/post/1/like
+router.post('/post/:id/like', (req, res) => {
+  const postId = req.params.id;
+  const userId = "dsfjklsdfj";
+  const result = incrementLikes(postId, userId)
+  res.redirect(`/?result=${result}`); // TODO: avoid reload
+});
+
 
 
 router.use(authRouter)
