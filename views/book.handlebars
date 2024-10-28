@@ -10,8 +10,14 @@
     <div id="logo"><a href="/">Logo!</a></div>
   </div>
   <div id="container">
-    <h1>{{bookName}}</h1>
-    <p>{{bookDescription}}</p>
+    <div class="book-info">
+      <h1>{{bookName}}</h1>
+      <img src={{bookCover}} alt="">
+      <p>Authors: {{bookAuthor}}</p>
+      <p>Genres: {{bookGenre}}</p>
+      <p>{{bookDescription}}</p>
+    </div>
+
     {{#if loggedIn}}
       <div id="bookStateDropdown">
         <label for="bookState">Book State:</label>
