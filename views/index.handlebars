@@ -67,6 +67,11 @@
           </div>
         </div>
         {{/each}}
+        {{#if last_date}}
+        <a href="/?last_date={{last_date}}">Load more posts</a>
+        {{else}}
+        <p>You have reached the bottom! There are no more older posts</p>
+        {{/if}}
         {{else}}
         <p>No posts yet</p>
         {{/if}}

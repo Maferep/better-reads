@@ -1,15 +1,30 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
 
+  if (!req.query.last_date) {
+    req.query.last_date = new Date().toISOString();
+  }
+
+  
+  const desdeFecha = new Date(req.query.last_date);
+
   //Map que convierta posts a un formato usado por el handlebars
-  const posts_raw = fetchPosts();
+  const posts_and_date_raw = fetchPostsAndLastDate(7,desdeFecha);
+
+  console.log(posts_and_date_raw)
+
+  const posts_raw = posts_and_date_raw.rows;
+
+  const last_date = posts_and_date_raw.last_date;
+
+
   const posts_processed = posts_raw.map(post_raw => {
     return {
       username: post_raw.username,
@@ -27,7 +42,8 @@ router.get('/', isAuthenticated, async function (req, res) {
     loggedIn: true, 
     title: "Home page",
     style: "style.css",
-    posts: posts_processed
+    posts: posts_processed,
+    last_date: (last_date.getTime() == 0)? 0 : last_date.toISOString()
    })
 })
 

@@ -4,7 +4,7 @@ import _SqliteStore from "better-sqlite3-session-store";
 import csv from "csv-parser";
 import fs from "fs";
 import axios from "axios";
-import { randomInt } from "crypto";
+import { start } from "repl";
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
@@ -157,7 +157,7 @@ function createPostDatabase(db) {
       author_id int,
       book_id int,
       text_content TEXT,
-      date TEXT,
+      date INTEGER,
       likes int,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
@@ -175,14 +175,26 @@ function createPostDatabase(db) {
     const insert_posts = db.prepare(
       `INSERT INTO posts (
           author_id, book_id, text_content, date, likes
-       ) VALUES (?,?,?,DateTime('now'), 0)`
+       ) VALUES (?,?,?,unixepoch('now'), 0)`
     );
 
-    insert_posts.run(
-      TEST_USER_ID, 
-      TEST_BOOK_ID, 
-      "This is my first post!!!!!!!!!!!!!!"
-    );
+    const insert_many_posts = db.transaction((n) => {
+      for (let i = 0; i < n; i++) {insert_posts.run(TEST_USER_ID, 
+        TEST_BOOK_ID, 
+        `This is my ${i}° post!!!!!!!!!!!!!!`);
+
+        sleepFor(1000)
+      }
+      })
+  
+    insert_many_posts(20)
+  }
+}
+
+function sleepFor(sleepDuration){
+  var now = new Date().getTime();
+  while(new Date().getTime() < now + sleepDuration){ 
+      /* Do nothing */ 
   }
 }
 
@@ -286,8 +298,6 @@ function fetchReviews(bookId, userId = null) {
 
   const rows = db.prepare(fetchReviews).all(bookId, userId);
 
-  console.log(rows);
-
   return rows;
 }
 
@@ -331,7 +341,7 @@ function createPost(userId, content, topic) {
   });
   const operation = /* sql */ `INSERT INTO posts (
         author_id, book_id, text_content, date, likes
-     ) VALUES (?,?,?,DateTime('now'), 0)`
+     ) VALUES (?,?,?,unixepoch('now'), 0)`
   db.prepare(operation).run(
     userId, 
     TEST_BOOK_ID,
@@ -339,18 +349,53 @@ function createPost(userId, content, topic) {
   );
 }
 
-function fetchPosts() {
+function fetchPosts(number_of_posts = -1) {
   //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content FROM posts
+  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
+                          ORDER BY posts.date DESC
+                          LIMIT ?`;
+
+  const rows = db.prepare(query).all(number_of_posts, offset);
+  return rows;
+}
+
+
+function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
+  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  //Fecha del post más reciente que quiero obtener. Como SQLite funcina con segundos, divido por 1000 para obtener segundos desde epoch.
+  const fecha_inicio_query = startDate.valueOf()/1000;
+
+  console.log(fecha_inicio_query)
+
+  //Fecha del post más antiguo que quiero obtener.
+  let fecha_final_query;
+  try {
+    fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(fecha_inicio_query, number_of_posts).date;
+  } catch (e) {
+    // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
+    fecha_final_query = 0;
+  }
+
+  console.log("Fecha inicial", fecha_inicio_query)
+  console.log("Fecha final", fecha_final_query)
+
+  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
+                          JOIN insecure_users ON posts.author_id = insecure_users.id
+                          JOIN books ON posts.book_id = books.id
+                          WHERE ? >= posts.date AND posts.date > ?
                           ORDER BY posts.date DESC;`;
 
-  const rows = db.prepare(query).all();
-  return rows;
+  const rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
+  return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
 }
 
 function incrementLikes(postId, userId) {
@@ -400,5 +445,6 @@ export {
   createPost,
   searchBooks,
   fetchPosts,
-  incrementLikes
+  incrementLikes,
+  fetchPostsAndLastDate
 };
