@@ -17,7 +17,7 @@ function initDb() {
   }); // create if no connection found
   console.log("pre insecure users");
   const db_stmt =
-    "CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))";
+    "CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))";
   console.log("post insecure users");
   db.prepare(db_stmt).run();
   console.log(db_stmt);
@@ -35,7 +35,7 @@ function initDb() {
 
 // this database stores passwords in plain text!
 function createInsecureUsersDatabase(db) {
-  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id int PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))';
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY, username varchar(255) UNIQUE, insecure_password varchar(255))';
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
@@ -149,7 +149,7 @@ function createPostDatabase(db) {
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS posts (
-      id int PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       author_id int,
       book_id int,
       text_content TEXT,
@@ -189,8 +189,8 @@ function createCommentDb(db) {
   const MAX_COMMENT_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS comments (
-      id int PRIMARY KEY,
-      parent int,
+      id INTEGER PRIMARY KEY,
+      parent INTEGER,
       text_content TEXT,
       date TEXT,
       likes int,
@@ -199,19 +199,19 @@ function createCommentDb(db) {
   
   // create comment
   
-  const posts_count = 'SELECT COUNT(*) FROM comments'
-  let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
+  let count = 'SELECT COUNT(*) FROM comments'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
 
   if (count['COUNT(*)'] <= 0) {
-    const insert_posts = db.prepare(
+    const insert_comments = db.prepare(
       `INSERT INTO comments (
           parent, text_content, date, likes
        ) VALUES (?,?,DateTime('now'), 0)`
     );
 
-    insert_posts.run(
+    insert_comments.run(
       1, 
-      "\"This post is rubbish, mate\""
+      "This post is rubbish mate"
     );
   }
 }
