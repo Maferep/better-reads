@@ -9,25 +9,27 @@ import Database from 'better-sqlite3';
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
-  let posts_manual = [{
-    username: "Maleriandro",
-    topic: "The best book ever",
-    content: "This book is the best book ever, I love it so much, I would recommend it to everyone",
-    number_likes: 0,
-    number_reposts: 0,
-    number_comments: 0,
-  }]
 
-  let posts = fetchPosts();
-
-
+  //Map que convierta posts a un formato usado por el handlebars
+  const posts_raw = fetchPosts();
+  const posts_processed = posts_raw.map(post_raw => {
+    return {
+      username: post_raw.username,
+      topic: post_raw.book_name,
+      book_id: post_raw.book_id,
+      content: post_raw.text_content,
+      number_likes: 0,
+      number_reposts: 0,
+      number_comments: 0
+    }})
+ 
 
   res.render("index", { 
     username: req.session.user, 
     loggedIn: true, 
     title: "Home page",
     style: "style.css",
-    posts: posts_manual
+    posts: posts_processed
    })
 })
 

@@ -332,6 +332,20 @@ function createPost(userId, content, topic) {
   );
 }
 
+function fetchPosts() {
+  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content FROM posts
+                          JOIN insecure_users ON posts.author_id = insecure_users.id
+                          JOIN books ON posts.book_id = books.id
+                          ORDER BY posts.date DESC;`;
+
+  const rows = db.prepare(query).all();
+  return rows;
+}
+
 function searchBooks(query, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -363,4 +377,5 @@ export {
   fetchBookState,
   createPost,
   searchBooks,
+  fetchPosts
 };
