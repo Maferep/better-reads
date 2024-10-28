@@ -18,7 +18,7 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
-router.get('/browse', function (req, res) {
+router.get('/browse', async function (req, res) {
   const amount = 10;
   const offset = 0;
 
