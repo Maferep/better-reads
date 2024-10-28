@@ -314,6 +314,12 @@ function createPost(userId, content, topic) {
   );
 }
 
+function incrementLikes(userId, postId) {
+  const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=postId`
+  db.prepare(operation).run();
+  
+}
+
 function searchBooks(query, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
