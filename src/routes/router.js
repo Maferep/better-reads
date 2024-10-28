@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -18,19 +18,32 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
-
 router.get('/browse', function (req, res) {
   const amount = 10;
   const offset = 0;
-  const rows = fetchBooks(amount, offset);
+
+  const rows = await searchBooks(searchTerm, amount, offset);
+
   res.render("browse", {
-    username: req.session.user, 
-    loggedIn: true, 
-    title: "Home page",
+    username: req.session.user,
+    loggedIn: true,
+    title: "Browse Books",
     style: "style.css",
     bookEntries: rows
   });
-})
+});
+
+
+router.get('/browse/search', async function (req, res) {
+  const searchTerm = req.query.search || "";
+  const amount = 10;
+  const offset = 0;
+
+  const rows = await searchBooks(searchTerm, amount, offset);
+  
+
+  res.json({ bookEntries: rows });
+});
 
 router.get('/book/:id', async function (req, res) {
   console.log("entro book")
@@ -143,6 +156,17 @@ router.post('/book/:id/state', (req, res) => {
   const state = req.body.bookState;
   addBookState(bookId, userId, state)
 })
+
+// post a post (not a review) to be shown on the feed
+
+router.post('/post', (req, res) => {
+  const userId = req.session.userId;
+  const postContent = req.body["post-content"];
+  const topic = req.body.topic;
+  createPost(userId, postContent, topic);
+  res.redirect('/')
+})
+
 
 router.use(authRouter)
 export default router;

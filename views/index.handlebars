@@ -33,13 +33,13 @@
 
     <div id="container">
       <div id="new-post">
-        <form>
-          <textarea placeholder="Post your opinion" maxlength="280"></textarea>
-          <select  id="book-selection" required>
+        <form action="/post" method="post">
+          <textarea name="post-content" placeholder="Post your opinion" maxlength="50000" required></textarea>
+          <select id="book-selection" name="topic" required>
             <option value="" disabled selected>Select a book/genre/author</option>
             <option value="1984">1984</option>
-            <option value="Cortázar">Julio Cortázar</option>
-            <option value="Terror">Terror</option>
+            <option value="Farenheit 451">Farenheit 451</option>
+            <option value="Brave New World">Brave New World</option>
           </select>
           <button type="submit">Post</button>
         </form>
