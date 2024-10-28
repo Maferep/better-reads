@@ -116,19 +116,25 @@ function createBookDb(db, datasetPath) {
     );
     insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
     loadFromCSV(datasetPath, (books) => {
+      let id = 0
+
+      const insert_many_books = db.transaction((books) => {
+        for (const book of books) {
+          id += 1;
+          insert_books.run(
+            id,
+            book["Title"], 
+            book["description"], 
+            book["isbn"],
+            JSON.stringify(book["authors"]), // Store authors as a JSON string
+            JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
+            book["image"] // Direct image link
+          );
+        }      
+      })
 
       // Populate the database with data from the CSV file
-      for (const book of books) {
-        insert_books.run(
-          randomInt(99999999), // Random ID for each book
-          book["Title"], 
-          book["description"], 
-          book["isbn"],
-          JSON.stringify(book["authors"]), // Store authors as a JSON string
-          JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
-          book["image"] // Direct image link
-        );
-      }
+      insert_many_books(books);
     });
   } 
 }
@@ -368,6 +374,20 @@ function createPost(userId, content, topic) {
   );
 }
 
+function fetchPosts() {
+  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content FROM posts
+                          JOIN insecure_users ON posts.author_id = insecure_users.id
+                          JOIN books ON posts.book_id = books.id
+                          ORDER BY posts.date DESC;`;
+
+  const rows = db.prepare(query).all();
+  return rows;
+}
+
 function incrementLikes(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -414,5 +434,6 @@ export {
   fetchBookState,
   createPost,
   searchBooks,
+  fetchPosts,
   incrementLikes
 };
