@@ -116,19 +116,23 @@ function createBookDb(db, datasetPath) {
     loadFromCSV(datasetPath, (books) => {
       let id = 0
 
+      const insert_many_books = db.transaction((books) => {
+        for (const book of books) {
+          id += 1;
+          insert_books.run(
+            id,
+            book["Title"], 
+            book["description"], 
+            book["isbn"],
+            JSON.stringify(book["authors"]), // Store authors as a JSON string
+            JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
+            book["image"] // Direct image link
+          );
+        }      
+      })
+
       // Populate the database with data from the CSV file
-      for (const book of books) {
-        id += 1;
-        insert_books.run(
-          id,
-          book["Title"], 
-          book["description"], 
-          book["isbn"],
-          JSON.stringify(book["authors"]), // Store authors as a JSON string
-          JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
-          book["image"] // Direct image link
-        );
-      }
+      insert_many_books(books);
     });
   } 
 }
