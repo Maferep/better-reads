@@ -7,7 +7,7 @@ import axios from "axios";
 import { randomInt } from "crypto";
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
-const TEST_BOOK_ID = 0; // https://www.sqlite.org/autoinc.html
+const TEST_BOOK_ID = 0;
 
 function initDb() {
   // Create username/password database
@@ -134,6 +134,7 @@ function createPostDatabase(db) {
       book_id int,
       text_content TEXT,
       date TEXT,
+      likes int,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
@@ -149,8 +150,8 @@ function createPostDatabase(db) {
   if (count['COUNT(*)'] <= 0) {
     const insert_posts = db.prepare(
       `INSERT INTO posts (
-          author_id, book_id, text_content, date
-       ) VALUES (?,?,?,DateTime('now'))`
+          author_id, book_id, text_content, date, likes
+       ) VALUES (?,?,?,DateTime('now'), 0)`
     );
 
     insert_posts.run(
@@ -304,8 +305,8 @@ function createPost(userId, content, topic) {
     verbose: console.log,
   });
   const operation = /* sql */ `INSERT INTO posts (
-        author_id, book_id, text_content, date
-     ) VALUES (?,?,?,DateTime('now'))`
+        author_id, book_id, text_content, date, likes
+     ) VALUES (?,?,?,DateTime('now'), 0)`
   db.prepare(operation).run(
     userId, 
     TEST_BOOK_ID,
