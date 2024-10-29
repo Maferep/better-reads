@@ -33,6 +33,7 @@ router.get('/', isAuthenticated, async function (req, res) {
     let liked_by_user = hasLiked(post_raw.id, userId);
     console.log(liked_by_user)
     return {
+      post_id: post_raw.id,
       username: post_raw.username,
       topic: post_raw.book_name,
       book_id: post_raw.book_id,
@@ -257,8 +258,15 @@ router.post('/post/:id/comment', (req, res) => {
 router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
   const userId = req.session.userId;
-  const result = incrementLikes(postId, userId)
-  res.redirect(`/?result=${result}`); // TODO: avoid reload
+  const {code, like_count, msg } = incrementLikes(postId, userId)
+  //res.redirect(`/?result=${result}`); // TODO: avoid reload
+
+  const data = {
+    message: msg,
+    like_count: like_count,
+    result: code,
+  };
+  res.json(data);
 });
 
 // Endpoint for checking if user likes a post

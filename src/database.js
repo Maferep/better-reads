@@ -473,16 +473,19 @@ function incrementLikes(postId, userId) { // TODO: run inside transaction to ens
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
+
   // check post already liked
+  const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
   const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
-  let id = findLike.get(postId, userId);
+  let id = findLike.get(postId, userId)
+
   if (id == undefined) {
     // add to db
       const addLike = db.prepare(`INSERT INTO likes (
         post_id, user_id, date
     ) VALUES (?,?,unixepoch('now'))`);
 
-    let info = addLike.run(postId, userId);
+    let info = addLike.run(Number(postId), userId);
     console.log(info.changes)
     if(!(info.changes > 0)) {
       return "fail to add like"
@@ -493,13 +496,28 @@ function incrementLikes(postId, userId) { // TODO: run inside transaction to ens
     info = db.prepare(operation).run(postId);
     console.log("LIKE INCREMENT WAS ATTEMPTED:")
     console.log(info.changes)
+    let like_count = findLikeCount.get(postId);
+
     if(!(info.changes > 0)) {
-    return "fail to increment"
+        return { 
+            code: 500, 
+            like_count: like_count.likes, 
+            msg: "fail to increment" 
+        };
     } else {
-    return "success to increment"
+        return { 
+            code: 200, 
+            like_count: like_count.likes, 
+            msg: "success to increment" 
+        };
     }
   } else {
-    console.log(`Like already exists for ${post_id}`);
+    let like_count = findLikeCount.get(postId);
+    return { 
+        code: 200, 
+        like_count: like_count.likes, 
+        msg: `Like already exists for ${postId}`
+    };
   }
 }
 

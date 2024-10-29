@@ -49,7 +49,7 @@
       <div id="feed">
         {{#if posts}}
         {{#each posts}}
-        <div class="post">
+        <div class="post" post-id="{{post_id}}">
           <div class="user-info">
             <!-- Se tiene que agregar el link personalizado para el usuario de este post -->
             <strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
@@ -59,7 +59,7 @@
           </div>
           <div class="post-actions">
             <div style="display: flex; align-items: center;">
-              <span style="margin-right: 8px;"> {{draw-heart liked_by_user}} {{number_likes}}</span>
+              <a href="#" class="like-button"><span class="like-counter" style="margin-right: 8px;">{{draw-heart liked_by_user}} {{number_likes}}</span></a>
               <span style="margin-right: 8px;">🔁 {{number_reposts}}</span>
               <span style="margin-right: 8px;">📩 {{number_comments}}</span>
             </div>
@@ -76,6 +76,27 @@
         <p>No posts yet</p>
         {{/if}}
       </div>
+      <script>
+        document.getElementById("feed").addEventListener("click", function(event) {
+          if (event.target.closest(".like-button")) {
+            event.preventDefault();
+            const postDiv = event.target.closest(".post");
+            const post_id = postDiv.getAttribute("post-id");
+            const likeCountElement = postDiv.querySelector(".like-counter");
+            console.log(post_id);
+
+            fetch(`http://localhost/post/${post_id}/like`, {
+              method: "POST",
+            })
+            .then(res => {
+              return res.json();
+            })
+            .then(data => {
+              likeCountElement.textContent = `❤️ ${data.like_count}`; // TODO: desacoplar el emoji del contador
+            })
+          }
+        }); 
+      </script>
     </div>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
