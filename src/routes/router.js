@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate, fetchPostAndComments } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate, fetchPostAndComments, createComment } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -235,6 +235,14 @@ router.post('/post', (req, res) => {
   const topic = req.body.topic;
   createPost(userId, postContent, topic);
   res.redirect('/')
+});
+
+router.post('/post/:id/comment', (req, res) => {
+  const postId = req.params.id;
+  const userId = req.session.userId;
+  const commentContent = req.body["comment-content"];
+  createComment(postId, userId, commentContent);
+  res.redirect(`/post/${postId}`);
 });
 
 // Endpoint for liking a post

@@ -539,7 +539,15 @@ function fetchComments(postId) {
   return db.prepare(query_post).all(postId);
 }
 
-
+function createComment(postId, userId, content) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `INSERT INTO comments (
+        parent_post, author_id, text_content, date
+     ) VALUES (?,?,?,unixepoch('now'))`
+  db.prepare(operation).run(postId, userId, content);
+}
 
 
 function searchBooks(query, limit, offset) {
@@ -576,5 +584,6 @@ export {
   fetchPosts,
   incrementLikes,
   fetchPostsAndLastDate,
-  fetchPostAndComments
+  fetchPostAndComments,
+  createComment
 };
