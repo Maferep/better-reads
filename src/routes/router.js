@@ -207,6 +207,7 @@ router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const userId = req.session.userId;
   const {code, like_count, msg } = incrementLikes(postId, userId)
   //res.redirect(`/?result=${result}`); // TODO: avoid reload
+
   const data = {
     message: msg,
     like_count: like_count,

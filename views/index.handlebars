@@ -92,7 +92,7 @@
               return res.json();
             })
             .then(data => {
-              likeCountElement.textContent = data.like_count; // Adjust according to your response structure
+              likeCountElement.textContent = `❤️ ${data.like_count}`; // TODO: desacoplar el emoji del contador
             })
           }
         }); 
