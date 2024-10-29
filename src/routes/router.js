@@ -31,6 +31,7 @@ router.get('/', isAuthenticated, async function (req, res) {
       topic: post_raw.book_name,
       book_id: post_raw.book_id,
       content: post_raw.text_content,
+      post_id: post_raw.id,
       number_likes: 0,
       number_reposts: 0,
       number_comments: 0
