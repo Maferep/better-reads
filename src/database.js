@@ -202,27 +202,29 @@ function createCommentDb(db) {
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY NOT NULL,
-      parent INTEGER NOT NULL,
+      parent_post INTEGER NOT NULL,
+      author_id INTEGER NOT NULL,
       text_content TEXT NOT NULL,
-      date TEXT NOT NULL,
-      likes int NOT NULL,
-      FOREIGN KEY(parent) REFERENCES posts(id))`
+      date INTEGER NOT NULL,
+      FOREIGN KEY(parent_post) REFERENCES posts(id),
+      FOREIGN KEY(author_id) REFERENCES insecure_users(id));`
   ).run();
   
   // create comment
   
-  let count = 'SELECT COUNT(*) FROM comments'
+  let count = 'SELECT COUNT(1) FROM comments'
   count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
 
   if (count['COUNT(*)'] <= 0) {
     const insert_comments = db.prepare(
       `INSERT INTO comments (
-          parent, text_content, date, likes
-       ) VALUES (?,?,DateTime('now'), 0)`
+          parent_post, author_id, text_content, date
+       ) VALUES (?,?,?,unixepoch('now'))`
     );
 
     insert_comments.run(
-      1, 
+      1,
+      20000000, 
       "This post is rubbish mate"
     );
   }
@@ -237,7 +239,7 @@ function createLikeDb(db) {
       id INTEGER PRIMARY KEY NOT NULL,
       post_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
-      date TEXT NOT NULL,
+      date INTEGER NOT NULL,
       FOREIGN KEY(post_id) REFERENCES posts(id),
       FOREIGN KEY(user_id) REFERENCES insecure_users(id))`
   ).run();
@@ -249,7 +251,7 @@ function createLikeDb(db) {
     const insert_likes = db.prepare(
       `INSERT INTO likes (
           post_id, user_id, date
-       ) VALUES (?,?,DateTime('now'))`
+       ) VALUES (?,?,unixepoch('now'))`
     );
 
     insert_likes.run(
@@ -477,7 +479,7 @@ function incrementLikes(postId, userId) { // TODO: run inside transaction to ens
     // add to db
       const addLike = db.prepare(`INSERT INTO likes (
         post_id, user_id, date
-    ) VALUES (?,?,DateTime('now'))`);
+    ) VALUES (?,?,unixepoch('now'))`);
 
     let info = addLike.run(postId, userId);
     console.log(info.changes)
@@ -512,6 +514,46 @@ function hasLiked(postId, userId) { // TODO: run inside transaction to ensure co
   } else {
     return true;
   }
+}
+
+function fetchPostAndComments(postId) {
+  const post = fetchPost(postId);
+  const comments = fetchComments(postId);
+  return { post, comments };
+}
+
+function fetchPost(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query_post = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
+                          JOIN insecure_users ON posts.author_id = insecure_users.id
+                          JOIN books ON posts.book_id = books.id
+                          WHERE posts.id = ?`;
+
+  return db.prepare(query_post).get(postId);
+}
+
+function fetchComments(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query_post = /* sql */ `SELECT comments.id, insecure_users.id as user_id, insecure_users.username, comments.text_content, comments.date FROM comments
+                          JOIN insecure_users ON comments.author_id = insecure_users.id
+                          WHERE comments.parent_post = ?
+                          ORDER BY comments.date ASC`;
+
+  return db.prepare(query_post).all(postId);
+}
+
+function createComment(postId, userId, content) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `INSERT INTO comments (
+        parent_post, author_id, text_content, date
+     ) VALUES (?,?,?,unixepoch('now'))`
+  db.prepare(operation).run(postId, userId, content);
 }
 
 
@@ -549,5 +591,7 @@ export {
   fetchPosts,
   incrementLikes,
   fetchPostsAndLastDate,
+  fetchPostAndComments,
+  createComment,
   hasLiked
 };

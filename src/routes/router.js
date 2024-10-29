@@ -1,7 +1,11 @@
 import { Router } from 'express';
-import { isAuthenticated } from '../authenticate.js';
+import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate, hasLiked } from '../database.js';
+import { addReview, fetchBook, fetchBooks,
+  fetchBookState, fetchReviews, userAlreadySubmitedReview,
+  addBookState, createPost, searchBooks,fetchPosts,
+  incrementLikes, fetchPostsAndLastDate,
+  fetchPostAndComments, createComment, hasLiked } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -33,6 +37,7 @@ router.get('/', isAuthenticated, async function (req, res) {
       topic: post_raw.book_name,
       book_id: post_raw.book_id,
       content: post_raw.text_content,
+      post_id: post_raw.id,
       number_likes: post_raw.likes,
       number_reposts: 0,
       number_comments: 0,
@@ -113,7 +118,7 @@ router.get('/book/:id', async function (req, res) {
   const meanText = (mean * 20).toString()
 
   
-  const estaAutenticado = Boolean(req.session.user);
+  const estaAutenticadoBool = estaAutenticado(req);
 
   //El libro con tal id no existe
   if (bookRow == null) {
@@ -133,8 +138,8 @@ router.get('/book/:id', async function (req, res) {
 
   res.render("book", {
     username: req.session.user,
-    loggedIn: estaAutenticado,
-    allowReview: estaAutenticado && !userSubmittedReview,
+    loggedIn: estaAutenticadoBool,
+    allowReview: estaAutenticadoBool && !userSubmittedReview,
     bookName: bookRow.book_name,
     bookDescription: bookRow.description,
     bookAuthor: authors, // Cambiado a authors
@@ -193,14 +198,58 @@ router.post('/book/:id/state', (req, res) => {
   addBookState(bookId, userId, state)
 })
 
-// post a post (not a review) to be shown on the feed
 
+router.get('/post/:id', (req, res) => {
+  const postId = req.params.id;
+  const postAndCommentsRaw = fetchPostAndComments(postId);
+  const postRaw = postAndCommentsRaw.post;
+  const commentsRaw = postAndCommentsRaw.comments;
+
+  console.log(postAndCommentsRaw)
+
+  //Map commentsRaw to cooments, where each ends up as {username, content}
+  const comments = commentsRaw.map(comment => {
+    return {
+      username_comment: comment.username,
+      content: comment.text_content
+    }})
+
+  // console.log(postAndCommentsRaw)
+
+  const estaAutenticadoBool = estaAutenticado(req);
+
+  console.log(postRaw.book_id)
+
+  res.render('post', {
+    username: req.session.user,
+    loggedIn: estaAutenticadoBool,
+    username_post: postRaw.username,
+    book_id: postRaw.book_id,
+    topic: postRaw.book_name,
+    content: postRaw.text_content,
+    number_likes: 0,
+    number_reposts: 0,
+    number_comments: commentsRaw.length,
+    comments: comments,
+    idPost: postId
+  });
+});
+
+// post a post (not a review) to be shown on the feed
 router.post('/post', (req, res) => {
   const userId = req.session.userId;
   const postContent = req.body["post-content"];
   const topic = req.body.topic;
   createPost(userId, postContent, topic);
   res.redirect('/')
+});
+
+router.post('/post/:id/comment', (req, res) => {
+  const postId = req.params.id;
+  const userId = req.session.userId;
+  const commentContent = req.body["comment-content"];
+  createComment(postId, userId, commentContent);
+  res.redirect(`/post/${postId}`);
 });
 
 // Endpoint for liking a post

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post and Comments</title>
+  <link rel="stylesheet" href="/post.css">
+</head>
+<body>
+  <div id="navbar">
+    <div id="logo"><a href="/">Better Reads</a></div>
+    <div class="user-actions">
+      {{#if loggedIn}}
+      <a href="/logout">Logout</a>
+      <a href="/profile">Hello, {{username}}</a>
+      {{else}}
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+      {{/if}}
+    </div>
+  </div>
+
+  <div id="main-layout">
+    <div id="container">
+      
+      <button id="back-to-feed" onclick="history.back()">⬅️ Back to Feed</button>
+
+      <!-- Single Post -->
+      <div class="post">
+        <div class="user-info">
+          <strong>@{{username_post}}</strong> on <a href="/book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
+        </div>
+        <div class="review">
+          {{content}}
+        </div>
+        <div class="post-actions">
+          <span>❤️ {{number_likes}}</span>
+          <span>🔁 {{number_reposts}}</span>
+          <span>📩 {{number_comments}}</span>
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div id="comments-section">
+        <h2>Comments</h2>
+        {{#if comments}}
+        {{#each comments}}
+        <!-- Existing Comment -->
+        <div class="comment">
+          <div class="comment-user">
+            <strong>@{{username_comment}}</strong>:
+          </div>
+          <div class="comment-content">
+            {{content}}
+          </div>
+        </div>
+        
+        {{/each}}
+        {{else}}
+        <p>No comments yet. Add one yourself!</p>
+        {{/if}}
+        {{#if loggedIn}}
+        <!-- New Comment Form -->
+        <form id="new-comment-form" action="/post/{{idPost}}/comment" method="post">
+          <textarea name="comment-content" placeholder="Add a comment..." required></textarea>
+          <button type="submit">Post Comment</button>
+        </form>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
