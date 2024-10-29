@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate, fetchPostAndComments, createComment } from '../database.js';
+import { addReview, fetchBook, fetchBooks,
+  fetchBookState, fetchReviews, userAlreadySubmitedReview,
+  addBookState, createPost, searchBooks,fetchPosts,
+  incrementLikes, fetchPostsAndLastDate,
+  fetchPostAndComments, createComment } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();

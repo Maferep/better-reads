@@ -141,3 +141,20 @@ body {
     }
   }
   
+
+  #back-to-feed {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  #back-to-feed:hover {
+    background-color: #005f8a;
+  }
