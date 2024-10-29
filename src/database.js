@@ -499,18 +499,18 @@ function incrementLikes(postId, userId) {
     info = db.prepare(operation).run(postId);
     console.log("LIKE INCREMENT WAS ATTEMPTED:")
     console.log(info.changes)
-    let like_count = findLikeCount.get(postId);
+    let like_count = findLikeCount.get(postId).likes;
 
     if(!(info.changes > 0)) {
         return { 
             code: 500, 
-            like_count: like_count.likes, 
+            like_count: like_count, 
             msg: "fail to increment" 
         };
     } else {
         return { 
             code: 200, 
-            like_count: like_count.likes, 
+            like_count: like_count, 
             msg: "success to increment" 
         };
     }
@@ -518,7 +518,7 @@ function incrementLikes(postId, userId) {
     let like_count = findLikeCount.get(postId);
     return { 
         code: 200, 
-        like_count: like_count.likes, 
+        like_count: like_count, 
         msg: `Like already exists for ${postId}`
     };
   }
@@ -536,13 +536,13 @@ function decrementLikes(postId, userId) {
   // check post already liked
   const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
   const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
-  let id = findLike.get(postId, userId)
+  let id = findLike.get(postId, userId).id;
 
   if (id != undefined) {
     // remove from db
-      const addLike = db.prepare(`DELETE likes WHERE id=?`);
-
-    let info = addLike.run(id);
+    const delLike = db.prepare(`DELETE FROM likes WHERE id=?`);
+    console.log("ID ", id);
+    let info = delLike.run(id);
     console.log(info.changes)
     if(!(info.changes > 0)) {
       return "fail to remove like"

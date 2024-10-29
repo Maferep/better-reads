@@ -4,7 +4,7 @@ import authRouter from './authRouter.js';
 import { addReview, fetchBook, fetchBooks,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
   addBookState, createPost, searchBooks,fetchPosts,
-  incrementLikes, fetchPostsAndLastDate,
+  incrementLikes, decrementLikes, fetchPostsAndLastDate,
   fetchPostAndComments, createComment, hasLiked } from '../database.js';
 import Database from 'better-sqlite3';
 
@@ -258,8 +258,8 @@ router.post('/post/:id/comment', (req, res) => {
 router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
   const userId = req.session.userId;
+  // TODO: fetch like count should be a separate method
   const {code, like_count, msg } = incrementLikes(postId, userId)
-  //res.redirect(`/?result=${result}`); // TODO: avoid reload
 
   const data = {
     message: msg,
@@ -289,7 +289,10 @@ router.get('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
   const userId = req.session.userId;
   const result = hasLiked(postId, userId)
-  res.redirect(`/?result=${result}`); // TODO: avoid reload
+  //res.redirect(`/?result=${result}`); // TODO: avoid reload
+  res.json({
+    liked: result,
+  });
 });
 
 

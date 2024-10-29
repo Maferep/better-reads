@@ -83,17 +83,38 @@
             const postDiv = event.target.closest(".post");
             const post_id = postDiv.getAttribute("post-id");
             const likeCountElement = postDiv.querySelector(".like-counter");
-            console.log(post_id);
 
             fetch(`http://localhost/post/${post_id}/like`, {
-              method: "POST",
+              method: "GET",
             })
             .then(res => {
               return res.json();
             })
             .then(data => {
-              likeCountElement.textContent = `❤️ ${data.like_count}`; // TODO: desacoplar el emoji del contador
+              if (data.liked == true) {
+                fetch(`http://localhost/post/${post_id}/unlike`, {
+                  method: "POST",
+                })
+                .then(res => {
+                  return res.json();
+                })
+                .then(data => {
+                  likeCountElement.textContent = `🤍 ${data.like_count}`; // TODO: desacoplar el emoji del contador
+                })
+
+              } else if (data.liked == false) {
+                fetch(`http://localhost/post/${post_id}/like`, {
+                  method: "POST",
+                })
+                .then(res => {
+                  return res.json();
+                })
+                .then(data => {
+                  likeCountElement.textContent = `❤️ ${data.like_count}`; // TODO: desacoplar el emoji del contador
+                })
+              }
             })
+
           }
         }); 
       </script>
