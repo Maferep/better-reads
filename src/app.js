@@ -5,6 +5,8 @@ import { initDb, initSessions } from "./database.js";
 import handlebars from "express-handlebars";
 import router from "./routes/router.js"
 
+
+
 // database
 initDb()
 

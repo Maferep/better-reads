@@ -24,9 +24,9 @@ router.get('/', isAuthenticated, async function (req, res) {
 
   const last_date = posts_and_date_raw.last_date;
 
-
   const posts_processed = posts_raw.map(post_raw => {
     return {
+      post_id: post_raw.id,
       username: post_raw.username,
       topic: post_raw.book_name,
       book_id: post_raw.book_id,

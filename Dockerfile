@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install 
 
-COPY ./views ./views
+#COPY ./views ./views
 COPY ./static ./static
 
 RUN mkdir ./database_files
@@ -26,6 +26,7 @@ CMD ["npm", "run", "dev"]
 
 # production 
 FROM base AS prod
+COPY ./views /app/views
 COPY ./src /app/src
 
 CMD ["npm", "run", "prod"]
