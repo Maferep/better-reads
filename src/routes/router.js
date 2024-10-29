@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
 import authRouter from './authRouter.js';
-import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate } from '../database.js';
+import { addReview, fetchBook, fetchBooks, fetchBookState, fetchReviews, userAlreadySubmitedReview, addBookState, createPost, searchBooks,fetchPosts, incrementLikes, fetchPostsAndLastDate, hasLiked } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
+  const userId = req.session.userId;
 
   if (!req.query.last_date) {
     req.query.last_date = new Date().toISOString();
@@ -24,8 +25,9 @@ router.get('/', isAuthenticated, async function (req, res) {
 
   const last_date = posts_and_date_raw.last_date;
 
-
   const posts_processed = posts_raw.map(post_raw => {
+    let liked_by_user = hasLiked(post_raw.id, userId);
+    console.log(liked_by_user)
     return {
       username: post_raw.username,
       topic: post_raw.book_name,
@@ -34,7 +36,7 @@ router.get('/', isAuthenticated, async function (req, res) {
       number_likes: post_raw.likes,
       number_reposts: 0,
       number_comments: 0,
-      liked_by_user: false
+      liked_by_user
     }})
  
 

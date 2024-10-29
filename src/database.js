@@ -231,7 +231,6 @@ function createCommentDb(db) {
 function createLikeDb(db) {
   /*
   */
-
   const MAX_COMMENT_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS likes (
@@ -549,5 +548,6 @@ export {
   searchBooks,
   fetchPosts,
   incrementLikes,
-  fetchPostsAndLastDate
+  fetchPostsAndLastDate,
+  hasLiked
 };
