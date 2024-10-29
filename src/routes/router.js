@@ -205,8 +205,14 @@ router.post('/post', (req, res) => {
 router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
   const userId = req.session.userId;
-  const result = incrementLikes(postId, userId)
-  res.redirect(`/?result=${result}`); // TODO: avoid reload
+  const {code, like_count, msg } = incrementLikes(postId, userId)
+  //res.redirect(`/?result=${result}`); // TODO: avoid reload
+  const data = {
+    message: msg,
+    like_count: like_count,
+    result: code,
+  };
+  res.json(data);
 });
 
 // Endpoint for checking if user likes a post

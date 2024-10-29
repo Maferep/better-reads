@@ -48,7 +48,7 @@
       <div id="feed">
         {{#if posts}}
         {{#each posts}}
-        <div class="post" post-id={{post_id}}>
+        <div class="post" post-id="{{post_id}}">
           <div class="user-info">
             <!-- Se tiene que agregar el link personalizado para el usuario de este post -->
             <strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
@@ -87,24 +87,13 @@
 
             fetch(`http://localhost/post/${post_id}/like`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
             })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-              return response.json();
+            .then(res => {
+              return res.json();
             })
             .then(data => {
-              console.log("Request was successful", data);
-              // Update the number of likes based on the response
-              likeCountElement.textContent = data.new_likes; // Adjust according to your response structure
+              likeCountElement.textContent = data.like_count; // Adjust according to your response structure
             })
-            .catch(error => {
-              console.error("Like Error:", error);
-            });
           }
         }); 
       </script>
