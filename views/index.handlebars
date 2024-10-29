@@ -3,6 +3,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Better Reads - Book Opinions</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/style_prototype.css">
 </head>
 <body>
@@ -34,12 +35,12 @@
     <div id="container">
       <div id="new-post">
         <form action="/post" method="post">
-          <textarea name="post-content" placeholder="Post your opinion" maxlength="50000" required></textarea>
-          <select id="book-selection" name="topic" required>
-            <option value="" disabled selected>Select a book/genre/author</option>
-            <option value="1984">1984</option>
-            <option value="Farenheit 451">Farenheit 451</option>
-            <option value="Brave New World">Brave New World</option>
+          <textarea name="post-content" placeholder="Post your opinion" maxlength="50000" required></textarea>  
+          <select name="book" id="book-select" style="width: 100%;">
+            <option value="">-- Select a book --</option>
+             {{#each bookEntries}}
+             <option value="{{this.id}}">{{this.book_name}}</option>
+            {{/each}}
           </select>
           <button type="submit">Post</button>
         </form>
@@ -76,6 +77,34 @@
         {{/if}}
       </div>
     </div>
-
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function() {
+  $('#book-select').select2({
+    placeholder: "-- Select a book --",
+    ajax: {
+      url: '/browse/search',
+      dataType: 'json',
+      delay: 300,
+      data: function(params) {
+        return {
+          search: params.term 
+        };
+      },
+      processResults: function(data) {
+        return {
+          results: data.bookEntries.map(book => ({
+            id: book.id,
+            text: book.book_name
+          }))
+        };
+      },
+      cache: true
+    }
+  });
+});
+   
+  </script>
 </body>
 </html>
