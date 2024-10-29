@@ -3,10 +3,12 @@ import Database from 'better-sqlite3';
 // middleware to test if authenticated
 export function isAuthenticated (req, res, next) {
   console.log("Checking authentication", req.session)
-  if (req.session.user &&
-      req.session.userId &&
-      estaEnBaseDeDatosUsuarios(req.session.userId, req.session.user)) next()
+  if (estaAutenticado(req)) next()
     else next('route')
+}
+
+export function estaAutenticado(req) {
+  return req.session.user && req.session.userId && estaEnBaseDeDatosUsuarios(req.session.userId, req.session.user);
 }
 
 function estaEnBaseDeDatosUsuarios(userId, username) {
