@@ -408,7 +408,7 @@ function createPost(userId, content, topic) {
   db.prepare(operation).run(
     userId, 
     bookId,
-    "About ''''" + topic + "'''': " + content
+    content
   );
 }
 
