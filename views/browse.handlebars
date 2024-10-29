@@ -38,7 +38,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script>
     $(document).ready(function() {
-      $('#book-select').select2({
+  $('#book-select').select2({
     placeholder: "-- Select a book --",
     ajax: {
       url: '/browse/search',
@@ -61,7 +61,6 @@
     }
   });
 });
-
     function redirectToBook(event) {
       event.preventDefault(); 
       const select = document.getElementById('book-select');
