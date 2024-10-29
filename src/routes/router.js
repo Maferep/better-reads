@@ -239,7 +239,7 @@ router.get('/post/:id', (req, res) => {
 router.post('/post', (req, res) => {
   const userId = req.session.userId;
   const postContent = req.body["post-content"];
-  const topic = req.body.topic; // this will now be a user id
+  const topic = req.body.book; // this will now be a user id
   createPost(userId, postContent, topic);
   res.redirect('/')
 });
