@@ -473,6 +473,13 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
 // Return error / info instead
 // TODO: run inside transaction to ensure correctness
 function incrementLikes(postId, userId) {
+  if (!Number.isInteger(postId)) {
+    return { 
+      code: 500, 
+      like_count: 0, 
+      msg: "fail to increment" 
+  };
+  }
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });

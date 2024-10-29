@@ -220,6 +220,7 @@ router.get('/post/:id', (req, res) => {
   const estaAutenticadoBool = estaAutenticado(req);
 
   console.log(postRaw.book_id)
+  let liked_by_user = estaAutenticadoBool ? hasLiked(postRaw.id, req.session.userId) : false;
 
   res.render('post', {
     username: req.session.user,
@@ -232,7 +233,8 @@ router.get('/post/:id', (req, res) => {
     number_reposts: 0,
     number_comments: commentsRaw.length,
     comments: comments,
-    idPost: postId
+    post_id: postId,
+    liked_by_user
   });
 });
 
@@ -258,15 +260,29 @@ router.post('/post/:id/comment', (req, res) => {
 router.post('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;
   const userId = req.session.userId;
-  // TODO: fetch like count should be a separate method
-  const {code, like_count, msg } = incrementLikes(postId, userId)
-
-  const data = {
-    message: msg,
-    like_count: like_count,
-    result: code,
-  };
-  res.json(data);
+  console.log(postId)
+  console.log((postId))
+  if (postId != "null") {
+    // TODO: fetch like count should be a separate method
+    const {code, like_count, msg } = incrementLikes(postId, userId)
+    const data = {
+      message: msg,
+      like_count: like_count,
+      result: code,
+    };
+    res.json(data);
+  } else {
+    const code = 500;
+    const like_count = 0;
+    const msg = "bad post id";
+    const data = {
+      message: msg,
+      like_count: like_count,
+      result: code,
+    };
+    res.json(data);
+  }
+  
 });
 
 // Endpoint for liking a post
