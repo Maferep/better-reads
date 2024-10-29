@@ -398,6 +398,7 @@ function addBookState(bookId, userId, state) {
 
 // TODO: ui needs to only let you talk about specific books so we can use a valid book id
 function createPost(userId, content, topic) {
+  const bookId = topic // in the future, a topic can be an author or book chapter
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
@@ -406,7 +407,7 @@ function createPost(userId, content, topic) {
      ) VALUES (?,?,?,unixepoch('now'), 0)`
   db.prepare(operation).run(
     userId, 
-    TEST_BOOK_ID,
+    bookId,
     "About ''''" + topic + "'''': " + content
   );
 }
