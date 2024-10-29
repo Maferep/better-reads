@@ -20,6 +20,9 @@ hbs.handlebars.registerHelper('eq', function(a, b) {
     return a === b;
 });
 
+hbs.handlebars.registerHelper('draw-heart', function (userHasLiked) {
+    return userHasLiked ? "❤️" : "🤍"
+});
 
 //Incializamos el motor de plantillas
 app.engine("handlebars", hbs.engine);

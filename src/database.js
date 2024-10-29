@@ -415,7 +415,15 @@ function fetchPosts(number_of_posts = -1) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
+  const query = /* sql */ `SELECT posts.id, 
+                            insecure_users.id as user_id, 
+                            insecure_users.username, 
+                            books.id as book_id, 
+                            books.book_name, 
+                            posts.text_content, 
+                            posts.date, 
+                            posts.likes 
+                          FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
                           ORDER BY posts.date DESC
@@ -449,7 +457,7 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
   console.log("Fecha inicial", fecha_inicio_query)
   console.log("Fecha final", fecha_final_query)
 
-  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
+  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
                           WHERE ? >= posts.date AND posts.date > ?
