@@ -269,6 +269,21 @@ router.post('/post/:id/like', isAuthenticated, (req, res) => {
   res.json(data);
 });
 
+// Endpoint for liking a post
+// test: curl -X POST http://localhost/post/1/like
+router.post('/post/:id/unlike', isAuthenticated, (req, res) => {
+  const postId = req.params.id;
+  const userId = req.session.userId;
+  const {code, like_count, msg } = decrementLikes(postId, userId)
+  
+  const data = {
+    message: msg,
+    like_count: like_count,
+    result: code,
+  };
+  res.json(data);
+});
+
 // Endpoint for checking if user likes a post
 router.get('/post/:id/like', isAuthenticated, (req, res) => {
   const postId = req.params.id;

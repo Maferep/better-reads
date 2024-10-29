@@ -469,7 +469,10 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
 }
 
-function incrementLikes(postId, userId) { // TODO: run inside transaction to ensure correctness
+// TODO: do not return status codes, this should not be handled in the database layer. 
+// Return error / info instead
+// TODO: run inside transaction to ensure correctness
+function incrementLikes(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
@@ -509,6 +512,60 @@ function incrementLikes(postId, userId) { // TODO: run inside transaction to ens
             code: 200, 
             like_count: like_count.likes, 
             msg: "success to increment" 
+        };
+    }
+  } else {
+    let like_count = findLikeCount.get(postId);
+    return { 
+        code: 200, 
+        like_count: like_count.likes, 
+        msg: `Like already exists for ${postId}`
+    };
+  }
+}
+
+
+// TODO: do not return status codes, this should not be handled in the database layer. 
+// Return error / info instead
+// TODO: run inside transaction to ensure correctness
+function decrementLikes(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  // check post already liked
+  const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
+  const findLike = db.prepare(`SELECT id FROM likes WHERE post_id=? AND user_id=?`);
+  let id = findLike.get(postId, userId)
+
+  if (id != undefined) {
+    // remove from db
+      const addLike = db.prepare(`DELETE likes WHERE id=?`);
+
+    let info = addLike.run(id);
+    console.log(info.changes)
+    if(!(info.changes > 0)) {
+      return "fail to remove like"
+    }
+
+    // decrement counter
+    const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)-1) WHERE rowid=? AND posts.likes > 0`
+    info = db.prepare(operation).run(postId);
+    console.log("LIKE INCREMENT WAS ATTEMPTED:")
+    console.log(info.changes)
+    let like_count = findLikeCount.get(postId);
+
+    if(!(info.changes > 0)) {
+        return { 
+            code: 500, 
+            like_count: like_count.likes, 
+            msg: "fail to decrement" 
+        };
+    } else {
+        return { 
+            code: 200, 
+            like_count: like_count.likes, 
+            msg: "success to decrement" 
         };
     }
   } else {
@@ -609,6 +666,7 @@ export {
   searchBooks,
   fetchPosts,
   incrementLikes,
+  decrementLikes,
   fetchPostsAndLastDate,
   fetchPostAndComments,
   createComment,
