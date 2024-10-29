@@ -5,12 +5,13 @@ import { addReview, fetchBook, fetchBooks,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
   addBookState, createPost, searchBooks,fetchPosts,
   incrementLikes, fetchPostsAndLastDate,
-  fetchPostAndComments, createComment } from '../database.js';
+  fetchPostAndComments, createComment, hasLiked } from '../database.js';
 import Database from 'better-sqlite3';
 
 const router = Router();
 
 router.get('/', isAuthenticated, async function (req, res) {
+  const userId = req.session.userId;
 
   if (!req.query.last_date) {
     req.query.last_date = new Date().toISOString();
@@ -28,17 +29,19 @@ router.get('/', isAuthenticated, async function (req, res) {
 
   const last_date = posts_and_date_raw.last_date;
 
-
   const posts_processed = posts_raw.map(post_raw => {
+    let liked_by_user = hasLiked(post_raw.id, userId);
+    console.log(liked_by_user)
     return {
       username: post_raw.username,
       topic: post_raw.book_name,
       book_id: post_raw.book_id,
       content: post_raw.text_content,
       post_id: post_raw.id,
-      number_likes: 0,
+      number_likes: post_raw.likes,
       number_reposts: 0,
-      number_comments: 0
+      number_comments: 0,
+      liked_by_user
     }})
  
 
