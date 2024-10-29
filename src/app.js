@@ -4,7 +4,10 @@ import { argv } from 'node:process';
 import { initDb, initSessions } from "./database.js";
 import handlebars from "express-handlebars";
 import router from "./routes/router.js"
-
+import authRouter from './routes/authRouter.js';
+import bookRouter from './routes/book.router.js';
+import browseRouter from './routes/browse.router.js';
+import postRouter from './routes/post.router.js';
 
 
 // database
@@ -34,7 +37,13 @@ app.set("view engine", "handlebars");
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('static'))
+
+// routes
+app.use(authRouter)
 app.use(router)
+app.use('/browse', browseRouter)
+app.use('/book', bookRouter)
+app.use('/post', postRouter)
 // http
 let serverHttp = http.createServer(app)
 serverHttp.listen(port, () => console.log('Example app is listening on port', port))
