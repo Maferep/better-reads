@@ -609,7 +609,7 @@ function fetchPost(postId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const query_post = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date FROM posts
+  const query_post = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
                           WHERE posts.id = ?`;

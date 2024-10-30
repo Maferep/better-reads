@@ -25,9 +25,7 @@ router.get('/:id', (req, res) => {
   
     const estaAutenticadoBool = estaAutenticado(req);
   
-    console.log(postRaw.book_id)
     let liked_by_user = estaAutenticadoBool ? hasLiked(postRaw.id, req.session.userId) : false;
-  
     res.render('post', {
       username: req.session.user,
       loggedIn: estaAutenticadoBool,
@@ -35,7 +33,7 @@ router.get('/:id', (req, res) => {
       book_id: postRaw.book_id,
       topic: postRaw.book_name,
       content: postRaw.text_content,
-      number_likes: 0,
+      number_likes: postRaw.likes,
       number_reposts: 0,
       number_comments: commentsRaw.length,
       comments: comments,
