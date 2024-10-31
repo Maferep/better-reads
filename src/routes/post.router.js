@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
-  fetchPostAndComments, createComment, hasLiked} from '../database.js';
+  fetchPostAndComments, createComment, hasLiked, getLikes} from '../database.js';
 
 const router = Router();
 
@@ -64,8 +64,7 @@ router.post('/:id/comment', (req, res) => {
 router.post('/:id/like', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
-    console.log(postId)
-    console.log((postId))
+
     if (postId != "null") {
         // TODO: fetch like count should be a separate method
         const {code, like_count, msg } = incrementLikes(postId, userId)
@@ -108,9 +107,11 @@ router.get('/:id/like', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
     const result = hasLiked(postId, userId)
+    const number_of_likes = getLikes(postId)
     //res.redirect(`/?result=${result}`); // TODO: avoid reload
     res.json({
     liked: result,
+    like_count: number_of_likes,
     });
 });
   

@@ -72,6 +72,27 @@
 </body>
 </html>
 
+<script type="module">
+      //Actualiza el contador de likes en la vista de un post
+      async function updateLikes() {
+        const post = document.getElementsByClassName("post")[0]
+        const post_id = post.getAttribute("post-id");
+
+        let response = await fetch(`http://localhost/post/${post_id}/like`, {
+          method: "GET",
+        });
+        let data = await response.json();
+
+        const heartToUse= data.liked ? "❤️" : "🤍";
+        post.querySelector(".like-counter").textContent = `${heartToUse} ${data.like_count}`;
+      }
+
+      //Actualiza el contador de likes en la vista de un post cuando se muestra la pagina
+      window.addEventListener('pageshow', function(event) {
+          updateLikes();
+      });
+</script>
+
 <script>
         document.getElementById("container").addEventListener("click", function(event) {
           if (event.target.closest(".like-button")) {
@@ -88,27 +109,18 @@
             })
             .then(data => {
               if (data.liked == true) {
-                fetch(`http://localhost/post/${post_id}/unlike`, {
+                return fetch(`http://localhost/post/${post_id}/unlike`, {
                   method: "POST",
-                })
-                .then(res => {
-                  return res.json();
-                })
-                .then(data => {
-                  likeCountElement.textContent = `🤍 ${data.like_count}`; // TODO: desacoplar el emoji del contador
                 })
 
               } else if (data.liked == false) {
-                fetch(`http://localhost/post/${post_id}/like`, {
+                return fetch(`http://localhost/post/${post_id}/like`, {
                   method: "POST",
                 })
-                .then(res => {
-                  return res.json();
-                })
-                .then(data => {
-                  likeCountElement.textContent = `❤️ ${data.like_count}`; // TODO: desacoplar el emoji del contador
-                })
               }
+            })
+            .then(res => {
+              updateLikes();
             })
           } else {
             console.log("Not found")

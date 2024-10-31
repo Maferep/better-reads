@@ -599,6 +599,14 @@ function hasLiked(postId, userId) { // TODO: run inside transaction to ensure co
   }
 }
 
+function getLikes(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
+  return findLikeCount.get(postId).likes;
+}
+
 function fetchPostAndComments(postId) {
   const post = fetchPost(postId);
   const comments = fetchComments(postId);
@@ -677,5 +685,6 @@ export {
   fetchPostsAndLastDate,
   fetchPostAndComments,
   createComment,
-  hasLiked
+  hasLiked,
+  getLikes
 };
