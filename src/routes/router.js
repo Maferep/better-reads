@@ -11,11 +11,16 @@ router.get('/', isAuthenticated, async function (req, res) {
     req.query.last_date = new Date().toISOString();
   }
 
+  if (!req.query.book_id) {
+    req.query.book_id = null;
+  }
+
   
   const desdeFecha = new Date(req.query.last_date);
+  const deLibro = req.query.book_id;
 
   //Map que convierta posts a un formato usado por el handlebars
-  const posts_and_date_raw = fetchPostsAndLastDate(7,desdeFecha);
+  const posts_and_date_raw = fetchPostsAndLastDate(7,desdeFecha, deLibro);
 
   console.log(posts_and_date_raw)
 

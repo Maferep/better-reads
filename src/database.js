@@ -436,7 +436,7 @@ function fetchPosts(number_of_posts = -1) {
 }
 
 
-function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
+function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), bookFilter = null) {
   //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -450,7 +450,11 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
   //Fecha del post más antiguo que quiero obtener.
   let fecha_final_query;
   try {
+    if (bookFilter!= null) {
     fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(fecha_inicio_query, number_of_posts).date;
+    } else {
+      fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(bookFilter,fecha_inicio_query, number_of_posts).date;
+    }
   } catch (e) {
     // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
     fecha_final_query = 0;
@@ -459,13 +463,27 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0)) {
   console.log("Fecha inicial", fecha_inicio_query)
   console.log("Fecha final", fecha_final_query)
 
-  const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
-                          JOIN insecure_users ON posts.author_id = insecure_users.id
-                          JOIN books ON posts.book_id = books.id
-                          WHERE ? >= posts.date AND posts.date > ?
-                          ORDER BY posts.date DESC;`;
+  let rows;
 
-  const rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
+  if (bookFilter == null) {
+    
+    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
+                            JOIN insecure_users ON posts.author_id = insecure_users.id
+                            JOIN books ON posts.book_id = books.id
+                            WHERE ? >= posts.date AND posts.date > ? 
+                            ORDER BY posts.date DESC;`;
+
+    rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
+
+  } else {
+    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
+                            JOIN insecure_users ON posts.author_id = insecure_users.id
+                            JOIN books ON posts.book_id = books.id
+                            WHERE books.id = ? AND ? >= posts.date AND posts.date > ? 
+                            ORDER BY posts.date DESC;`;
+
+    rows = db.prepare(query).all(bookFilter, fecha_inicio_query, fecha_final_query);
+  }
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
 }
 
