@@ -51,6 +51,7 @@ body {
 
 #new-post textarea, 
 #new-post select {
+  box-sizing: border-box;
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
@@ -114,10 +115,18 @@ body {
 }
 
 #sidebar {
-  width: 20%;
-  min-width: 120px;
+  width: 10vw;
+  min-width: 10px;
+  height: fit-content;
   background-color: #f4f4f4;
   padding: 20px;
+  position: sticky;
+  top: 0;
+}
+
+#book-cover {
+  width: 100%;
+  border-radius: 5px;
 }
 
 #sidebar ul {
@@ -155,7 +164,25 @@ body {
   max-width: 100%; /* Makes it responsive */
 }
 
-@media (max-width: 768px) {
+#goBackButton {
+  width: 100%;
+  max-width: 150px;
+  padding: 15px;
+  background-color: #1ABC9C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  margin: 10px 0;
+}
+
+#go-back:hover {
+  background-color: #16A085;
+}
+
+@media (max-width: 920px) {
   #main-layout {
     flex-direction: column;
   }
@@ -168,5 +195,12 @@ body {
     width: 100%;
     text-align: center;
     padding: 10px;
+    position: relative;
+  }
+
+  #book-cover {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 5px;
   }
 }

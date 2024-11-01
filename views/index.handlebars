@@ -23,6 +23,14 @@
   <div id="main-layout">
     <!-- Left sidebar -->
     <div id="sidebar">
+      {{!-- Si es feed de libro, se muestra info de libro en vez de menu de navegacion --}}
+    {{#if book}}
+      <a href="/book/{{book.id}}"><button id="goBackButton">Go back to book</button></a>
+      <div id="book-info">
+        <img src="{{book.cover_url}}" alt="Book cover" id="book-cover">
+        <h2>{{book.title}}</h2>
+      </div>
+    {{else}}
       <ul>
         <li><a href="/profile">My User</a></li>
         <li><a href="/browse">Browse</a></li>
@@ -30,18 +38,33 @@
         <li><a href="/favorites">Following</a></li>
         <li><a href="/settings">Settings</a></li>
       </ul>
+    {{/if}}
     </div>
 
     <div id="container">
       <div id="new-post">
         <form action="/post" method="post">
           <textarea name="post-content" placeholder="Post your opinion" maxlength="50000" required></textarea>
+{{!-- Si es feed de libro, existe solo un libro como opcion de publicacion, --}}
+          {{#if book}}
+          <select name="book" style="width: 100%;" disabled>
+            <option selected="true" value="{{book.id}}">{{book.title}}</option>
+          </select>
+          {{!-- Tengo que agregar este input hidden, porque el select esta desactivado, por lo que no se envia --}}
+          <input type="hidden" name="book" value="{{book.id}}" />
+          <input type="hidden" name="goBackToBookFeed" value="true" />
+            {{else}}
+
           <select name="book" id="book-select" style="width: 100%;">
+            
             <option value="">-- Select a book --</option>
-             {{#each bookEntries}}
+            {{#each bookEntries}}
              <option value="{{this.id}}">{{this.book_name}}</option>
             {{/each}}
           </select>
+          {{!-- Envio este parametro para saber que tengo que volver al feed general. --}}
+          <input type="hidden" name="goBackToBookFeed" value="false" />
+            {{/if}}
           <button type="submit">Post</button>
         </form>
       </div>

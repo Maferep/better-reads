@@ -60,6 +60,7 @@ router.get('/:id', async function (req, res) {
       username: req.session.user,
       loggedIn: estaAutenticadoBool,
       allowReview: estaAutenticadoBool && !userSubmittedReview,
+      bookId: bookRow.id,
       bookName: bookRow.book_name,
       bookDescription: bookRow.description,
       bookAuthor: authors, // Cambiado a authors

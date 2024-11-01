@@ -9,6 +9,7 @@
     {{/if}}
     <div id="logo"><a href="/">Logo!</a></div>
   </div>
+  <div id="content">
   <div id="container">
     <div class="book-info">
       <h1>{{bookName}}</h1>
@@ -28,6 +29,7 @@
             <option value="plan-to-read" {{#if (eq bookState 'plan-to-read')}}selected{{/if}}>Plan to Read</option>
         </select>
         <button id="saveStateButton" type="button">Save</button>
+        <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button">See Posts</button></a>
       </div>
     {{/if}}
     {{#if allowReview}}
@@ -107,6 +109,7 @@
     </div>
 
   </div>
+</div>
 </body>
 
 <link

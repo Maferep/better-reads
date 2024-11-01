@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate,hasLiked } from '../database.js';
+import {fetchPostsAndLastDate,hasLiked, fetchBook } from '../database.js';
 
 const router = Router();
 
@@ -43,13 +43,25 @@ router.get('/', isAuthenticated, async function (req, res) {
       number_comments: 0,
       liked_by_user
     }})
- 
+
+    //Poner id, nombre e imagen de libro si bookId no es null
+    let book = null;
+
+    if (deLibro != null) {
+      const book_raw = fetchBook(deLibro)
+      book = {
+        id: book_raw.id,
+        title: book_raw.book_name,
+        cover_url: book_raw.image
+      }
+    }
 
   res.render("index", { 
     username: req.session.user, 
     loggedIn: true, 
     title: "Home page",
     style: "style.css",
+    book: book,
     posts: posts_processed,
     last_date: (last_date.getTime() == 0)? 0 : last_date.toISOString()
    })

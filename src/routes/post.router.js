@@ -48,7 +48,14 @@ router.post('/', (req, res) => {
     const postContent = req.body["post-content"];
     const topic = req.body.book; // this will now be a user id
     createPost(userId, postContent, topic);
-    res.redirect('/')
+    
+    //Quiero saber si tengo que volver al feed de libro, o al feed general.
+    const goBackToBookFeed = req.body.goBackToBookFeed;
+    if (goBackToBookFeed == "true") {
+        res.redirect(`/?book_id=${topic}`);
+    } else {
+        res.redirect('/')
+    }
 });
 
 router.post('/:id/comment', (req, res) => {
