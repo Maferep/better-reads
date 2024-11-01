@@ -12,7 +12,7 @@
   <div id="container">
     <div class="book-info">
       <h1>{{bookName}}</h1>
-      <img src={{bookCover}} alt="">
+      <img id="book-cover" src={{bookCover}} alt="">
       <p>Authors: {{bookAuthor}}</p>
       <p>Genres: {{bookGenre}}</p>
       <p>{{bookDescription}}</p>
@@ -116,6 +116,12 @@
 {{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
 
 <style>
+#book-cover {
+  /* set maximum witdth and hight*/
+  width: 30vw;
+  max-width: 250px;
+}
+
     .ratings {
     position: relative;
     vertical-align: middle;
