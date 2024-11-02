@@ -16,6 +16,7 @@ function initDb() {
     verbose: console.log,
   }); // create if no connection found
   createInsecureUsersDatabase(db);
+  createUserProfileDb(db);
   createBookDb(db, "./database_files/books_data.csv");
 
   createReviewDb(db);
@@ -26,6 +27,18 @@ function initDb() {
 
   // create posts database
 }
+
+function createUserProfileDb(db) {
+  const db_stmt = `CREATE TABLE IF NOT EXISTS user_profiles (
+    user_id INTEGER PRIMARY KEY NOT NULL,
+    bio TEXT,
+    profile_photo TEXT,
+    FOREIGN KEY (user_id) REFERENCES insecure_users(id)
+  )`;
+  db.prepare(db_stmt).run();
+  console.log("Created user_profiles table.");
+}
+
 
 // this database stores passwords in plain text!
 function createInsecureUsersDatabase(db) {
@@ -703,6 +716,18 @@ function getLikedPostsFromUserId(userId){
   return rows;
 }
 
+function getUserProfile(userId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = db.prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+  return stmt.get(userId);
+}
+
+function updateUserProfile(userId, bio, profilePhoto) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = db.prepare("INSERT INTO user_profiles (user_id, bio, profile_photo) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET bio = ?, profile_photo = ?");
+  stmt.run(userId, bio, profilePhoto, bio, profilePhoto);
+}
+
 
 export {
   initDb,
@@ -725,5 +750,7 @@ export {
   hasLiked,
   getLikes,
   getPostsFromUserId,
-  getLikedPostsFromUserId
+  getLikedPostsFromUserId,
+  getUserProfile,
+  updateUserProfile
 };

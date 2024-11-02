@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate,hasLiked, getPostsFromUserId, getLikedPostsFromUserId } from '../database.js';
+import {fetchPostsAndLastDate,hasLiked, getPostsFromUserId, getUserProfile, updateUserProfile } from '../database.js';
+import {uploader} from "../uploader.js";
 
 const router = Router();
 
@@ -60,17 +61,29 @@ router.get('/', function (req, res) {
 })
 
 router.get("/profile", isAuthenticated, function (req, res) {
-
   const posts = getPostsFromUserId(req.session.userId);
-  console.log(posts)
-
+  const userProfile = getUserProfile(req.session.userId); // Obtén la información de perfil
+  console.log(userProfile?.bio, userProfile?.profile_photo);
+  const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   res.render("profile", { 
     username: req.session.user, 
     loggedIn: true, 
     title: "Profile page",
-    posts: posts
-    }
-  )
-})
+    posts: posts,
+    profile_photo: userProfile?.profile_photo,
+    bio: userProfile?.bio,
+    isProfileComplete
+  });
+});
+
+// Ruta para actualizar el perfil y cargar la foto
+router.post("/profile", uploader.single("profile_photo"), function (req, res) {
+  const userId = req.session.userId;
+  const bio = req.body.bio || null;
+  const profilePhoto = req.file ? `/uploads/${req.file.filename}` : null;
+
+  updateUserProfile(userId, bio, profilePhoto);
+  res.redirect("/profile");
+});
 
 export default router;
