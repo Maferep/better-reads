@@ -60,7 +60,7 @@ router.get('/', isAuthenticated, async function (req, res) {
     username: req.session.user, 
     loggedIn: true, 
     title: "Home page",
-    style: "style.css",
+    // style: "style_prototype.css",
     book: book,
     posts: posts_processed,
     last_date: (last_date.getTime() == 0)? 0 : last_date.toISOString()
