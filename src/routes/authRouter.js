@@ -2,66 +2,9 @@ import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { isAuthenticated } from '../authenticate.js';
 import {uploader} from "../uploader.js";
-import {hasLiked, fetchPostsAndLastDate, getPostsFromUserId, getUserProfile, updateUserProfile } from '../database.js';
+import {getPostsFromUserId, getUserProfile, updateUserProfile } from '../database.js';
 
-const authRouter = Router();
-
-authRouter.get('/', isAuthenticated, async function (req, res) {
-  const userId = req.session.userId;
-
-  if (!req.query.last_date) {
-    req.query.last_date = new Date().toISOString();
-  }
-
-  if (!req.query.book_id) {
-    req.query.book_id = null;
-  }
-
-  
-  const desdeFecha = new Date(req.query.last_date);
-  const deLibro = req.query.book_id;
-
-  //Map que convierta posts a un formato usado por el handlebars
-  const posts_and_date_raw = fetchPostsAndLastDate(7,desdeFecha, deLibro);
-
-  console.log(posts_and_date_raw)
-
-  const posts_raw = posts_and_date_raw.rows;
-
-  const last_date = posts_and_date_raw.last_date;
-
-  const posts_processed = posts_raw.map(post_raw => {
-    let liked_by_user = hasLiked(post_raw.id, userId);
-    console.log(liked_by_user)
-    return {
-      post_id: post_raw.id,
-      username: post_raw.username,
-      topic: post_raw.book_name,
-      book_id: post_raw.book_id,
-      content: post_raw.text_content,
-      post_id: post_raw.id,
-      number_likes: post_raw.likes,
-      number_reposts: 0,
-      number_comments: 0,
-      liked_by_user
-    }})
- 
-
-  res.render("index", { 
-    username: req.session.user, 
-    loggedIn: true, 
-    title: "Home page",
-    style: "style_prototype.css",
-    posts: posts_processed,
-    last_date: (last_date.getTime() == 0)? 0 : last_date.toISOString()
-   })
-})
-
-// authRouter.get('/', function (req, res) {
-//   res.redirect('login')
-// })
-
-
+const authRouter = Router()
 
 authRouter.get('/logout', function (req, res, next) {
   // logout logic

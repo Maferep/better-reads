@@ -9,6 +9,7 @@ import browseRouter from './routes/browse.router.js';
 import postRouter from './routes/post.router.js';
 import path from 'path';
 import __dirname from './path.js';
+import router from './routes/router.js';
 
 // database
 initDb()
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use(authRouter)
+app.use(router)
 app.use('/browse', browseRouter)
 app.use('/book', bookRouter)
 app.use('/post', postRouter)
