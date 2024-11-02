@@ -1,11 +1,4 @@
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Reads - Book Opinions</title>
-  <link rel="stylesheet" href="/style_prototype.css">
-</head>
-<body>
+
     <div id="navbar">
         <div id="logo"><a href="/">Better Reads</a></div>
         <div class="user-actions">
@@ -23,7 +16,7 @@
         <h1>Username: {{username}}</h1>
         
         {{#if isProfileComplete}}   
-            <img src={{profile_photo}} alt="Profile Photo">
+            <img src="static/{{profile_photo}}" alt="Profile Photo">
             <div class="bio">
                 <p>{{bio}}</p>
             </div>
@@ -54,5 +47,3 @@
         </div>
     </div>
 
-</body>
-</html>
