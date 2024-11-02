@@ -1,16 +1,16 @@
 
-    <div id="navbar">
-        <div id="logo"><a href="/">Better Reads</a></div>
-        <div class="user-actions">
-        {{#if loggedIn}}
-        <div><a href="/logout">Logout</a></div>
-        <div><a href="/profile">Hello, {{username}}</a></div>
-        {{else}}
-        <div><a href="/login">Login</a></div>
-        <div><a href="/register">Register</a></div>
-        {{/if}}
-        </div>
+  <div id="navbar">
+    <div id="logo"><a href="/">Better Reads</a></div>
+    <div class="user-actions">
+      {{#if loggedIn}}
+      <a href="/logout">Logout</a>
+      <a href="/profile">Hello, {{username}}</a>
+      {{else}}
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+      {{/if}}
     </div>
+  </div>
 
     <div class="profile-container">
         <h1>Username: {{username}}</h1>

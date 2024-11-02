@@ -4,22 +4,56 @@
 
    body {
     color: #01010f;
-    font-family: "Sans";
+    font-family: Arial, sans-serif;
     background-color: #bed3eb;
     margin: 0;
     background-size: 600px 600px;
     background-repeat: repeat;
   }
   
-  a {
-    text-decoration: none;
-    color: lavender;
-  }
+  
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0077b6;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  color: white;
+}
 
-  #logo {
-    margin-left: auto;
-    color: lavender;
-  }
+a {
+  text-decoration: none;
+  color: lavender;
+}
+
+#logo {
+  margin-left: auto;
+  color: lavender;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
+#logo{
+  margin-left: 15px;
+}
+
+#logo a {
+  text-decoration: none;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.user-actions {
+  margin-right: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 20%;
+}
   
   a:hover {
     text-decoration:underline;
@@ -35,26 +69,7 @@
     padding-right: 2vw;
   }
 
-  #navbar {
-    background:  #141540FF;
-    position: fixed;
-    width: 100%;
-    display: flex;
-    z-index: 100;
-    padding-top: 0;
-  }
-  
-  #navbar * {
-    display: inline-block;
-    padding: 1em;
-    padding-top: 0.5em;
-    padding-bottom: 0.4em;
-    font-size: calc(1.7vh + 3px);
-  }
-  
-  #navbar :hover {
-    color: #EEEEFF;
-  }
+
   
   svg {
     position: absolute;
@@ -124,25 +139,7 @@ button:hover {
   font-size: 14px;
 }
 
-#navbar {
-  background: #2C3E50;
-  position: fixed;
-  width: 100%;
-  display: flex;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-#navbar * {
-  display: inline-block;
-  padding: 10px;
-  color: white;
-  font-size: 16px;
-}
-
-#navbar div:hover {
-  color: #1ABC9C;
-}
 
 h1 {
   color: #2C3E50;
