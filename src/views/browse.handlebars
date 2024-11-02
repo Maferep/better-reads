@@ -1,13 +1,5 @@
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}}</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-  <link href="{{style}}" rel="stylesheet" type="text/css" media="all">
-</head>
-<body>
-  <div id="navbar">
+
+  {{!-- <div id="navbar">
     <div id="logo"><a href="/">Logo!</a></div>
     <div id="user-info">
       {{#if loggedIn}}
@@ -17,7 +9,23 @@
         <a href="/login">Login</a>
       {{/if}}
     </div>
+  </div> --}}
+
+<div id="navbar">
+  <div id="logo"><a href="/">Better Reads</a></div>
+  <div class="user-actions">
+    {{#if loggedIn}}
+    <div><a href="/logout">Logout</a></div>
+    <div><a href="/profile">Hello, {{username}}</a></div>
+    {{else}}
+    <div><a href="/login">Login</a></div>
+    <div><a href="/register">Register</a></div>
+    {{/if}}
   </div>
+</div>
+
+
+
   <div id="browse-container">
   <h1>Browse Books</h1>
 
@@ -72,5 +80,3 @@
       }
     }
   </script>
-</body>
-</html>

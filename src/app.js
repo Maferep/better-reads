@@ -3,12 +3,12 @@ import http from 'http';
 import { argv } from 'node:process';
 import { initDb, initSessions } from "./database.js";
 import handlebars from "express-handlebars";
-import router from "./routes/router.js"
 import authRouter from './routes/authRouter.js';
 import bookRouter from './routes/book.router.js';
 import browseRouter from './routes/browse.router.js';
 import postRouter from './routes/post.router.js';
-
+import path from 'path';
+import __dirname from './path.js';
 
 // database
 initDb()
@@ -29,18 +29,16 @@ hbs.handlebars.registerHelper('draw-heart', function (userHasLiked) {
     return userHasLiked ? "❤️" : "🤍"
 });
 
-//Incializamos el motor de plantillas
-app.engine("handlebars", hbs.engine);
-//Establecemos el motor de renderizado
-app.set("view engine", "handlebars");
 
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars'); // Set default view engine
+app.set('views', path.join(__dirname, 'views'));
+app.use('/static',express.static(`${__dirname}/../public`));
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('static'))
 
 // routes
 app.use(authRouter)
-app.use(router)
 app.use('/browse', browseRouter)
 app.use('/book', bookRouter)
 app.use('/post', postRouter)

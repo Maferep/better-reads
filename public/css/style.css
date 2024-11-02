@@ -4,20 +4,15 @@
 
    body {
     color: #01010f;
-    font-family: "Sans";
     background-color: #bed3eb;
+    font-family: Arial, sans-serif;
     margin: 0;
-    background-size: 600px 600px;
-    background-repeat: repeat;
+    padding: 0;
+    box-sizing: border-box;
   }
   
   a {
     text-decoration: none;
-    color: lavender;
-  }
-
-  #logo {
-    margin-left: auto;
     color: lavender;
   }
   
@@ -34,6 +29,53 @@
     padding-left: 2vw;
     padding-right: 2vw;
   }
+
+  #navbar {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    background-color: #0077b6;
+    color: white;
+  }
+
+  #logo{
+    margin-left: 15px;
+  }
+
+  #logo a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .user-actions {
+    margin-right: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 20%;
+  }
+
+  .user-actions a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  /* #navbar * {
+    display: inline-block;
+    padding: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.4em;
+    font-size: calc(1.7vh + 3px);
+  } */
+  
+
   
   svg {
     position: absolute;
@@ -43,22 +85,19 @@
     opacity: 0.6;
   }
 
-  #content {
-    display: flex;
-    justify-content: center;
-  }
-
-  #container {
-    flex-grow: 1;
-    max-width: 600px;
-    padding: 40px;
-    padding-top: 120px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+#container {
+  width: 70vw;
+  max-width: 600px;
+  padding: 40px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
 .input-group {
   margin-bottom: 20px;
@@ -89,17 +128,11 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 10px;
 }
 
 button:hover {
   background-color: #16A085;
 }
-
-#seePostsButton {
-  background-color: #007bff;
-}
-
 
 .register-link {
   margin-top: 15px;
@@ -110,22 +143,7 @@ button:hover {
   font-size: 14px;
 }
 
-#navbar {
-  background: #2C3E50;
-  position: fixed;
-  width: 100%;
-  display: flex;
-  z-index: 100;
-  padding: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-#navbar * {
-  display: inline-block;
-  padding: 10px;
-  color: white;
-  font-size: 16px;
-}
 
 h1 {
   color: #2C3E50;
@@ -187,15 +205,6 @@ h1 {
     font-size: 18px;
 }
 
-
-.book-info{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.book-info img{
-  object-fit: contain;
-  margin-bottom: 20px;
+.profile-container{
+  background-color: #16A085;
 }
