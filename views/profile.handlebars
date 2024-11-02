@@ -1,0 +1,42 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Better Reads - Book Opinions</title>
+  <link rel="stylesheet" href="/style_prototype.css">
+</head>
+<body>
+    <div id="navbar">
+        <div id="logo"><a href="/">Better Reads</a></div>
+        <div class="user-actions">
+        {{#if loggedIn}}
+        <div><a href="/logout">Logout</a></div>
+        <div><a href="/profile">Hello, {{username}}</a></div>
+        {{else}}
+        <div><a href="/login">Login</a></div>
+        <div><a href="/register">Register</a></div>
+        {{/if}}
+        </div>
+    </div>
+
+    <div class="profile-container">
+        <h1>Username: {{username}}</h1>
+        
+    </div>
+
+    <div>
+        <h2 style="text-align: center;">My Posts</h2>
+        <div class="my-posts">
+            {{#each posts}}
+            <div id="new-post">
+                <p>book id: {{this.book_id}}</p>
+                <p>content: {{this.text_content}}</p>
+                <p>date: {{this.date}}</p>
+                <p>Likes: {{this.likes}}</p>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+
+</body>
+</html>

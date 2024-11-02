@@ -685,6 +685,25 @@ function searchBooks(query, limit, offset) {
   return rows;
 }
 
+function getPostsFromUserId(userId){
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT * FROM posts WHERE author_id = ?`;
+  const rows = db.prepare(query).all(userId);
+  return rows;
+}
+
+function getLikedPostsFromUserId(userId){
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT * FROM posts WHERE id IN (SELECT post_id FROM likes WHERE user_id = ?)`;
+  const rows = db.prepare(query).all(userId);
+  return rows;
+}
+
+
 export {
   initDb,
   initSessions,
@@ -704,5 +723,7 @@ export {
   fetchPostAndComments,
   createComment,
   hasLiked,
-  getLikes
+  getLikes,
+  getPostsFromUserId,
+  getLikedPostsFromUserId
 };

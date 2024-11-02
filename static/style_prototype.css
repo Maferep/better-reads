@@ -170,3 +170,21 @@ body {
     padding: 10px;
   }
 }
+
+
+.my-posts{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.my-posts #new-post{
+  text-align: center;
+}
+
+.profile-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

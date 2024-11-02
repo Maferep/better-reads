@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate,hasLiked } from '../database.js';
+import {fetchPostsAndLastDate,hasLiked, getPostsFromUserId, getLikedPostsFromUserId } from '../database.js';
 
 const router = Router();
 
@@ -59,5 +59,18 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
+router.get("/profile", isAuthenticated, function (req, res) {
+
+  const posts = getPostsFromUserId(req.session.userId);
+  console.log(posts)
+
+  res.render("profile", { 
+    username: req.session.user, 
+    loggedIn: true, 
+    title: "Profile page",
+    posts: posts
+    }
+  )
+})
 
 export default router;
