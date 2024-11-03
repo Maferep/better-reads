@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { isAuthenticated } from '../authenticate.js';
 import {uploader} from "../uploader.js";
-import {getPostsFromUserId, getUserProfile, updateUserProfile } from '../database.js';
+import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing } from '../database.js';
 
 const authRouter = Router()
 
@@ -130,6 +130,8 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
   const userProfile = getUserProfile(req.session.userId); // Obtén la información de perfil
   console.log(userProfile?.bio, userProfile?.profile_photo);
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
+  const followers =  getFollowers(req.session.userId);
+  const following =  getFollowing(req.session.userId);
   res.render("profile", { 
     username: req.session.user, 
     loggedIn: true, 
@@ -138,6 +140,8 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
     profile_photo: userProfile?.profile_photo,
     bio: userProfile?.bio,
     isProfileComplete,
+    followers: followers,
+    following: following,
     style: "style_prototype.css"
   });
 });

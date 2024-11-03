@@ -71,5 +71,55 @@ router.get('/', function (req, res) {
   res.redirect('login')
 })
 
+// Seguir a un usuario
+router.post('/follow', isAuthenticated, async function (req, res) {
+  const followerId = req.session.userId; 
+  const followingId = req.body.followingId; 
+
+  try {
+    await followUser(followerId, followingId);
+    res.status(200).json({ message: `User ${followerId} now follows user ${followingId}` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Dejar de seguir a un usuario
+router.post('/unfollow', isAuthenticated, async function (req, res) {
+  const followerId = req.session.userId; 
+  const followingId = req.body.followingId; 
+
+  try {
+    await unfollowUser(followerId, followingId);
+    res.status(200).json({ message: `User ${followerId} unfollowed user ${followingId}` });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Ver seguidores de un usuario
+router.get('/:userId/followers', isAuthenticated, async function (req, res) {
+  const userId = req.params.userId; 
+
+  try {
+    const followers = await getFollowers(userId);
+    res.status(200).json({ followers });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Ver a quién sigue un usuario
+router.get('/:userId/following', isAuthenticated, async function (req, res) {
+  const userId = req.params.userId; 
+
+  try {
+    const following = await getFollowing(userId);
+    res.status(200).json({ following });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
 export default router;
