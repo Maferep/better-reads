@@ -498,7 +498,7 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), boo
     if (bookFilter!= null) {
     fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(fecha_inicio_query, number_of_posts).date;
     } else {
-      fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(bookFilter,fecha_inicio_query, number_of_posts).date;
+      fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE books.id = ? AND date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(bookFilter,fecha_inicio_query, number_of_posts).date;
     }
   } catch (e) {
     // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
