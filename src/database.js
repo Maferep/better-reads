@@ -17,6 +17,7 @@ function initDb() {
   }); // create if no connection found
   createInsecureUsersDatabase(db);
   createUserProfileDb(db);
+  createUserFollowsDb(db);
   createBookDb(db, "./database_files/books_data.csv");
 
   createReviewDb(db);
@@ -39,25 +40,56 @@ function createUserProfileDb(db) {
   console.log("Created user_profiles table.");
 }
 
+function createUserFollowsDb(db) {
+  const db_stmt = `CREATE TABLE IF NOT EXISTS user_follows (
+    follower_id INTEGER NOT NULL,
+    following_id INTEGER NOT NULL,
+    PRIMARY KEY (follower_id, following_id),
+    FOREIGN KEY (follower_id) REFERENCES insecure_users(id),
+    FOREIGN KEY (following_id) REFERENCES insecure_users(id)
+  )`;
+  db.prepare(db_stmt).run();
+  console.log("Created user_follows table.");
 
-// this database stores passwords in plain text!
+  // testing
+  const staffId = TEST_USER_ID; 
+  const founderId = TEST_USER_ID + 1; 
+
+  followUser(staffId, founderId);
+  followUser(founderId, staffId);
+
+  const followers = getFollowers( staffId);
+  console.log(`User ${staffId} followers:`, followers);
+ 
+  const following = getFollowing(staffId);
+  console.log(`User ${staffId} is following:`, following);
+
+  unfollowUser(staffId, founderId);
+  unfollowUser(staffId, founderId);
+  console.log(`After unfollowing, user ${staffId} followers:`, getFollowers(staffId));
+  console.log(`After unfollowing, user ${staffId} is following:`, getFollowing(staffId));
+}
+
+
+
 function createInsecureUsersDatabase(db) {
   const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
-  // insert test user
-  const id = TEST_USER_ID;
-  // TODO: validate input
-  const username = "staff"
-  const password = "password"
+  const users = [
+    { id: TEST_USER_ID, username: "staff", password: "password" },
+    { id: TEST_USER_ID + 1, username: "founder", password: "founderpassword" } 
+  ];
 
-  try {
-    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
-    console.log("Created default test user.")
-  } catch (e) {
-    console.log("Database already contains default test user.")
-  }
+  users.forEach(user => {
+    try {
+      const run = db.prepare('INSERT INTO insecure_users (id, username, insecure_password) VALUES (?, ?, ?)').run(user.id, user.username, user.password);
+      console.log(`Created default test user: ${user.username}`);
+    } catch (e) {
+      console.log(`Database already contains default test user: ${user.username}`);
+    }
+  });
 }
 
 function loadFromCSV(path, callback) {
@@ -728,6 +760,52 @@ function updateUserProfile(userId, bio, profilePhoto) {
   stmt.run(userId, bio, profilePhoto, bio, profilePhoto);
 }
 
+function followUser(followerId, followingId) {
+  const db = new Database("database_files/betterreads.db");
+  const exists = db.prepare(`SELECT 1 FROM user_follows WHERE follower_id = ? AND following_id = ?`).get(followerId, followingId);
+  
+  if (exists) {
+    console.log(`User ${followerId} is already following user ${followingId}.`);
+    return; 
+  }
+
+  const stmt = `INSERT INTO user_follows (follower_id, following_id) VALUES (?, ?)`;
+  try {
+    db.prepare(stmt).run(followerId, followingId);
+    console.log(`User ${followerId} now follows user ${followingId}.`);
+  } catch (e) {
+    console.log(`Failed to create follow relationship: ${e.message}`);
+  }
+}
+
+function getFollowers(userId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `SELECT follower_id FROM user_follows WHERE following_id = ?`;
+  return db.prepare(stmt).all(userId);
+}
+
+function getFollowing(userId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `SELECT following_id FROM user_follows WHERE follower_id = ?`;
+  return db.prepare(stmt).all(userId);
+}
+
+function unfollowUser(followerId, followingId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `DELETE FROM user_follows WHERE follower_id = ? AND following_id = ?`;
+
+  try {
+    const result = db.prepare(stmt).run(followerId, followingId);
+    if (result.changes > 0) {
+      console.log(`User ${followerId} has unfollowed user ${followingId}`);
+    } else {
+      console.log(`User ${followerId} was not following user ${followingId}`);
+    }
+  } catch (error) {
+    console.error(`Failed to unfollow user ${followingId}: ${error.message}`);
+  }
+}
+
 
 export {
   initDb,
@@ -752,5 +830,9 @@ export {
   getPostsFromUserId,
   getLikedPostsFromUserId,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  followUser,
+  getFollowers,
+  getFollowing,
+  unfollowUser,
 };
