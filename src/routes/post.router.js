@@ -122,6 +122,13 @@ router.get('/:id/like', isAuthenticated, (req, res) => {
     like_count: number_of_likes,
     });
 });
+
+router.post('/:id/repost', isAuthenticated, (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+
+    createRepost(userId, postId);
+});
   
 
 export default router;

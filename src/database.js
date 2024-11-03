@@ -162,14 +162,17 @@ function createPostDatabase(db) {
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY  NOT NULL,
+      id INTEGER PRIMARY KEY NOT NULL,
       author_id int NOT NULL,
       book_id int NOT NULL,
-      text_content TEXT  NOT NULL,
+      text_content TEXT NOT NULL DEFAULT '',
       date INTEGER NOT NULL,
-      likes int NOT NULL,
+      likes int NOT NULL DEFAULT 0,
+      reposts int NOT NULL DEFAULT 0,
+      repost_id int DEFAULT NULL,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
-      FOREIGN KEY(book_id) REFERENCES books(id))`
+      FOREIGN KEY(book_id) REFERENCES books(id),
+      FOREIGN KEY(repost_id) REFERENCES posts(id))`
   ).run();
   
   // TODO: add size constraint from https://stackoverflow.com/questions/17785047/string-storage-size-in-sqlite
@@ -423,6 +426,35 @@ function createPost(userId, content, topic) {
     bookId,
     content
   );
+}
+
+function getPostTopic(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT book_id FROM posts WHERE id = ?`;
+  const result = db.prepare(query).get(postId);
+  return result.book_id;
+}
+
+function createRepost(userId, repostId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const book_id = getPostTopic(repostId);
+
+
+  const operation = /* sql */ `INSERT INTO posts (
+        author_id, book_id, text_content, date, repost_id
+     ) VALUES (?,?, '', unixepoch('now'), ?)`
+  db.prepare(operation).run(
+    userId,
+    book_id,
+    repostId
+  );
+
+  db.prepare(/* sql */ `UPDATE posts SET reposts=((posts.reposts)+1) WHERE id=?`).run(repostId);
 }
 
 function fetchPosts(number_of_posts = -1) {
@@ -752,5 +784,6 @@ export {
   getPostsFromUserId,
   getLikedPostsFromUserId,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  createRepost
 };

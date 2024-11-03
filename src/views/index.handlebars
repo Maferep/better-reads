@@ -75,7 +75,7 @@
           <div class="post-actions">
             <div style="display: flex; align-items: center;">
               <a href="#" class="like-button"><span class="like-counter" style="margin-right: 8px;">{{draw-heart liked_by_user}} {{number_likes}}</span></a>
-              <span style="margin-right: 8px;">🔁 {{number_reposts}}</span>
+              <a href="#" class="repost-button"><span class="repost-counter" style="margin-right: 8px;">AVAIBLE 🔁 {{number_reposts}}</span></a>
               <span style="margin-right: 8px;">📩 {{number_comments}}</span>
             </div>
             <a href="/post/{{post_id}}">Comments</a>
@@ -142,6 +142,26 @@
               updateLikes(post_id);
             })
 
+          } else if (event.target.closest(".repost-button")) {
+            event.preventDefault();
+            const postDiv = event.target.closest(".post");
+            const post_id = postDiv.getAttribute("post-id");
+            const repostCountElement = postDiv.querySelector(".repost-counter");
+            //"AVAIBLE 🔁 X"
+            // obtain the number x
+            const numberofReposts = repostCountElement.textContent.split(" ")[2];
+
+            console.log("REPOST", post_id)
+
+            fetch(`http://localhost/post/${post_id}/repost`, {
+              method: "POST",
+            })
+            .then(res => {
+              //return res.json();
+            })
+            .then(res => {
+              repostCountElement.textContent = `🔁 ${Number(numberofReposts)+1}`;
+            })
           }
         }); 
       </script>
