@@ -63,11 +63,6 @@ function createUserFollowsDb(db) {
  
   const following = getFollowing(staffId);
   console.log(`User ${staffId} is following:`, following);
-
-  unfollowUser(staffId, founderId);
-  unfollowUser(staffId, founderId);
-  console.log(`After unfollowing, user ${staffId} followers:`, getFollowers(staffId));
-  console.log(`After unfollowing, user ${staffId} is following:`, getFollowing(staffId));
 }
 
 
@@ -806,6 +801,45 @@ function unfollowUser(followerId, followingId) {
   }
 }
 
+function getFollowingFeed(userId, limit = 10, offset = 0) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `
+    SELECT 
+      posts.id AS post_id, 
+      insecure_users.id AS user_id, 
+      insecure_users.username, 
+      books.id AS book_id, 
+      books.book_name, 
+      posts.text_content, 
+      posts.date, 
+      posts.likes 
+    FROM posts
+    JOIN insecure_users ON posts.author_id = insecure_users.id
+    JOIN books ON posts.book_id = books.id
+    JOIN user_follows uf ON posts.author_id = uf.following_id 
+    WHERE uf.follower_id = ?
+    ORDER BY posts.date DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const posts_raw = db.prepare(stmt).all(userId, limit, offset);
+  console.log(`Fetched ${posts_raw.length} posts for user ${userId} feed with offset ${offset}.`);
+
+   const stmtCount = `
+    SELECT COUNT(*) AS total 
+    FROM posts
+    JOIN user_follows uf ON posts.author_id = uf.following_id 
+    WHERE uf.follower_id = ?
+  `;
+
+  const countResult = db.prepare(stmtCount).get(userId);
+  const totalPosts = countResult.total;
+
+  const has_more = totalPosts > (offset + limit);
+
+  return { posts_raw, has_more };
+}
+
 
 export {
   initDb,
@@ -835,4 +869,5 @@ export {
   getFollowers,
   getFollowing,
   unfollowUser,
+  getFollowingFeed,
 };

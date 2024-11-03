@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate,hasLiked, fetchBook } from '../database.js';
+import {fetchPostsAndLastDate,hasLiked, fetchBook, getFollowingFeed} from '../database.js';
 
 const router = Router();
 
@@ -119,6 +119,40 @@ router.get('/:userId/following', isAuthenticated, async function (req, res) {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+
+router.get('/following-posts', function (req, res) {
+    const userId = req.session.userId;
+    const amount = 10;
+    const offset = parseInt(req.query.offset) || 0;
+    console.log(offset);
+    const { posts_raw, has_more } = getFollowingFeed(userId, amount, offset);
+
+    const posts_processed = posts_raw.map(post_raw => {
+    let liked_by_user = hasLiked(post_raw.post_id, userId);
+    console.log(liked_by_user)
+    return {
+      post_id: post_raw.post_id,
+      username: post_raw.username,
+      topic: post_raw.book_name,
+      book_id: post_raw.book_id,
+      content: post_raw.text_content,
+      post_id: post_raw.post_id,
+      number_likes: post_raw.likes,
+      number_reposts: 0,
+      number_comments: 0,
+      liked_by_user
+    }})
+
+    res.render("following_posts", {
+        username: req.session.user,
+        loggedIn: true,
+        title: "Following Posts",
+        //style: "style.css",
+        posts: posts_processed,
+        has_more
+    });
 });
 
 
