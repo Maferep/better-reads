@@ -91,60 +91,108 @@
         <p>No posts yet</p>
         {{/if}}
       </div>
+
+
+
+
+
       <script type="module">
         //Esta funcion busca el boton de like y actualiza el contador de likes, y si le diste like o no.
-        async function updateLikes(post_id) {
+
+
+
+
+
+
+
+        async function updateLikes(post, post_id) {
           let response = await fetch(`http://localhost/post/${post_id}/like`, {
             method: "GET",
           });
           let data = await response.json();
-
-          const post = document.querySelector(`.post[post-id="${post_id}"]`);
           const heartToUse= data.liked ? "❤️" : "🤍";
           post.querySelector(".like-counter").textContent = `${heartToUse} ${data.like_count}`;
         }
+
+
+
+
+
+
 
         //Cada vez que se muestra la pagina (se recarga, o se vuelva atras desde otra pagina) se actualizan los likes de todos los posts.
         window.addEventListener('pageshow', function(event) {
           const posts = document.querySelectorAll(".post");
           posts.forEach(post => {
             const post_id = post.getAttribute("post-id");
-            updateLikes(post_id);
+            const post = document.querySelector(`.post[post-id="${post_id}"]`);
+            updateLikes(post, post_id);
           });
         });
 
-        document.getElementById("feed").addEventListener("click", function(event) {
-          if (event.target.closest(".like-button")) {
-            event.preventDefault();
-            const postDiv = event.target.closest(".post");
-            const post_id = postDiv.getAttribute("post-id");
-            const likeCountElement = postDiv.querySelector(".like-counter");
 
-            fetch(`http://localhost/post/${post_id}/like`, {
-              method: "GET",
-            })
-            .then(res => {
-              return res.json();
-            })
-            .then(data => {
-              if (data.liked == true) {
-                return fetch(`http://localhost/post/${post_id}/unlike`, {
-                  method: "POST",
-                })
 
-              } else if (data.liked == false) {
-                return fetch(`http://localhost/post/${post_id}/like`, {
-                  method: "POST",
-                })
-              }
-            })
-            .then(res => {
-              updateLikes(post_id);
-            })
 
-          }
-        }); 
-      </script>
+
+
+
+
+
+
+
+
+
+  document.getElementById("feed").addEventListener("click", function(event) {
+    if (event.target.closest(".like-button")) {
+      event.preventDefault();
+      const postDiv = event.target.closest(".post");
+      const post_id = postDiv.getAttribute("post-id");
+      const likeCountElement = postDiv.querySelector(".like-counter");
+
+      fetch(`http://localhost/post/${post_id}/like`, {
+        method: "GET",
+      })
+      .then(res => {
+        return res.json();
+      })
+      .then(data => {
+        if (data.liked == true) {
+          return fetch(`http://localhost/post/${post_id}/unlike`, {
+            method: "POST",
+          })
+
+        } else if (data.liked == false) {
+          return fetch(`http://localhost/post/${post_id}/like`, {
+            method: "POST",
+          })
+        }
+      })
+      .then(res => {
+        const post = document.querySelector(`.post[post-id="${post_id}"]`);
+        updateLikes(post, post_id);
+      })
+
+    }
+  }); 
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>

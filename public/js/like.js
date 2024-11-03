@@ -28,26 +28,35 @@ document.getElementById(event_listener_location).addEventListener("click", funct
       }
     })
     .then(res => {
-      updateLikes();
+      const post = document.getElementsByClassName("post")[0]
+      const post_id = post.getAttribute("post-id");
+      updateLikes(post, post_id);
     })
   }
 }); 
 
-//Actualiza el contador de likes en la vista de un post
-async function updateLikes() {
-  const post = document.getElementsByClassName("post")[0]
-  const post_id = post.getAttribute("post-id");
 
+
+
+
+//Actualiza el contador de likes en la vista de un post
+async function updateLikes(post, post_id) {
   let response = await fetch(`http://localhost/post/${post_id}/like`, {
     method: "GET",
   });
   let data = await response.json();
-
   const heartToUse= data.liked ? "❤️" : "🤍";
   post.querySelector(".like-counter").textContent = `${heartToUse} ${data.like_count}`;
 }
 
+
+
+
+
+
 //Actualiza el contador de likes en la vista de un post cuando se muestra la pagina
 window.addEventListener('pageshow', function(event) {
-    updateLikes();
+  const post = document.getElementsByClassName("post")[0]
+  const post_id = post.getAttribute("post-id");
+  updateLikes(post, post_id);
 });
