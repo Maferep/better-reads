@@ -504,37 +504,57 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), boo
     fecha_final_query = 0;
   }
 
-  console.log("Fecha inicial", fecha_inicio_query)
-  console.log("Fecha final", fecha_final_query)
-
-  let rows;
-
-  const query = /* sql */ `SELECT p.id AS post_id,
-                                  original_user.id AS user_id,
-                                  original_user.username AS username,
-                                  b.id AS book_id,
-                                  b.book_name,
-                                  p.text_content,
-                                  COALESCE(rp.date, p.date) AS date,
-                                  -- p.likes,
-                                  rp.user_id AS repost_user_id,
-                                  repost_user.username AS repost_username
-                            FROM posts p
-                            JOIN insecure_users original_user ON p.author_id = original_user.id
-                            JOIN books b ON p.book_id = b.id
-                            LEFT JOIN reposts rp ON rp.post_id = p.id
-                            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
-                            WHERE`
-                            + ((bookFilter == null)?``:` b.id = ? AND `) +
-                            /*sql*/` ? >= COALESCE(rp.date, p.date) AND COALESCE(rp.date, p.date) > ? 
-                            ORDER BY COALESCE(rp.date, p.date) DESC;`;
-
-if (bookFilter == null) {
-    rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
-  } else {
-    rows = db.prepare(query).all(bookFilter, fecha_inicio_query, fecha_final_query);
-  }
+  const rows = getPostsWithFilters(fecha_inicio_query, fecha_final_query, bookFilter);
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
+}
+
+
+function getPostsWithFilters(since, until, bookId = null) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const book_filter = (bookId == null)?``:`AND b.id = ? `;
+
+  const query = 
+  /*sql*/  `SELECT p.id AS post_id,
+                    original_user.id AS user_id,
+                    original_user.username AS username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    p.date AS date,
+                    NULL AS repost_user_id,        -- NULL for original posts
+                    NULL AS repost_username         -- NULL for original posts
+            FROM posts p
+            JOIN insecure_users original_user ON p.author_id = original_user.id
+            JOIN books b ON p.book_id = b.id
+            WHERE ? >= date AND date > ? ` + book_filter + 
+  /*sql*/  `UNION
+            SELECT rp.post_id AS post_id,
+                    original_user.id AS user_id,
+                    original_user.username AS username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    rp.date AS date,
+                    rp.user_id AS repost_user_id,  -- ID of the user who reposted
+                    repost_user.username AS repost_username  -- Username of the user who reposted
+            FROM reposts rp
+            JOIN posts p ON rp.post_id = p.id
+            JOIN insecure_users original_user ON p.author_id = original_user.id
+            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+            JOIN books b ON p.book_id = b.id
+            WHERE ? >= rp.date AND rp.date > ?` + book_filter +
+  /*sql*/  `ORDER BY date DESC;`;
+
+  console.log(query)
+
+  if (bookId == null) {
+    return db.prepare(query).all(since, until, since, until);
+  } else {
+    return db.prepare(query).all(since, until,bookId, since, until, bookId);
+  }
 }
 
 // TODO: do not return status codes, this should not be handled in the database layer. 
@@ -690,7 +710,13 @@ function fetchPost(postId) {
                           JOIN books ON posts.book_id = books.id
                           WHERE posts.id IN (SELECT value FROM json_each(?))`;
 
-  return db.prepare(query_post).all(JSON.stringify(postId));
+  const rows = db.prepare(query_post).all(JSON.stringify(postId));
+
+  //Quiero devolver un array de posts si pedi muchos posts, pero un unico post, si pedi solo uno.
+  if (Array.isArray(postId))
+    return rows;
+  else
+    return rows[0];
 }
 
 function fetchComments(postId) {
