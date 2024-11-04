@@ -104,7 +104,6 @@
           const posts = document.querySelectorAll(".post");
           posts.forEach(post => {
             const post_id = post.getAttribute("post-id");
-            const post = document.querySelector(`.post[post-id="${post_id}"]`);
             updateLikes(post, post_id);
           });
         });
@@ -127,7 +126,7 @@
               })
             })
             .then(res => {
-              updateLikes(post_id);
+              updateLikes(postDiv,post_id);
             })
 
           } else if (event.target.closest(".repost-button")) {
