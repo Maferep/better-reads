@@ -27,7 +27,7 @@
         <li><a href="/profile">My User</a></li>
         <li><a href="/browse">Browse</a></li>
         <li><a href="/my-reviews">My Books</a></li>
-        <li><a href="/favorites">Following</a></li>
+        <li><a href="/following-posts">Following</a></li>
         <li><a href="/settings">Settings</a></li>
       </ul>
     {{/if}}
@@ -91,30 +91,21 @@
         <p>No posts yet</p>
         {{/if}}
       </div>
-      <script type="module">
-        //Esta funcion busca el boton de like y actualiza el contador de likes, y si le diste like o no.
-        async function updateLikes(post_id) {
-          let response = await fetch(`http://localhost/post/${post_id}/like`, {
-            method: "GET",
-          });
-          let data = await response.json();
 
-          const contentToUse = (data.liked ? "❤️" : "🤍") + ` ${data.like_count}`;
 
-          const posts = document.querySelectorAll(`.post[post-id="${post_id}"]`);
-          posts.forEach(post => {
-            const likeCounter = post.querySelector(".like-counter");
 
-            likeCounter.textContent = contentToUse;
-          });
-        }
 
+
+<script src="/static/js/updateLikes.js" type="text/javascript"></script>
+
+      <script>
         //Cada vez que se muestra la pagina (se recarga, o se vuelva atras desde otra pagina) se actualizan los likes de todos los posts.
         window.addEventListener('pageshow', function(event) {
           const posts = document.querySelectorAll(".post");
           posts.forEach(post => {
             const post_id = post.getAttribute("post-id");
-            updateLikes(post_id);
+            const post = document.querySelector(`.post[post-id="${post_id}"]`);
+            updateLikes(post, post_id);
           });
         });
 
@@ -157,6 +148,7 @@
           }
         }); 
       </script>
+
     </div>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>

@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="/static/css/style_prototype.css">
+<div id="navbar">
+  <div id="logo"><a href="/">Better Reads</a></div>
+  <div class="user-actions">
+    {{#if loggedIn}}
+    <a href="/logout">Logout</a>
+    <a href="/profile">Hello, {{username}}</a>
+    {{else}}
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+    {{/if}}
+  </div>
+</div>
+
+<div id="main-layout">
+  <!-- Left sidebar -->
+  <div id="sidebar">
+    {{#if book}}
+    <a href="/book/{{book.id}}"><button id="goBackButton">Go back to book</button></a>
+    <div id="book-info">
+      <img src="{{book.cover_url}}" alt="Book cover" id="book-cover">
+      <h2>{{book.title}}</h2>
+    </div>
+    {{else}}
+    <ul>
+      <li><a href="/profile">My User</a></li>
+      <li><a href="/browse">Browse</a></li>
+      <li><a href="/my-reviews">My Books</a></li>
+      <li><a href="/following-posts">Following</a></li>
+      <li><a href="/settings">Settings</a></li>
+    </ul>
+    {{/if}}
+  </div>
+
+  <!-- Feed content -->
+  <div id="container">
+    <div id="feed">
+      {{#if posts}}
+      {{#each posts}}
+      <div class="post" post-id="{{post_id}}">
+        <div class="user-info">
+          <strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
+        </div>
+        <div class="review">
+          {{content}}
+        </div>
+        <div class="post-actions">
+          <div style="display: flex; align-items: center;">
+            <a href="#" class="like-button">
+              <span class="like-counter" style="margin-right: 8px;">{{draw-heart liked_by_user}} {{number_likes}}</span>
+            </a>
+            <span style="margin-right: 8px;">🔁 {{number_reposts}}</span>
+            <span style="margin-right: 8px;">📩 {{number_comments}}</span>
+          </div>
+          <a href="/post/{{post_id}}">Comments</a>
+        </div>
+      </div>
+      {{/each}}
+      {{#if has_more}}
+       <a href="/following-posts?offset={{posts.length}}">Load more posts</a>
+      {{else}}
+      <p>You have reached the bottom! There are no more older posts</p>
+      {{/if}}
+      {{else}}
+      <p>No posts yet</p>
+      {{/if}}
+    </div>
+
+    <script type="module">
+      async function updateLikes(post_id) {
+          let response = await fetch(`http://localhost/post/${post_id}/like`, {
+            method: "GET",
+          });
+          let data = await response.json();
+          console
+          const post = document.querySelector(`.post[post-id="${post_id}"]`);
+          const heartToUse= data.liked ? "❤️" : "🤍";
+          post.querySelector(".like-counter").textContent = `${heartToUse} ${data.like_count}`;
+        }
+
+        //Cada vez que se muestra la pagina (se recarga, o se vuelva atras desde otra pagina) se actualizan los likes de todos los posts.
+        window.addEventListener('pageshow', function(event) {
+          const posts = document.querySelectorAll(".post");
+          posts.forEach(post => {
+            const post_id = post.getAttribute("post-id");
+            updateLikes(post_id);
+          });
+        });
+
+        document.getElementById("feed").addEventListener("click", function(event) {
+          if (event.target.closest(".like-button")) {
+            event.preventDefault();
+            const postDiv = event.target.closest(".post");
+            const post_id = postDiv.getAttribute("post-id");
+            const likeCountElement = postDiv.querySelector(".like-counter");
+
+            fetch(`http://localhost/post/${post_id}/like`, {
+              method: "GET",
+            })
+            .then(res => {
+              return res.json();
+            })
+            .then(data => {
+              if (data.liked == true) {
+                return fetch(`http://localhost/post/${post_id}/unlike`, {
+                  method: "POST",
+                })
+
+              } else if (data.liked == false) {
+                return fetch(`http://localhost/post/${post_id}/like`, {
+                  method: "POST",
+                })
+              }
+            })
+            .then(res => {
+              updateLikes(post_id);
+            })
+
+          }
+        }); 
+      </script>
+    </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+</div>
