@@ -230,3 +230,10 @@ a:hover {
   object-fit: cover;
   border-radius: 50%;
 }
+
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+  color: grey;
+  filter: grayscale(100%);
+}

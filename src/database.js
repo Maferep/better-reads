@@ -196,6 +196,7 @@ function createPostDatabase(db) {
       text_content TEXT NOT NULL DEFAULT '',
       date INTEGER NOT NULL,
       likes int NOT NULL DEFAULT 0,
+      comments int NOT NULL DEFAULT 0,
       reposts int NOT NULL DEFAULT 0,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
@@ -714,13 +715,56 @@ function hasLiked(postId, userId) { // TODO: run inside transaction to ensure co
   }
 }
 
-function getLikes(postId) {
+function canRepost(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  console.log(postId, userId)
+
+  //Si hay un registro con tal postID y UserID quiere decir que ya reposteó.
+  // Tambien quiero ver que el usuario no sea dueño del post, para no poder repostearse a si mismo
+  const findRepost = db.prepare(`SELECT id FROM reposts WHERE post_id=? AND user_id=?`);
+  const findPost = db.prepare(`SELECT author_id FROM posts WHERE id=?`);
+
+  const id = findRepost.get(postId, userId);
+  const post = findPost.get(postId);
+
+  const yaReposteo = id != undefined;
+  const esDuenio = post.author_id == userId;
+
+  console.log(yaReposteo)
+  console.log(esDuenio)
+
+  return (!yaReposteo && !esDuenio)
+
+}
+
+function getLikesCount(postId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
   const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
   return findLikeCount.get(postId).likes;
 }
+
+function getRepostsCount(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const findRepostCount = db.prepare(`SELECT reposts FROM posts WHERE id=?`);
+  return findRepostCount.get(postId).reposts;
+}
+
+function getInfoCount(postId) {
+  //Get number of comments, likes, reposts
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const findInfo = db.prepare(`SELECT comments, likes, reposts FROM posts WHERE id=?`);
+  return findInfo.get(postId);
+}
+
 
 function fetchPostAndComments(postId) {
   const post = fetchPost(postId);
@@ -766,6 +810,9 @@ function createComment(postId, userId, content) {
         parent_post, author_id, text_content, date
      ) VALUES (?,?,?,unixepoch('now'))`
   db.prepare(operation).run(postId, userId, content);
+
+  const incrementComments = /* sql */ `UPDATE posts SET comments=((posts.comments)+1) WHERE id=?`
+  db.prepare(incrementComments).run(postId);
 }
 
 
@@ -922,7 +969,10 @@ export {
   fetchPostAndComments,
   createComment,
   hasLiked,
-  getLikes,
+  canRepost,
+  getLikesCount,
+  getRepostsCount,
+  getInfoCount,
   getPostsFromUserId,
   getLikedPostsFromUserId,
   getUserProfile,

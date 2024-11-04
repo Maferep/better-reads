@@ -75,8 +75,8 @@
           <div class="post-actions">
             <div style="display: flex; align-items: center;">
               <a href="#" class="like-button"><span class="like-counter" style="margin-right: 8px;">🤍 ?</span></a>
-              <a href="#" class="repost-button"><span class="repost-counter" style="margin-right: 8px;">AVAIBLE 🔁 {{number_reposts}}</span></a>
-              <span style="margin-right: 8px;">📩 {{number_comments}}</span>
+              <a href="#" class="repost-button"><span class="repost-counter" style="margin-right: 8px;">🔁 ?</span></a>
+              <span class="comment-counter" style="margin-right: 8px;">📩 ?</span>
             </div>
             <a href="/post/{{post_id}}">Comments</a>
           </div>
@@ -104,7 +104,7 @@
           const posts = document.querySelectorAll(".post");
           posts.forEach(post => {
             const post_id = post.getAttribute("post-id");
-            updateLikes(post, post_id);
+            updateInfo(post, post_id);
           });
         });
 
@@ -121,7 +121,7 @@
               return res.json();
             })
             .then(data => {
-              return fetch(`http://localhost/post/${post_id}/` + data.liked?"unlike":"like", {
+              return fetch(`http://localhost/post/${post_id}/` + (data.liked?"unlike":"like"), {
                 method: "POST",
               })
             })
@@ -142,7 +142,7 @@
               method: "POST",
             })
             .then(res => {
-              repostCountElement.textContent = `-> ${Number(numberofReposts)+1}`;
+              updateReposts(postDiv,post_id);
             })
           }
         }); 
