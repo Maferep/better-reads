@@ -67,14 +67,14 @@
         <div class="post" post-id="{{post_id}}">
           <div class="user-info">
             <!-- Se tiene que agregar el link personalizado para el usuario de este post -->
-            <strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
+            {{#if repost_username}}<strong style="color: gray;">@{{repost_username}} ⥂</strong> {{/if}}<strong>@{{username}}</strong> on <a href="book/{{book_name}}" class="topic-link"><em>{{topic}}</em></a>
           </div>
           <div class="review">
             {{content}}
           </div>
           <div class="post-actions">
             <div style="display: flex; align-items: center;">
-              <a href="#" class="like-button"><span class="like-counter" style="margin-right: 8px;">{{draw-heart liked_by_user}} {{number_likes}}</span></a>
+              <a href="#" class="like-button"><span class="like-counter" style="margin-right: 8px;">🤍 ?</span></a>
               <a href="#" class="repost-button"><span class="repost-counter" style="margin-right: 8px;">AVAIBLE 🔁 {{number_reposts}}</span></a>
               <span style="margin-right: 8px;">📩 {{number_comments}}</span>
             </div>
@@ -99,9 +99,14 @@
           });
           let data = await response.json();
 
-          const post = document.querySelector(`.post[post-id="${post_id}"]`);
-          const heartToUse= data.liked ? "❤️" : "🤍";
-          post.querySelector(".like-counter").textContent = `${heartToUse} ${data.like_count}`;
+          const contentToUse = (data.liked ? "❤️" : "🤍") + ` ${data.like_count}`;
+
+          const posts = document.querySelectorAll(`.post[post-id="${post_id}"]`);
+          posts.forEach(post => {
+            const likeCounter = post.querySelector(".like-counter");
+
+            likeCounter.textContent = contentToUse;
+          });
         }
 
         //Cada vez que se muestra la pagina (se recarga, o se vuelva atras desde otra pagina) se actualizan los likes de todos los posts.
@@ -114,11 +119,10 @@
         });
 
         document.getElementById("feed").addEventListener("click", function(event) {
+          const postDiv = event.target.closest(".post");
+          const post_id = postDiv.getAttribute("post-id");
           if (event.target.closest(".like-button")) {
             event.preventDefault();
-            const postDiv = event.target.closest(".post");
-            const post_id = postDiv.getAttribute("post-id");
-            const likeCountElement = postDiv.querySelector(".like-counter");
 
             fetch(`http://localhost/post/${post_id}/like`, {
               method: "GET",
@@ -127,16 +131,9 @@
               return res.json();
             })
             .then(data => {
-              if (data.liked == true) {
-                return fetch(`http://localhost/post/${post_id}/unlike`, {
-                  method: "POST",
-                })
-
-              } else if (data.liked == false) {
-                return fetch(`http://localhost/post/${post_id}/like`, {
-                  method: "POST",
-                })
-              }
+              return fetch(`http://localhost/post/${post_id}/` + data.liked?"unlike":"like", {
+                method: "POST",
+              })
             })
             .then(res => {
               updateLikes(post_id);
@@ -144,8 +141,6 @@
 
           } else if (event.target.closest(".repost-button")) {
             event.preventDefault();
-            const postDiv = event.target.closest(".post");
-            const post_id = postDiv.getAttribute("post-id");
             const repostCountElement = postDiv.querySelector(".repost-counter");
             //"AVAIBLE 🔁 X"
             // obtain the number x
@@ -157,10 +152,7 @@
               method: "POST",
             })
             .then(res => {
-              //return res.json();
-            })
-            .then(res => {
-              repostCountElement.textContent = `🔁 ${Number(numberofReposts)+1}`;
+              repostCountElement.textContent = `-> ${Number(numberofReposts)+1}`;
             })
           }
         }); 

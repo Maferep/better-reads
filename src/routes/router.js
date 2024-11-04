@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate,hasLiked, fetchBook } from '../database.js';
+import {fetchPostsAndLastDate, fetchBook, fetchPost } from '../database.js';
 
 const router = Router();
 
@@ -29,19 +29,17 @@ router.get('/', isAuthenticated, async function (req, res) {
   const last_date = posts_and_date_raw.last_date;
 
   const posts_processed = posts_raw.map(post_raw => {
-    let liked_by_user = hasLiked(post_raw.id, userId);
-    console.log(liked_by_user)
     return {
-      post_id: post_raw.id,
+      post_id: post_raw.post_id,
+      user_id: post_raw.user_id,
       username: post_raw.username,
-      topic: post_raw.book_name,
       book_id: post_raw.book_id,
+      book_name: post_raw.book_name,
       content: post_raw.text_content,
-      post_id: post_raw.id,
-      number_likes: post_raw.likes,
-      number_reposts: 0,
+      number_reposts: post_raw.reposts,
       number_comments: 0,
-      liked_by_user
+      repost_user_id: post_raw.repost_user_id,
+      repost_username: post_raw.repost_username,
     }})
 
     //Poner id, nombre e imagen de libro si bookId no es null
@@ -69,6 +67,12 @@ router.get('/', isAuthenticated, async function (req, res) {
 
 router.get('/', function (req, res) {
   res.redirect('login')
+})
+
+router.get("/test", function(req, res) {
+  const posts = fetchPost(1)
+  console.log("POSTS", posts)
+  res.json(posts)
 })
 
 

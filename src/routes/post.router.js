@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
-  fetchPostAndComments, createComment, hasLiked, getLikes} from '../database.js';
+  fetchPostAndComments, createComment, hasLiked, getLikes, createRepost} from '../database.js';
 
 const router = Router();
 
@@ -111,7 +111,7 @@ router.post('/:id/unlike', isAuthenticated, (req, res) => {
 });
 
 // Endpoint for checking if user likes a post
-router.get('/:id/like', isAuthenticated, (req, res) => {
+router.get('/:id/like', (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
     const result = hasLiked(postId, userId)

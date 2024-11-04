@@ -22,6 +22,7 @@ function initDb() {
   createReviewDb(db);
   createBookStatesDb(db);
   createPostDatabase(db);
+  createRepostsDb(db);
   createCommentDb(db);
   createLikeDb(db);
 
@@ -169,10 +170,8 @@ function createPostDatabase(db) {
       date INTEGER NOT NULL,
       likes int NOT NULL DEFAULT 0,
       reposts int NOT NULL DEFAULT 0,
-      repost_id int DEFAULT NULL,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
-      FOREIGN KEY(book_id) REFERENCES books(id),
-      FOREIGN KEY(repost_id) REFERENCES posts(id))`
+      FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
   
   // TODO: add size constraint from https://stackoverflow.com/questions/17785047/string-storage-size-in-sqlite
@@ -202,6 +201,35 @@ function createPostDatabase(db) {
     insert_many_posts(20)
   }
 }
+
+function createRepostsDb(db) {
+  db.prepare(
+    /*sql*/`CREATE TABLE IF NOT EXISTS reposts (
+      id INTEGER PRIMARY KEY NOT NULL,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      FOREIGN KEY(post_id) REFERENCES posts(id),
+      FOREIGN KEY(user_id) REFERENCES insecure_users(id));`
+    ).run();
+
+  let count = 'SELECT COUNT(*) FROM reposts'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_reposts = db.prepare(
+      `INSERT INTO reposts (
+          post_id, user_id, date
+       ) VALUES (?,?,unixepoch('now'))`
+    );
+
+    insert_reposts.run(
+      1,
+      20000000
+    );
+  }
+}  
+  
 
 function sleepFor(sleepDuration){
   var now = new Date().getTime();
@@ -428,56 +456,19 @@ function createPost(userId, content, topic) {
   );
 }
 
-function getPostTopic(postId) {
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-  const query = /* sql */ `SELECT book_id FROM posts WHERE id = ?`;
-  const result = db.prepare(query).get(postId);
-  return result.book_id;
-}
-
-function createRepost(userId, repostId) {
+function createRepost(userId, postId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
 
-  const book_id = getPostTopic(repostId);
+  const operation = /* sql */ `INSERT INTO reposts (
+        post_id, user_id, date
+     ) VALUES (?,?,unixepoch('now'))`
 
+  db.prepare(operation).run(postId, userId);
 
-  const operation = /* sql */ `INSERT INTO posts (
-        author_id, book_id, text_content, date, repost_id
-     ) VALUES (?,?, '', unixepoch('now'), ?)`
-  db.prepare(operation).run(
-    userId,
-    book_id,
-    repostId
-  );
-
-  db.prepare(/* sql */ `UPDATE posts SET reposts=((posts.reposts)+1) WHERE id=?`).run(repostId);
-}
-
-function fetchPosts(number_of_posts = -1) {
-  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-  const query = /* sql */ `SELECT posts.id, 
-                            insecure_users.id as user_id, 
-                            insecure_users.username, 
-                            books.id as book_id, 
-                            books.book_name, 
-                            posts.text_content, 
-                            posts.date, 
-                            posts.likes 
-                          FROM posts
-                          JOIN insecure_users ON posts.author_id = insecure_users.id
-                          JOIN books ON posts.book_id = books.id
-                          ORDER BY posts.date DESC
-                          LIMIT ?`;
-
-  const rows = db.prepare(query).all(number_of_posts, offset);
-  return rows;
+  const incrementReposts = /* sql */ `UPDATE posts SET reposts=((posts.reposts)+1) WHERE id=?`
+  db.prepare(incrementReposts).run(postId);
 }
 
 
@@ -495,10 +486,18 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), boo
   //Fecha del post más antiguo que quiero obtener.
   let fecha_final_query;
   try {
-    if (bookFilter!= null) {
-    fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(fecha_inicio_query, number_of_posts).date;
+    const fecha_final_query_prepare = db.prepare(
+/*sql*/ `SELECT date FROM posts
+        UNION
+        SELECT date FROM reposts rp
+        WHERE` + (bookFilter == null)?"":/*sql*/` books.id = ? AND ` + /*sql*/` date <= ?
+        ORDER BY date DESC
+        LIMIT 1 OFFSET ?;`);
+
+    if (bookFilter == null) {
+      fecha_final_query = fecha_final_query_prepare.get(fecha_inicio_query, number_of_posts);
     } else {
-      fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE books.id = ? AND date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(bookFilter,fecha_inicio_query, number_of_posts).date;
+      fecha_final_query = fecha_final_query_prepare.get(bookFilter, fecha_inicio_query, number_of_posts);
     }
   } catch (e) {
     // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
@@ -510,23 +509,29 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), boo
 
   let rows;
 
-  if (bookFilter == null) {
-    
-    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
-                            JOIN insecure_users ON posts.author_id = insecure_users.id
-                            JOIN books ON posts.book_id = books.id
-                            WHERE ? >= posts.date AND posts.date > ? 
-                            ORDER BY posts.date DESC;`;
+  const query = /* sql */ `SELECT p.id AS post_id,
+                                  original_user.id AS user_id,
+                                  original_user.username AS username,
+                                  b.id AS book_id,
+                                  b.book_name,
+                                  p.text_content,
+                                  COALESCE(rp.date, p.date) AS date,
+                                  -- p.likes,
+                                  rp.user_id AS repost_user_id,
+                                  repost_user.username AS repost_username
+                            FROM posts p
+                            JOIN insecure_users original_user ON p.author_id = original_user.id
+                            JOIN books b ON p.book_id = b.id
+                            LEFT JOIN reposts rp ON rp.post_id = p.id
+                            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+                            WHERE`
+                            + ((bookFilter == null)?``:` b.id = ? AND `) +
+                            /*sql*/` ? >= COALESCE(rp.date, p.date) AND COALESCE(rp.date, p.date) > ? 
+                            ORDER BY COALESCE(rp.date, p.date) DESC;`;
 
+if (bookFilter == null) {
     rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
-
   } else {
-    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
-                            JOIN insecure_users ON posts.author_id = insecure_users.id
-                            JOIN books ON posts.book_id = books.id
-                            WHERE books.id = ? AND ? >= posts.date AND posts.date > ? 
-                            ORDER BY posts.date DESC;`;
-
     rows = db.prepare(query).all(bookFilter, fecha_inicio_query, fecha_final_query);
   }
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
@@ -683,9 +688,9 @@ function fetchPost(postId) {
   const query_post = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
-                          WHERE posts.id = ?`;
+                          WHERE posts.id IN (SELECT value FROM json_each(?))`;
 
-  return db.prepare(query_post).get(postId);
+  return db.prepare(query_post).all(JSON.stringify(postId));
 }
 
 function fetchComments(postId) {
@@ -773,7 +778,6 @@ export {
   fetchBookState,
   createPost,
   searchBooks,
-  fetchPosts,
   incrementLikes,
   decrementLikes,
   fetchPostsAndLastDate,
@@ -785,5 +789,6 @@ export {
   getLikedPostsFromUserId,
   getUserProfile,
   updateUserProfile,
-  createRepost
+  createRepost,
+  fetchPost
 };
