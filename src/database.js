@@ -839,25 +839,45 @@ function getPostsFromUserId(userId){
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-   const query = /*sql*/ `
-    SELECT 
-      posts.id AS post_id, 
-      insecure_users.id AS user_id, 
-      insecure_users.username, 
-      books.id AS book_id, 
-      books.book_name, 
-      posts.text_content, 
-      posts.date, 
-      posts.likes,
-      NULL AS repost_user_id,
-      NULL AS repost_username
-    FROM posts
-    JOIN insecure_users ON posts.author_id = insecure_users.id
-    JOIN books ON posts.book_id = books.id
-    WHERE posts.author_id = ?
-    ORDER BY posts.date DESC
-  `;
-  const rows = db.prepare(query).all(userId);
+    const query = 
+  /*sql*/  `SELECT 
+                    p.id AS post_id,
+                    u.id AS user_id,
+                    u.username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    p.date AS date,
+                    p.likes,
+                    NULL AS repost_user_id,
+                    NULL AS repost_username
+            FROM posts p
+            JOIN insecure_users u ON p.author_id = u.id
+            JOIN books b ON p.book_id = b.id
+            WHERE p.author_id = ?
+
+            UNION
+
+            SELECT 
+                    rp.post_id AS post_id,
+                    u.id AS user_id,
+                    u.username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    rp.date AS date,
+                    p.likes,
+                    rp.user_id AS repost_user_id,
+                    repost_user.username AS repost_username
+            FROM reposts rp
+            JOIN posts p ON rp.post_id = p.id
+            JOIN insecure_users u ON p.author_id = u.id
+            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+            JOIN books b ON p.book_id = b.id
+            WHERE rp.user_id = ?
+
+            ORDER BY p.date DESC`;
+  const rows = db.prepare(query).all(userId, userId);
   return rows;
 }
 
