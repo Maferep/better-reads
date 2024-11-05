@@ -126,13 +126,25 @@ authRouter.post('/register', function  (req, res) {
 
 
 authRouter.get("/profile", isAuthenticated, function (req, res) {
-  const posts = getPostsFromUserId(req.session.userId);
+  const posts_raw = getPostsFromUserId(req.session.userId);
   const userProfile = getUserProfile(req.session.userId); // Obtén la información de perfil
   console.log(userProfile?.bio, userProfile?.profile_photo);
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   const followers =  getFollowers(req.session.userId);
   const following =  getFollowing(req.session.userId);
-  
+  const posts = posts_raw.map(post_raw => {
+    return {
+      post_id: post_raw.post_id,
+      user_id: post_raw.user_id,
+      username: post_raw.username,
+      book_id: post_raw.book_id,
+      book_name: post_raw.book_name,
+      content: post_raw.text_content,
+      number_reposts: post_raw.reposts,
+      number_comments: 0,
+      repost_user_id: post_raw.repost_user_id,
+      repost_username: post_raw.repost_username,
+    }})
   res.render("profile", { 
     username: req.session.user, 
     loggedIn: true, 
@@ -155,13 +167,26 @@ authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res)
   // Determina si el perfil es del usuario actual o de otro usuario
   const isOwnProfile = username === sessionUsername;
   const userId = getIdFromUsername(username);
-  const posts = getPostsFromUserId(userId);
+  const posts_raw = getPostsFromUserId(userId);
   const userProfile = getUserProfile(userId); // Obtén la información de perfil
   console.log(userProfile?.bio, userProfile?.profile_photo);
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   const followers =  getFollowers(userId);
   const following =  getFollowing(userId);
   const isFollowing = isUserFollowing(req.session.userId, userId);
+  const posts = posts_raw.map(post_raw => {
+    return {
+      post_id: post_raw.post_id,
+      user_id: post_raw.user_id,
+      username: post_raw.username,
+      book_id: post_raw.book_id,
+      book_name: post_raw.book_name,
+      content: post_raw.text_content,
+      number_reposts: post_raw.reposts,
+      number_comments: 0,
+      repost_user_id: post_raw.repost_user_id,
+      repost_username: post_raw.repost_username,
+    }})
   res.render("profile", { 
     username: username, 
     userId: userId,

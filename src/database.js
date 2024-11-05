@@ -839,7 +839,24 @@ function getPostsFromUserId(userId){
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const query = /* sql */ `SELECT * FROM posts WHERE author_id = ?`;
+   const query = /*sql*/ `
+    SELECT 
+      posts.id AS post_id, 
+      insecure_users.id AS user_id, 
+      insecure_users.username, 
+      books.id AS book_id, 
+      books.book_name, 
+      posts.text_content, 
+      posts.date, 
+      posts.likes,
+      NULL AS repost_user_id,
+      NULL AS repost_username
+    FROM posts
+    JOIN insecure_users ON posts.author_id = insecure_users.id
+    JOIN books ON posts.book_id = books.id
+    WHERE posts.author_id = ?
+    ORDER BY posts.date DESC
+  `;
   const rows = db.prepare(query).all(userId);
   return rows;
 }
