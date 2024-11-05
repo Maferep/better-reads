@@ -39,7 +39,7 @@
       {{#each posts}}
       <div class="post" post-id="{{post_id}}">
         <div class="user-info">
-          <strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
+          <strong>@<a href="{{username}}/profile">{{username}}</a></strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
         </div>
         <div class="review">
           {{content}}

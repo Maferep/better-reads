@@ -13,3 +13,7 @@ body {
   padding: 10px 20px;
   color: white;
 }
+
+#main-layout a {
+  color: darkslategrey;
+}
