@@ -234,6 +234,34 @@ a:hover {
   border-radius: 50%;
 }
 
+#follow-button {
+  font-size: 18px;          
+  padding: 10px 20px;      
+  margin-top: 20px;  
+  margin: 20px auto;  
+  display: block;     
+  background-color: #007bff;
+  color: white;            
+  border: none;             
+  border-radius: 5px;      
+  cursor: pointer;       
+  transition: background-color 0.3s ease;
+}
+
+#follow-button.unfollow {
+  background-color: red; /* Cambia el color a rojo */
+}
+
+
+#follow-button:hover {
+  background-color: #0056b3; 
+}
+
+/* Efecto al hacer clic */
+#follow-button:active {
+  transform: scale(0.95);
+}
+
 
 /* DUPLICADO */
 a.disabled {

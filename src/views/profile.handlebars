@@ -13,7 +13,7 @@
   </div>
 
     <div class="profile-container">
-        <h1>Username: {{username}}</h1>
+        <h1>{{username}}</h1>
         
         {{#if isProfileComplete}}   
             <img src="static/{{profile_photo}}" alt="Profile Photo">
@@ -37,7 +37,7 @@
     </div>
     </div>
      {{#unless isOwnProfile}}
-    <button id="follow-button" onclick="toggleFollow({{userId}})">
+    <button id="follow-button" class="{{#if isFollowing}}unfollow{{/if}}" onclick="toggleFollow({{userId}})">
       {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
     </button>
   {{/unless}}
@@ -73,6 +73,11 @@
        
        button.innerText = isFollowing ? 'Follow' : 'Unfollow';
        isFollowing = !isFollowing; 
+       if (isFollowing) {
+        button.classList.add('unfollow');
+      } else {
+        button.classList.remove('unfollow');
+      }
       } else {
        const errorData = await response.json();
        alert(`Error: ${errorData.error}`);
