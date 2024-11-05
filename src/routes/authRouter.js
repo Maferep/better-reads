@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { isAuthenticated } from '../authenticate.js';
 import {uploader} from "../uploader.js";
-import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing } from '../database.js';
+import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getUsernameFromId, getIdFromUsername } from '../database.js';
 
 const authRouter = Router()
 
@@ -134,6 +134,35 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
   const following =  getFollowing(req.session.userId);
   res.render("profile", { 
     username: req.session.user, 
+    loggedIn: true, 
+    title: "Profile page",
+    posts: posts,
+    profile_photo: userProfile?.profile_photo,
+    bio: userProfile?.bio,
+    isProfileComplete,
+    followers: followers,
+    following: following,
+    style: "style_prototype.css"
+  });
+});
+
+authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res) {
+  const username = req.params.profileUsername;
+  const userId = getIdFromUsername(username);
+  if (typeof userId === 'undefined') {
+    console.log("BAD!!!!!!!!!!!!!! ")
+  } else {
+    console.log(userId)
+  }
+
+  const posts = getPostsFromUserId(userId);
+  const userProfile = getUserProfile(userId); // Obtén la información de perfil
+  console.log(userProfile?.bio, userProfile?.profile_photo);
+  const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
+  const followers =  getFollowers(userId);
+  const following =  getFollowing(userId);
+  res.render("profile", { 
+    username: username, 
     loggedIn: true, 
     title: "Profile page",
     posts: posts,
