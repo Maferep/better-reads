@@ -149,9 +149,6 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
 authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res) {
   const username = req.params.profileUsername;
   const userId = getIdFromUsername(username);
-  if (typeof userId === 'undefined') {
-    throw new Error("Username not found");
-  }
   const posts = getPostsFromUserId(userId);
   const userProfile = getUserProfile(userId); // Obtén la información de perfil
   console.log(userProfile?.bio, userProfile?.profile_photo);

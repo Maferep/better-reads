@@ -855,6 +855,10 @@ function getIdFromUsername(username) {
     SELECT id FROM insecure_users WHERE username=?
   `;
   const id = db.prepare(stmt).get(username);
+
+  if (typeof id === 'undefined') {
+    throw new Error("Username does not exist");
+  }
   return id['id']
 }
 
