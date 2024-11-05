@@ -1,20 +1,33 @@
 //Actualiza el contador de likes en la vista de un post
-async function updateLikes(post, post_id) {
+async function updateLikes(posts, post_id) {
   let response = await fetch(`http://localhost/post/${post_id}/like`, {
     method: "GET",
   });
   let data = await response.json();
-  updateLikeHtml(post, data.like_count, data.liked);
+
+  if (!(posts?.[Symbol.iterator])) {
+    posts = [posts];
+  }
+
+  posts.forEach(post => {
+    updateLikeHtml(post, data.like_count, data.liked);
+  });
 }
 
-async function updateReposts(post, post_id) {
+async function updateReposts(posts, post_id) {
   let response = await fetch(`http://localhost/post/${post_id}/repost`, {
     method: "GET",
   });
   let data = await response.json();
-  updateRepostHtml(post, data.repost_count, data.reposted);
-}
 
+  if (!(posts?.[Symbol.iterator])) {
+    posts = [posts];
+  }
+
+  posts.forEach(post => {
+    updateRepostHtml(post, data.repost_count, data.reposted);
+  });
+}
 
 
 function updateLikeHtml(post, like_count, liked) {
@@ -24,7 +37,6 @@ function updateLikeHtml(post, like_count, liked) {
 
 function updateRepostHtml(post, repost_count, can_repost) {
   modifyRespostButton(post, can_repost);
-
   post.querySelector(".repost-counter").textContent = `🔁 ${repost_count}`;
 }
 
@@ -44,15 +56,19 @@ function updateCommentHtml(post, comment_count) {
 
 
 
-async function updateInfo(post, post_id) {
+async function updateInfo(posts, post_id) {
   let response = await fetch(`http://localhost/post/${post_id}/info`, {
     method: "GET",
   });
   let data = await response.json();
 
-  console.log(post_id, data);
+  if (!(posts?.[Symbol.iterator])) {
+    posts = [posts];
+  }
 
-  updateLikeHtml(post, data.like_count, data.liked);
-  updateRepostHtml(post, data.repost_count, data.can_repost);
-  updateCommentHtml(post, data.comment_count);
+  posts.forEach(post => {
+    updateLikeHtml(post, data.like_count, data.liked);
+    updateRepostHtml(post, data.repost_count, data.can_repost);
+    updateCommentHtml(post, data.comment_count);
+  });
 }

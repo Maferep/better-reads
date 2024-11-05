@@ -484,7 +484,7 @@ function createPost(userId, content, topic) {
   );
 }
 
-function createRepost(userId, postId) {
+function createRepost(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });

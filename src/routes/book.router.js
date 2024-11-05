@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { estaAutenticado } from '../authenticate.js';
+import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
   addBookState } from '../database.js';
@@ -75,7 +75,7 @@ router.get('/:id', async function (req, res) {
 });
 
 
-router.post('/:id/review', (req, res) => {
+router.post('/:id/review', isAuthenticated, (req, res) => {
     try {
         const bookId = req.params.id;
         const rating = req.body.rating;
@@ -112,7 +112,7 @@ router.post('/:id/review', (req, res) => {
     }
 })
   
-router.post('/:id/state', (req, res) => {
+router.post('/:id/state', isAuthenticated, (req, res) => {
     const bookId = req.params.id;
     const userId = req.session.userId;
     const state = req.body.bookState;

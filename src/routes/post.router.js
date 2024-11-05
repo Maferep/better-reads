@@ -45,7 +45,7 @@ router.get('/:id', (req, res) => {
   });
   
 // post a post (not a review) to be shown on the feed
-router.post('/', (req, res) => {
+router.post('/',isAuthenticated, (req, res) => {
     const userId = req.session.userId;
     const postContent = req.body["post-content"];
     const topic = req.body.book; // this will now be a user id
@@ -60,7 +60,7 @@ router.post('/', (req, res) => {
     }
 });
 
-router.post('/:id/comment', (req, res) => {
+router.post('/:id/comment',isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
     const commentContent = req.body["comment-content"];
@@ -145,14 +145,22 @@ router.post('/:id/repost', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
 
-    createRepost(userId, postId);
+
+    if (canRepost(postId, userId)) {
+        createRepost(postId, userId);
+        res.sendStatus(201)
+    } else {
+        res.sendStatus(403)
+    }
+
+
 });
 
 router.get('/:id/repost', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
 
-    const can_repost = canRepost(userId, postId);
+    const can_repost = canRepost(postId, userId);
     const repostCount = getRepostsCount(postId);
 
     res.json({
