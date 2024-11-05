@@ -36,7 +36,11 @@
         <h2>Following: {{following.length}}</h2>
     </div>
     </div>
-
+     {{#unless isOwnProfile}}
+    <button id="follow-button" onclick="toggleFollow({{userId}})">
+      {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
+    </button>
+  {{/unless}}
     <div>
         <h2 style="text-align: center;">My Posts</h2>
         <div class="my-posts">
@@ -50,4 +54,32 @@
             {{/each}}
         </div>
     </div>
+
+<script>
+  let isFollowing = {{isFollowing}}; 
+  async function toggleFollow(userId) {
+    const button = document.getElementById('follow-button');
+    const url = isFollowing ? `/unfollow/${userId}` : `/follow/${userId}`; 
+
+    try {
+     const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+     }
+     });
+
+     if (response.ok) {
+       
+       button.innerText = isFollowing ? 'Follow' : 'Unfollow';
+       isFollowing = !isFollowing; 
+      } else {
+       const errorData = await response.json();
+       alert(`Error: ${errorData.error}`);
+      }
+     } catch (error) {
+      alert(`Request failed: ${error.message}`);
+     }
+}
+</script>
 

@@ -911,6 +911,15 @@ function unfollowUser(followerId, followingId) {
   }
 }
 
+function isUserFollowing(followerId, followingId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `SELECT 1 FROM user_follows WHERE follower_id = ? AND following_id = ?`;
+  
+  const exists = db.prepare(stmt).get(followerId, followingId);
+  
+  return !!exists; 
+}
+
 function getFollowingFeed(userId, limit = 10, offset = 0) {
   const db = new Database("database_files/betterreads.db");
   const stmt = /*sql*/`
@@ -1026,6 +1035,7 @@ export {
   getFollowers,
   getFollowing,
   unfollowUser,
+  isUserFollowing,
   getFollowingFeed,
   getUsernameFromId,
   getIdFromUsername

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../authenticate.js';
-import {fetchPostsAndLastDate, fetchBook, fetchPost, getFollowingFeed, hasLiked } from '../database.js';
+import {fetchPostsAndLastDate, hasLiked, fetchBook, fetchPost, getFollowingFeed, followUser, unfollowUser} from '../database.js';
 
 const router = Router();
 
@@ -75,10 +75,11 @@ router.get("/test", function(req, res) {
   res.json(posts)
 })
 // Seguir a un usuario
-router.post('/follow', isAuthenticated, async function (req, res) {
+router.post('/follow/:followingId', isAuthenticated, async function (req, res) {
   const followerId = req.session.userId; 
-  const followingId = req.body.followingId; 
+  const followingId = req.params.followingId; 
 
+  
   try {
     await followUser(followerId, followingId);
     res.status(200).json({ message: `User ${followerId} now follows user ${followingId}` });
@@ -88,10 +89,10 @@ router.post('/follow', isAuthenticated, async function (req, res) {
 });
 
 // Dejar de seguir a un usuario
-router.post('/unfollow', isAuthenticated, async function (req, res) {
+router.post('/unfollow/:followingId', isAuthenticated, async function (req, res) {
   const followerId = req.session.userId; 
-  const followingId = req.body.followingId; 
-
+  const followingId = req.params.followingId; 
+  
   try {
     await unfollowUser(followerId, followingId);
     res.status(200).json({ message: `User ${followerId} unfollowed user ${followingId}` });

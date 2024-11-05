@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { isAuthenticated } from '../authenticate.js';
 import {uploader} from "../uploader.js";
-import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getUsernameFromId, getIdFromUsername } from '../database.js';
+import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getUsernameFromId, getIdFromUsername, isUserFollowing } from '../database.js';
 
 const authRouter = Router()
 
@@ -132,6 +132,7 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   const followers =  getFollowers(req.session.userId);
   const following =  getFollowing(req.session.userId);
+  
   res.render("profile", { 
     username: req.session.user, 
     loggedIn: true, 
@@ -142,12 +143,17 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
     isProfileComplete,
     followers: followers,
     following: following,
+    isOwnProfile: true,
     style: "style_prototype.css"
   });
 });
 
 authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res) {
   const username = req.params.profileUsername;
+  const sessionUsername = req.session.user;
+  
+  // Determina si el perfil es del usuario actual o de otro usuario
+  const isOwnProfile = username === sessionUsername;
   const userId = getIdFromUsername(username);
   const posts = getPostsFromUserId(userId);
   const userProfile = getUserProfile(userId); // Obtén la información de perfil
@@ -155,8 +161,10 @@ authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res)
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   const followers =  getFollowers(userId);
   const following =  getFollowing(userId);
+  const isFollowing = isUserFollowing(req.session.userId, userId);
   res.render("profile", { 
     username: username, 
+    userId: userId,
     loggedIn: true, 
     title: "Profile page",
     posts: posts,
@@ -165,6 +173,8 @@ authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res)
     isProfileComplete,
     followers: followers,
     following: following,
+    isOwnProfile,
+    isFollowing,
     style: "style_prototype.css"
   });
 });
@@ -180,3 +190,4 @@ authRouter.post("/profile", uploader.single("profile_photo"), function (req, res
 });
 
 export default authRouter
+
