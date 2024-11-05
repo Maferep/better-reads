@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
-  fetchPostAndComments, createComment, hasLiked, getLikes} from '../database.js';
+  fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
+  getRepostsCount} from '../database.js';
 
 const router = Router();
 
@@ -44,7 +45,7 @@ router.get('/:id', (req, res) => {
   });
   
 // post a post (not a review) to be shown on the feed
-router.post('/', (req, res) => {
+router.post('/',isAuthenticated, (req, res) => {
     const userId = req.session.userId;
     const postContent = req.body["post-content"];
     const topic = req.body.book; // this will now be a user id
@@ -59,7 +60,7 @@ router.post('/', (req, res) => {
     }
 });
 
-router.post('/:id/comment', (req, res) => {
+router.post('/:id/comment',isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
     const commentContent = req.body["comment-content"];
@@ -111,15 +112,60 @@ router.post('/:id/unlike', isAuthenticated, (req, res) => {
 });
 
 // Endpoint for checking if user likes a post
-router.get('/:id/like', isAuthenticated, (req, res) => {
+router.get('/:id/like', (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
     const result = hasLiked(postId, userId)
-    const number_of_likes = getLikes(postId)
+    const number_of_likes = getLikesCount(postId)
     //res.redirect(`/?result=${result}`); // TODO: avoid reload
     res.json({
     liked: result,
     like_count: number_of_likes,
+    });
+});
+
+router.get('/:id/info', (req, res) => {
+    //obtains number of likes, if the user liked it, number of reposts, if the user reposted it, number of comments
+    const postId = req.params.id;
+    const userId = req.session.userId;
+    
+    const liked = hasLiked(postId, userId);
+    const can_repost = canRepost(postId, userId);
+    const info = getInfoCount(postId);
+    res.json({
+        liked: liked,
+        like_count: info.likes,
+        can_repost: can_repost,
+        repost_count: info.reposts,
+        comment_count: info.comments
+    });
+});
+
+router.post('/:id/repost', isAuthenticated, (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+
+
+    if (canRepost(postId, userId)) {
+        createRepost(postId, userId);
+        res.sendStatus(201)
+    } else {
+        res.sendStatus(403)
+    }
+
+
+});
+
+router.get('/:id/repost', isAuthenticated, (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+
+    const can_repost = canRepost(postId, userId);
+    const repostCount = getRepostsCount(postId);
+
+    res.json({
+        can_repost: can_repost,
+        repost_count: repostCount
     });
 });
   

@@ -23,6 +23,7 @@ function initDb() {
   createReviewDb(db);
   createBookStatesDb(db);
   createPostDatabase(db);
+  createRepostsDb(db);
   createCommentDb(db);
   createLikeDb(db);
 
@@ -189,12 +190,14 @@ function createPostDatabase(db) {
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
     `CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY  NOT NULL,
+      id INTEGER PRIMARY KEY NOT NULL,
       author_id int NOT NULL,
       book_id int NOT NULL,
-      text_content TEXT  NOT NULL,
+      text_content TEXT NOT NULL DEFAULT '',
       date INTEGER NOT NULL,
-      likes int NOT NULL,
+      likes int NOT NULL DEFAULT 0,
+      comments int NOT NULL DEFAULT 0,
+      reposts int NOT NULL DEFAULT 0,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
@@ -226,6 +229,35 @@ function createPostDatabase(db) {
     insert_many_posts(20)
   }
 }
+
+function createRepostsDb(db) {
+  db.prepare(
+    /*sql*/`CREATE TABLE IF NOT EXISTS reposts (
+      id INTEGER PRIMARY KEY NOT NULL,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      date INTEGER NOT NULL,
+      FOREIGN KEY(post_id) REFERENCES posts(id),
+      FOREIGN KEY(user_id) REFERENCES insecure_users(id));`
+    ).run();
+
+  let count = 'SELECT COUNT(*) FROM reposts'
+  count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
+
+  if (count['COUNT(*)'] <= 0) {
+    const insert_reposts = db.prepare(
+      `INSERT INTO reposts (
+          post_id, user_id, date
+       ) VALUES (?,?,unixepoch('now'))`
+    );
+
+    insert_reposts.run(
+      1,
+      20000000
+    );
+  }
+}  
+  
 
 function sleepFor(sleepDuration){
   var now = new Date().getTime();
@@ -452,27 +484,19 @@ function createPost(userId, content, topic) {
   );
 }
 
-function fetchPosts(number_of_posts = -1) {
-  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
+function createRepost(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const query = /* sql */ `SELECT posts.id, 
-                            insecure_users.id as user_id, 
-                            insecure_users.username, 
-                            books.id as book_id, 
-                            books.book_name, 
-                            posts.text_content, 
-                            posts.date, 
-                            posts.likes 
-                          FROM posts
-                          JOIN insecure_users ON posts.author_id = insecure_users.id
-                          JOIN books ON posts.book_id = books.id
-                          ORDER BY posts.date DESC
-                          LIMIT ?`;
 
-  const rows = db.prepare(query).all(number_of_posts, offset);
-  return rows;
+  const operation = /* sql */ `INSERT INTO reposts (
+        post_id, user_id, date
+     ) VALUES (?,?,unixepoch('now'))`
+
+  db.prepare(operation).run(postId, userId);
+
+  const incrementReposts = /* sql */ `UPDATE posts SET reposts=((posts.reposts)+1) WHERE id=?`
+  db.prepare(incrementReposts).run(postId);
 }
 
 
@@ -490,41 +514,75 @@ function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), boo
   //Fecha del post más antiguo que quiero obtener.
   let fecha_final_query;
   try {
-    if (bookFilter!= null) {
-    fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(fecha_inicio_query, number_of_posts).date;
+    const fecha_final_query_prepare = db.prepare(
+/*sql*/ `SELECT date FROM posts
+        UNION
+        SELECT date FROM reposts rp
+        WHERE` + (bookFilter == null)?"":/*sql*/` books.id = ? AND ` + /*sql*/` date <= ?
+        ORDER BY date DESC
+        LIMIT 1 OFFSET ?;`);
+
+    if (bookFilter == null) {
+      fecha_final_query = fecha_final_query_prepare.get(fecha_inicio_query, number_of_posts);
     } else {
-      fecha_final_query = db.prepare(/*sql*/ `SELECT date FROM posts WHERE date <= ? ORDER BY date DESC LIMIT 1 offset ?`).get(bookFilter,fecha_inicio_query, number_of_posts).date;
+      fecha_final_query = fecha_final_query_prepare.get(bookFilter, fecha_inicio_query, number_of_posts);
     }
   } catch (e) {
     // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
     fecha_final_query = 0;
   }
 
-  console.log("Fecha inicial", fecha_inicio_query)
-  console.log("Fecha final", fecha_final_query)
-
-  let rows;
-
-  if (bookFilter == null) {
-    
-    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
-                            JOIN insecure_users ON posts.author_id = insecure_users.id
-                            JOIN books ON posts.book_id = books.id
-                            WHERE ? >= posts.date AND posts.date > ? 
-                            ORDER BY posts.date DESC;`;
-
-    rows = db.prepare(query).all(fecha_inicio_query, fecha_final_query);
-
-  } else {
-    const query = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
-                            JOIN insecure_users ON posts.author_id = insecure_users.id
-                            JOIN books ON posts.book_id = books.id
-                            WHERE books.id = ? AND ? >= posts.date AND posts.date > ? 
-                            ORDER BY posts.date DESC;`;
-
-    rows = db.prepare(query).all(bookFilter, fecha_inicio_query, fecha_final_query);
-  }
+  const rows = getPostsWithFilters(fecha_inicio_query, fecha_final_query, bookFilter);
   return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
+}
+
+
+function getPostsWithFilters(since, until, bookId = null) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const book_filter = (bookId == null)?``:`AND b.id = ? `;
+
+  const query = 
+  /*sql*/  `SELECT p.id AS post_id,
+                    original_user.id AS user_id,
+                    original_user.username AS username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    p.date AS date,
+                    NULL AS repost_user_id,        -- NULL for original posts
+                    NULL AS repost_username         -- NULL for original posts
+            FROM posts p
+            JOIN insecure_users original_user ON p.author_id = original_user.id
+            JOIN books b ON p.book_id = b.id
+            WHERE ? >= date AND date > ? ` + book_filter + 
+  /*sql*/  `UNION
+            SELECT rp.post_id AS post_id,
+                    original_user.id AS user_id,
+                    original_user.username AS username,
+                    b.id AS book_id,
+                    b.book_name,
+                    p.text_content,
+                    rp.date AS date,
+                    rp.user_id AS repost_user_id,  -- ID of the user who reposted
+                    repost_user.username AS repost_username  -- Username of the user who reposted
+            FROM reposts rp
+            JOIN posts p ON rp.post_id = p.id
+            JOIN insecure_users original_user ON p.author_id = original_user.id
+            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+            JOIN books b ON p.book_id = b.id
+            WHERE ? >= rp.date AND rp.date > ?` + book_filter +
+  /*sql*/  `ORDER BY date DESC;`;
+
+  console.log(query)
+
+  if (bookId == null) {
+    return db.prepare(query).all(since, until, since, until);
+  } else {
+    return db.prepare(query).all(since, until,bookId, since, until, bookId);
+  }
 }
 
 // TODO: do not return status codes, this should not be handled in the database layer. 
@@ -657,13 +715,56 @@ function hasLiked(postId, userId) { // TODO: run inside transaction to ensure co
   }
 }
 
-function getLikes(postId) {
+function canRepost(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  console.log(postId, userId)
+
+  //Si hay un registro con tal postID y UserID quiere decir que ya reposteó.
+  // Tambien quiero ver que el usuario no sea dueño del post, para no poder repostearse a si mismo
+  const findRepost = db.prepare(`SELECT id FROM reposts WHERE post_id=? AND user_id=?`);
+  const findPost = db.prepare(`SELECT author_id FROM posts WHERE id=?`);
+
+  const id = findRepost.get(postId, userId);
+  const post = findPost.get(postId);
+
+  const yaReposteo = id != undefined;
+  const esDuenio = post.author_id == userId;
+
+  console.log(yaReposteo)
+  console.log(esDuenio)
+
+  return (!yaReposteo && !esDuenio)
+
+}
+
+function getLikesCount(postId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
   const findLikeCount = db.prepare(`SELECT likes FROM posts WHERE id=?`);
   return findLikeCount.get(postId).likes;
 }
+
+function getRepostsCount(postId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const findRepostCount = db.prepare(`SELECT reposts FROM posts WHERE id=?`);
+  return findRepostCount.get(postId).reposts;
+}
+
+function getInfoCount(postId) {
+  //Get number of comments, likes, reposts
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const findInfo = db.prepare(`SELECT comments, likes, reposts FROM posts WHERE id=?`);
+  return findInfo.get(postId);
+}
+
 
 function fetchPostAndComments(postId) {
   const post = fetchPost(postId);
@@ -678,9 +779,15 @@ function fetchPost(postId) {
   const query_post = /* sql */ `SELECT posts.id, insecure_users.id as user_id, insecure_users.username, books.id as book_id, books.book_name, posts.text_content, posts.date, posts.likes FROM posts
                           JOIN insecure_users ON posts.author_id = insecure_users.id
                           JOIN books ON posts.book_id = books.id
-                          WHERE posts.id = ?`;
+                          WHERE posts.id IN (SELECT value FROM json_each(?))`;
 
-  return db.prepare(query_post).get(postId);
+  const rows = db.prepare(query_post).all(JSON.stringify(postId));
+
+  //Quiero devolver un array de posts si pedi muchos posts, pero un unico post, si pedi solo uno.
+  if (Array.isArray(postId))
+    return rows;
+  else
+    return rows[0];
 }
 
 function fetchComments(postId) {
@@ -703,6 +810,9 @@ function createComment(postId, userId, content) {
         parent_post, author_id, text_content, date
      ) VALUES (?,?,?,unixepoch('now'))`
   db.prepare(operation).run(postId, userId, content);
+
+  const incrementComments = /* sql */ `UPDATE posts SET comments=((posts.comments)+1) WHERE id=?`
+  db.prepare(incrementComments).run(postId);
 }
 
 
@@ -803,7 +913,7 @@ function unfollowUser(followerId, followingId) {
 
 function getFollowingFeed(userId, limit = 10, offset = 0) {
   const db = new Database("database_files/betterreads.db");
-  const stmt = `
+  const stmt = /*sql*/`
     SELECT 
       posts.id AS post_id, 
       insecure_users.id AS user_id, 
@@ -812,17 +922,38 @@ function getFollowingFeed(userId, limit = 10, offset = 0) {
       books.book_name, 
       posts.text_content, 
       posts.date, 
-      posts.likes 
+      posts.likes,
+      NULL AS repost_user_id,
+      NULL AS repost_username
     FROM posts
     JOIN insecure_users ON posts.author_id = insecure_users.id
     JOIN books ON posts.book_id = books.id
     JOIN user_follows uf ON posts.author_id = uf.following_id 
     WHERE uf.follower_id = ?
+    UNION
+    SELECT
+      rp.post_id AS post_id,
+      insecure_users.id AS user_id,
+      insecure_users.username,
+      books.id AS book_id,
+      books.book_name,
+      posts.text_content,
+      rp.date AS date,
+      posts.likes,
+      rp.user_id AS repost_user_id,
+      repost_user.username AS repost_username
+    FROM reposts rp
+    JOIN posts ON rp.post_id = posts.id
+    JOIN insecure_users ON posts.author_id = insecure_users.id
+    LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+    JOIN books ON posts.book_id = books.id
+    JOIN user_follows uf ON rp.user_id = uf.following_id 
+    WHERE uf.follower_id = ?
     ORDER BY posts.date DESC
-    LIMIT ? OFFSET ?
+    LIMIT ? OFFSET ?;
   `;
 
-  const posts_raw = db.prepare(stmt).all(userId, limit, offset);
+  const posts_raw = db.prepare(stmt).all(userId, userId, limit, offset);
   console.log(`Fetched ${posts_raw.length} posts for user ${userId} feed with offset ${offset}.`);
 
    const stmtCount = `
@@ -875,18 +1006,22 @@ export {
   fetchBookState,
   createPost,
   searchBooks,
-  fetchPosts,
   incrementLikes,
   decrementLikes,
   fetchPostsAndLastDate,
   fetchPostAndComments,
   createComment,
   hasLiked,
-  getLikes,
+  canRepost,
+  getLikesCount,
+  getRepostsCount,
+  getInfoCount,
   getPostsFromUserId,
   getLikedPostsFromUserId,
   getUserProfile,
   updateUserProfile,
+  createRepost,
+  fetchPost,
   followUser,
   getFollowers,
   getFollowing,

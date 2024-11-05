@@ -142,3 +142,24 @@
 #back-to-feed:hover {
   background-color: #005f8a;
 }
+
+/* DUPLICADO */
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+  color: grey;
+  filter: grayscale(100%);
+}
+
+
+/* DUPLICADO */
+.post .post-actions a {
+  text-decoration: none;
+  color: #0077b6;
+}
+
+
+/* DUPLICADO */
+.post .post-actions a:hover {
+  text-decoration: underline;
+}
