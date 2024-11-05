@@ -971,6 +971,28 @@ function getFollowingFeed(userId, limit = 10, offset = 0) {
   return { posts_raw, has_more };
 }
 
+function getUsernameFromId(userId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `
+    SELECT username FROM insecure_users WHERE id=?
+  `;
+  const name = db.prepare(stmt).get(userId);
+  return name['username']
+}
+
+function getIdFromUsername(username) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `
+    SELECT id FROM insecure_users WHERE username=?
+  `;
+  const id = db.prepare(stmt).get(username);
+
+  if (typeof id === 'undefined') {
+    throw new Error("Username does not exist");
+  }
+  return id['id']
+}
+
 
 export {
   initDb,
@@ -1005,4 +1027,6 @@ export {
   getFollowing,
   unfollowUser,
   getFollowingFeed,
+  getUsernameFromId,
+  getIdFromUsername
 };

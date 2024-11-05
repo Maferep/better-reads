@@ -20,7 +20,7 @@
       <!-- Single Post -->
       <div class="post" post-id="{{post_id}}">
         <div class="user-info">
-          <strong>@{{username_post}}</strong> on <a href="/book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+          <a href="{{username_post}}/profile"><strong>@{{username_post}}</strong></a> on <a href="/book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
         </div>
         <div class="review">
           {{content}}
@@ -40,7 +40,7 @@
         <!-- Existing Comment -->
         <div class="comment">
           <div class="comment-user">
-            <strong>@{{username_comment}}</strong>:
+            <strong>@<a href="{{username_comment}}/profile">{{username_comment}}</a></strong>:
           </div>
           <div class="comment-content">
             {{content}}

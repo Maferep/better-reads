@@ -66,8 +66,7 @@
         {{#each posts}}
         <div class="post" post-id="{{post_id}}">
           <div class="user-info">
-            <!-- Se tiene que agregar el link personalizado para el usuario de este post -->
-            {{#if repost_username}}<strong style="color: gray;">@{{repost_username}} ⥂</strong> {{/if}}<strong>@{{username}}</strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+            {{#if repost_username}}<strong style="color: gray;"><a href="{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
           </div>
           <div class="review">
             {{content}}
