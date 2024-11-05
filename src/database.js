@@ -913,7 +913,7 @@ function unfollowUser(followerId, followingId) {
 
 function getFollowingFeed(userId, limit = 10, offset = 0) {
   const db = new Database("database_files/betterreads.db");
-  const stmt = `
+  const stmt = /*sql*/`
     SELECT 
       posts.id AS post_id, 
       insecure_users.id AS user_id, 
@@ -922,17 +922,38 @@ function getFollowingFeed(userId, limit = 10, offset = 0) {
       books.book_name, 
       posts.text_content, 
       posts.date, 
-      posts.likes 
+      posts.likes,
+      NULL AS repost_user_id,
+      NULL AS repost_username
     FROM posts
     JOIN insecure_users ON posts.author_id = insecure_users.id
     JOIN books ON posts.book_id = books.id
     JOIN user_follows uf ON posts.author_id = uf.following_id 
     WHERE uf.follower_id = ?
+    UNION
+    SELECT
+      rp.post_id AS post_id,
+      insecure_users.id AS user_id,
+      insecure_users.username,
+      books.id AS book_id,
+      books.book_name,
+      posts.text_content,
+      rp.date AS date,
+      posts.likes,
+      rp.user_id AS repost_user_id,
+      repost_user.username AS repost_username
+    FROM reposts rp
+    JOIN posts ON rp.post_id = posts.id
+    JOIN insecure_users ON posts.author_id = insecure_users.id
+    LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
+    JOIN books ON posts.book_id = books.id
+    JOIN user_follows uf ON rp.user_id = uf.following_id 
+    WHERE uf.follower_id = ?
     ORDER BY posts.date DESC
-    LIMIT ? OFFSET ?
+    LIMIT ? OFFSET ?;
   `;
 
-  const posts_raw = db.prepare(stmt).all(userId, limit, offset);
+  const posts_raw = db.prepare(stmt).all(userId, userId, limit, offset);
   console.log(`Fetched ${posts_raw.length} posts for user ${userId} feed with offset ${offset}.`);
 
    const stmtCount = `
