@@ -56,19 +56,25 @@ function updateCommentHtml(post, comment_count) {
 
 
 
-async function updateInfo(posts, post_id) {
-  let response = await fetch(`http://localhost/post/${post_id}/info`, {
-    method: "GET",
-  });
-  let data = await response.json();
+async function updateInfo(posts, post_id) {  
+  try{
+      let response = await fetch(`http://localhost/post/${post_id}/info`, {
+        method: "GET",
+      });
+      let data = await response.json();
+    
+      if (!(posts?.[Symbol.iterator])) {
+        posts = [posts];
+      }
+    
+      posts.forEach(post => {
+        updateLikeHtml(post, data.like_count, data.liked);
+        updateRepostHtml(post, data.repost_count, data.can_repost);
+        updateCommentHtml(post, data.comment_count);
+      });
 
-  if (!(posts?.[Symbol.iterator])) {
-    posts = [posts];
+  }catch(e){
+    console.error(e);
   }
 
-  posts.forEach(post => {
-    updateLikeHtml(post, data.like_count, data.liked);
-    updateRepostHtml(post, data.repost_count, data.can_repost);
-    updateCommentHtml(post, data.comment_count);
-  });
 }
