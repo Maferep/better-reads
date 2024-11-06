@@ -5,3 +5,4 @@ user_uploads
 database_files/*
 .vscode
 database_files/books_data.csv
+public/uploads/*
