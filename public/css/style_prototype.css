@@ -3,6 +3,10 @@
   flex-wrap: wrap; /* Allows wrapping for smaller screens */
 }
 
+#navbar a {
+  color: white;
+}
+
 a {
   text-decoration: none;
 }
@@ -315,4 +319,16 @@ a.disabled {
 .post .post-actions a {
   text-decoration: none;
   color: #0077b6;
+}
+
+
+.post a {
+  color: #0077b6;
+}
+
+.post .repost-indicator {
+  color: gray;
+} 
+.post .repost-indicator > a {
+  color: gray;
 }

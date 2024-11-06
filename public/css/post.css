@@ -17,6 +17,15 @@
   margin: 20px 0;
 }
 
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
 #container {
   width: 80%;
   max-width: 700px;
@@ -162,4 +171,12 @@ a.disabled {
 /* DUPLICADO */
 .post .post-actions a:hover {
   text-decoration: underline;
+}
+
+.post a {
+  color: #0077b6;
+}
+
+.comment a {
+  color: #0077b6;
 }

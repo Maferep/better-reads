@@ -57,7 +57,7 @@
       {{#each posts}}
       <div class="post" post-id="{{post_id}}">
         <div class="user-info">
-            {{#if repost_username}}<strong style="color: gray;"><a href="/{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="/{{username}}/profile">@{{username}}</a></strong> on <a href="/book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+            {{#if repost_username}}<strong class="repost-indicator"><a href="/{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="/{{username}}/profile">@{{username}}</a></strong> on <a href="/book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
           </div>
         <div class="review">
           {{content}}
