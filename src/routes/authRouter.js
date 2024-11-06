@@ -145,12 +145,14 @@ authRouter.get("/profile", isAuthenticated, function (req, res) {
       repost_user_id: post_raw.repost_user_id,
       repost_username: post_raw.repost_username,
     }})
+  const profile_photo = isProfileComplete ? userProfile.profile_photo : "/uploads/default-profile.png";
   res.render("profile", { 
+    my_username: req.session.user, 
     username: req.session.user, 
     loggedIn: true, 
     title: "Profile page",
     posts: posts,
-    profile_photo: userProfile?.profile_photo,
+    profile_photo: profile_photo,
     bio: userProfile?.bio,
     isProfileComplete,
     followers: followers,
@@ -187,13 +189,15 @@ authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res)
       repost_user_id: post_raw.repost_user_id,
       repost_username: post_raw.repost_username,
     }})
+  const profile_photo = isProfileComplete ? userProfile.profile_photo : "/uploads/default-profile.png";
   res.render("profile", { 
+    my_username: req.session.user, 
     username: username, 
     userId: userId,
     loggedIn: true, 
     title: "Profile page",
     posts: posts,
-    profile_photo: userProfile?.profile_photo,
+    profile_photo: profile_photo,
     bio: userProfile?.bio,
     isProfileComplete,
     followers: followers,
@@ -208,11 +212,18 @@ authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res)
 authRouter.post("/profile", uploader.single("profile_photo"), function (req, res) {
   const userId = req.session.userId;
   const bio = req.body.bio || null;
+
+  // Solo actualiza `profilePhoto` si se ha subido un archivo
   const profilePhoto = req.file ? `/uploads/${req.file.filename}` : null;
 
-  updateUserProfile(userId, bio, profilePhoto);
+  // Obtén el perfil actual del usuario para no sobreescribir `profile_photo` si no hay un archivo nuevo
+  const currentProfile = getUserProfile(userId);
+  const updatedProfilePhoto = profilePhoto || currentProfile.profile_photo;
+
+  updateUserProfile(userId, bio, updatedProfilePhoto);
   res.redirect("/profile");
 });
 
-export default authRouter
+export default authRouter;
+
 
