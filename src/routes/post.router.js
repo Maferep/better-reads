@@ -69,7 +69,7 @@ router.post('/:id/comment',isAuthenticated, (req, res) => {
 });
 
 // Endpoint for liking a post
-// test: curl -X POST http://localhost/post/1/like
+// test: curl -X POST /post/1/like
 router.post('/:id/like', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
@@ -97,7 +97,7 @@ router.post('/:id/like', isAuthenticated, (req, res) => {
 });
 
 // Endpoint for liking a post
-// test: curl -X POST http://localhost/post/1/like
+// test: curl -X POST /post/1/like
 router.post('/:id/unlike', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;

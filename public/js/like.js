@@ -8,14 +8,14 @@ document.getElementById(event_listener_location).addEventListener("click", funct
   if (event.target.closest(".like-button")) {
     event.preventDefault();
 
-    fetch(`http://localhost/post/${post_id}/like`, {
+    fetch(`/post/${post_id}/like`, {
       method: "GET",
     })
     .then(res => {
       return res.json();
     })
     .then(data => {
-      return fetch(`http://localhost/post/${post_id}/` + (data.liked?"unlike":"like"), {
+      return fetch(`/post/${post_id}/` + (data.liked?"unlike":"like"), {
         method: "POST",
       })
     })
@@ -27,7 +27,7 @@ document.getElementById(event_listener_location).addEventListener("click", funct
   } else if (event.target.closest(".repost-button")) {
     event.preventDefault();
 
-    fetch(`http://localhost/post/${post_id}/repost`, {
+    fetch(`/post/${post_id}/repost`, {
       method: "POST",
     })
     .then(res => {

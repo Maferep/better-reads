@@ -1,6 +1,6 @@
 //Actualiza el contador de likes en la vista de un post
 async function updateLikes(posts, post_id) {
-  let response = await fetch(`http://localhost/post/${post_id}/like`, {
+  let response = await fetch(`/post/${post_id}/like`, {
     method: "GET",
   });
   let data = await response.json();
@@ -15,7 +15,7 @@ async function updateLikes(posts, post_id) {
 }
 
 async function updateReposts(posts, post_id) {
-  let response = await fetch(`http://localhost/post/${post_id}/repost`, {
+  let response = await fetch(`/post/${post_id}/repost`, {
     method: "GET",
   });
   let data = await response.json();
@@ -58,7 +58,7 @@ function updateCommentHtml(post, comment_count) {
 
 async function updateInfo(posts, post_id) {  
   try{
-      let response = await fetch(`http://localhost/post/${post_id}/info`, {
+      let response = await fetch(`/post/${post_id}/info`, {
         method: "GET",
       });
       let data = await response.json();
