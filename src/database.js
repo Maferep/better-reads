@@ -132,6 +132,9 @@ function createBookDb(db, datasetPath) {
       image TEXT
     )`
   ).run();
+  
+  // create genres index
+  db.prepare("CREATE INDEX idx_genre ON books(genre);").run();
 
   // Check if the table already contains data
   const books_count = "SELECT COUNT(*) FROM books";
