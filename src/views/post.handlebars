@@ -1,36 +1,12 @@
+<link rel="stylesheet" href="/static/css/post.css">
 
-  <div id="navbar">
-    <div id="logo"><a href="/">Better Reads</a></div>
-    <div class="user-actions">
-      {{#if loggedIn}}
-      <a href="/logout">Logout</a>
-      <a href="/profile">Hello, {{username}}</a>
-      {{else}}
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-      {{/if}}
-    </div>
-  </div>
-
-  <div id="main-layout">
+<div id="main-layout">
     <div id="container">
       
       <button id="back-to-feed" onclick="history.back()">⬅️ Back to Feed</button>
 
       <!-- Single Post -->
-      <div class="post" post-id="{{post_id}}">
-        <div class="user-info">
-          <a href="{{username_post}}/profile"><strong>@{{username_post}}</strong></a> on <a href="/book/{{book_id}}" class="topic-link"><em>{{topic}}</em></a>
-        </div>
-        <div class="review">
-          {{content}}
-        </div>
-        <div class="post-actions">
-            <a href="#" class="like-button" liked="false"><span class="like-counter" style="margin-right: 8px;">🤍 ?</span></a>
-            <a href="#" class="repost-button"><span class="repost-counter" style="margin-right: 8px;">🔁 {{number_repost}}</span></a>
-            <span style="margin-right: 8px;">📩 {{number_comments}}</span>
-        </div>
-      </div>
+      {{> individual_post hideCommentButton=true}}
 
       <!-- Comments Section -->
       <div id="comments-section">

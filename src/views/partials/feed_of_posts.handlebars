@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="/static/css/post.css"/>
+
+<div id="feed">
+    {{#with feed}}
+    {{#if posts}}
+        {{#each posts}}
+            {{> individual_post}}
+        {{/each}}
+        {{#if page_number}}
+            <a href="/{{endpoint_route}}?page={{page_number}}&paginate_from={{paginate_from}}{{#if book.id includeZero=true}}&book_id={{book.id}}{{/if}}">Load more posts</a>
+        {{else}}
+            <p>You have reached the bottom! There are no more older posts</p>
+        {{/if}}
+    {{else}}
+        <p>No posts yet</p>
+    {{/if}}
+    {{/with}}
+</div>

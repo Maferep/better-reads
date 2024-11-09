@@ -1,25 +1,29 @@
+<link rel="stylesheet" href="/static/css/style.css" />
 
-  <div id="navbar">
-    <div id="logo"><a href="/">Logo!</a></div>
-  </div>
-  <div id="container">
-    <h1>Sign up</h1>
-    {{#if usernameExists}}
-    <div>Username already exists.</div><br>
-    {{/if}}
-    <form action="register" method="post">
-      <div class="input-group">
-        <label for="username">Username:</label>
-        <input type="text" name="name" id="username" minlength="8" required /><br>
-      </div>
-      <div class="input-group">
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" minlength="8" required /><br>
-      </div>
-      <button type="submit">
-        <span>Sign Up</span>
-      </button>
-      <p class="redirect-link"><a href="/login">Already have an account? Login</a></p>
-    </form>
-  </div>
-
+<div id="container">
+  <h1>Sign up</h1>
+  {{#if usernameExists}}
+    <div>Username already exists.</div><br />
+  {{/if}}
+  <form action="register" method="post">
+    <div class="input-group">
+      <label for="username">Username:</label>
+      <input type="text" name="name" id="username" minlength="8" required /><br
+      />
+    </div>
+    <div class="input-group">
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        minlength="8"
+        required
+      /><br />
+    </div>
+    <button type="submit">
+      <span>Sign Up</span>
+    </button>
+    <p class="redirect-link"><a href="/login">Already have an account? Login</a></p>
+  </form>
+</div>

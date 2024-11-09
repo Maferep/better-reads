@@ -13,7 +13,6 @@ router.get('/', function (req, res) {
         username: req.session.user,
         loggedIn: true,
         title: "Browse Books",
-        style: "style.css",
         bookEntries: rows
     });
 });

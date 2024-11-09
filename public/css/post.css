@@ -1,15 +1,3 @@
-#logo a {
-  text-decoration: none;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.user-actions a {
-  margin-left: 15px;
-  text-decoration: none;
-  color: white;
-}
 
 #main-layout {
   display: flex;
@@ -17,14 +5,6 @@
   margin: 20px 0;
 }
 
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration:underline;
-}
 
 #container {
   width: 80%;
@@ -48,7 +28,7 @@ a:hover {
   margin-bottom: 8px;
 }
 
-.review {
+.post-text {
   font-size: 1rem;
   margin-bottom: 10px;
   color: #555;
@@ -161,17 +141,6 @@ a.disabled {
 }
 
 
-/* DUPLICADO */
-.post .post-actions a {
-  text-decoration: none;
-  color: #0077b6;
-}
-
-
-/* DUPLICADO */
-.post .post-actions a:hover {
-  text-decoration: underline;
-}
 
 .post a {
   color: #0077b6;
@@ -179,4 +148,60 @@ a.disabled {
 
 .comment a {
   color: #0077b6;
+}
+
+
+
+
+/* NUEVO */
+
+#feed .post {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+#feed .user-info {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+#feed .post-text {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+#feed .post-actions {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #e63946;
+}
+
+#feed .post-actions span {
+  margin-right: 8px;
+}
+
+.post .post-actions a:hover {
+  text-decoration: underline;
+}
+
+.post .post-actions a {
+  text-decoration: none;
+  color: #0077b6;
+}
+
+
+.post a {
+  color: #0077b6;
+}
+
+.post .repost-indicator {
+  color: gray;
+} 
+.post .repost-indicator > a {
+  color: gray;
 }

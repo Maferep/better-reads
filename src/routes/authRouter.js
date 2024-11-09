@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { isAuthenticated } from '../authenticate.js';
-import {uploader} from "../uploader.js";
-import {getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getUsernameFromId, getIdFromUsername, isUserFollowing } from '../database.js';
 
 const authRouter = Router()
 
@@ -37,8 +35,7 @@ authRouter.get('/login', function(req, res) {
     username: "guest", 
     loggedIn: false, 
     hasWrongCred: _hasWrongCred, 
-    title: "Login",
-    style: "style.css" })
+    title: "Login" })
 })
 
 authRouter.post('/login', isAuthenticated, function(req, res) {
@@ -99,8 +96,7 @@ authRouter.get('/register', function(req, res) {
     username: "guest", 
     loggedIn: false, 
     usernameExists: _usernameExists,
-    title: "Home page",
-    style: "style.css"  })
+    title: "Home page" })
 })
 
 authRouter.post('/register', isAuthenticated, function(req, res) {
@@ -124,105 +120,6 @@ authRouter.post('/register', function  (req, res) {
   }
 })
 
-
-authRouter.get("/profile", isAuthenticated, function (req, res) {
-  const posts_raw = getPostsFromUserId(req.session.userId);
-  const userProfile = getUserProfile(req.session.userId); // Obtén la información de perfil
-  console.log(userProfile?.bio, userProfile?.profile_photo);
-  const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
-  const followers =  getFollowers(req.session.userId);
-  const following =  getFollowing(req.session.userId);
-  const posts = posts_raw.map(post_raw => {
-    return {
-      post_id: post_raw.post_id,
-      user_id: post_raw.user_id,
-      username: post_raw.username,
-      book_id: post_raw.book_id,
-      book_name: post_raw.book_name,
-      content: post_raw.text_content,
-      number_reposts: post_raw.reposts,
-      number_comments: 0,
-      repost_user_id: post_raw.repost_user_id,
-      repost_username: post_raw.repost_username,
-    }})
-  const profile_photo = isProfileComplete ? userProfile.profile_photo : "/uploads/default-profile.png";
-  res.render("profile", { 
-    my_username: req.session.user, 
-    username: req.session.user, 
-    loggedIn: true, 
-    title: "Profile page",
-    posts: posts,
-    profile_photo: profile_photo,
-    bio: userProfile?.bio,
-    isProfileComplete,
-    followers: followers,
-    following: following,
-    isOwnProfile: true,
-    style: "style_prototype.css"
-  });
-});
-
-authRouter.get("/:profileUsername/profile", isAuthenticated, function (req, res) {
-  const username = req.params.profileUsername;
-  const sessionUsername = req.session.user;
-  
-  // Determina si el perfil es del usuario actual o de otro usuario
-  const isOwnProfile = username === sessionUsername;
-  const userId = getIdFromUsername(username);
-  const posts_raw = getPostsFromUserId(userId);
-  const userProfile = getUserProfile(userId); // Obtén la información de perfil
-  console.log(userProfile?.bio, userProfile?.profile_photo);
-  const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
-  const followers =  getFollowers(userId);
-  const following =  getFollowing(userId);
-  const isFollowing = isUserFollowing(req.session.userId, userId);
-  const posts = posts_raw.map(post_raw => {
-    return {
-      post_id: post_raw.post_id,
-      user_id: post_raw.user_id,
-      username: post_raw.username,
-      book_id: post_raw.book_id,
-      book_name: post_raw.book_name,
-      content: post_raw.text_content,
-      number_reposts: post_raw.reposts,
-      number_comments: 0,
-      repost_user_id: post_raw.repost_user_id,
-      repost_username: post_raw.repost_username,
-    }})
-  const profile_photo = isProfileComplete ? userProfile.profile_photo : "/uploads/default-profile.png";
-  res.render("profile", { 
-    my_username: req.session.user, 
-    username: username, 
-    userId: userId,
-    loggedIn: true, 
-    title: "Profile page",
-    posts: posts,
-    profile_photo: profile_photo,
-    bio: userProfile?.bio,
-    isProfileComplete,
-    followers: followers,
-    following: following,
-    isOwnProfile,
-    isFollowing,
-    style: "style_prototype.css"
-  });
-});
-
-// Ruta para actualizar el perfil y cargar la foto
-authRouter.post("/profile", uploader.single("profile_photo"), function (req, res) {
-  const userId = req.session.userId;
-  const bio = req.body.bio || null;
-
-  // Solo actualiza `profilePhoto` si se ha subido un archivo
-  const profilePhoto = req.file ? `/uploads/${req.file.filename}` : null;
-
-  // Obtén el perfil actual del usuario para no sobreescribir `profile_photo` si no hay un archivo nuevo
-  const currentProfile = getUserProfile(userId);
-  const updatedProfilePhoto = profilePhoto || currentProfile.profile_photo;
-
-  updateUserProfile(userId, bio, updatedProfilePhoto);
-  res.redirect("/profile");
-});
 
 export default authRouter;
 

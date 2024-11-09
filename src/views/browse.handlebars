@@ -1,32 +1,6 @@
+<link rel="stylesheet" href="/static/css/style.css" />
 
-  {{!-- <div id="navbar">
-    <div id="logo"><a href="/">Logo!</a></div>
-    <div id="user-info">
-      {{#if loggedIn}}
-        <span>Welcome, {{username}}!</span>
-        <a href="/logout">Logout</a>
-      {{else}}
-        <a href="/login">Login</a>
-      {{/if}}
-    </div>
-  </div> --}}
-
-<div id="navbar">
-  <div id="logo"><a href="/">Better Reads</a></div>
-  <div class="user-actions">
-    {{#if loggedIn}}
-    <div><a href="/logout">Logout</a></div>
-    <div><a href="/profile">Hello, {{username}}</a></div>
-    {{else}}
-    <div><a href="/login">Login</a></div>
-    <div><a href="/register">Register</a></div>
-    {{/if}}
-  </div>
-</div>
-
-
-
-  <div id="browse-container">
+<div id="browse-container">
   <h1>Browse Books</h1>
 
   <div id="book-list">
@@ -38,7 +12,7 @@
       {{/each}}
     </select>
   </div>
-  
+
   <button type="submit" onclick="return redirectToBook(event)">View Book</button>
 </div>
 
@@ -69,14 +43,15 @@
     }
   });
 });
-    function redirectToBook(event) {
-      event.preventDefault(); 
-      const select = document.getElementById('book-select');
-      const bookId = select.value;
-      if (bookId) {
+
+function redirectToBook(event) {
+    event.preventDefault();
+    const select = document.getElementById('book-select');
+    const bookId = select.value;
+    if (bookId) {
         window.location.href = `/book/${bookId}`;
-      } else {
-        alert("Please select a book."); 
-      }
+    } else {
+        alert("Please select a book.");
     }
-  </script>
+}
+</script>

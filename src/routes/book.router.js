@@ -67,7 +67,6 @@ router.get('/:id', async function (req, res) {
       bookGenre: genres,   // Cambiado a genres
       bookCover: bookRow.image,
       title: bookRow.book_name,
-      style: "style_book.css",
       reviews: reviewsData.reviews,
       ratingsMean: meanText,
       bookState: bookState,
