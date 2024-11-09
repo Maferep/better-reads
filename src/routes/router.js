@@ -38,6 +38,8 @@ router.get('/', isAuthenticated, async function (req, res) {
       content: post_raw.text_content,
       number_reposts: post_raw.reposts,
       number_comments: 0,
+      is_review: Boolean(post_raw.review_score),
+      review_score: (post_raw.review_score * 20),
       repost_user_id: post_raw.repost_user_id,
       repost_username: post_raw.repost_username,
     }})

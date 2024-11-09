@@ -66,8 +66,14 @@
         {{#each posts}}
         <div class="post" post-id="{{post_id}}">
           <div class="user-info">
-            {{#if repost_username}}<strong class="repost-indicator"><a href="{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong> on <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+            {{#if repost_username}}<strong class="repost-indicator"><a href="{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong> {{#if review_score}}reviewed{{else}}on{{/if}} <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
           </div>
+          {{#if is_review}}
+          <div class="ratings">
+              <div class="full-stars" style="width:{{review_score}}%"></div>
+              <div class="empty-stars"></div>
+            </div>
+          {{/if}}
           <div class="review">
             {{content}}
           </div>
@@ -92,8 +98,46 @@
       </div>
 
 
+<style>
 
+  * { border: 1px solid black; }
 
+  
+  .ratings {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    color: #b1b1b1;
+    overflow: hidden;
+    z-index: 1;
+}
+.full-stars {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #fde16d;
+}
+.empty-stars:before, .full-stars:before {
+    content:"\2605\2605\2605\2605\2605";
+}
+
+.ratings > .empty-stars:before, .ratings > .full-stars:before {
+    font-size: 2em;
+}
+
+.empty-stars:before {
+    -webkit-text-stroke: 1px #848484;
+}
+.full-stars:before {
+    -webkit-text-stroke: 1px orange;
+}
+</style>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
 
 <script src="/static/js/updateLikes.js" type="text/javascript"></script>
 <script src="/static/js/like.js" type="text/javascript" event_listener_location="feed"></script>

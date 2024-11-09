@@ -198,6 +198,7 @@ function createPostDatabase(db) {
       likes int NOT NULL DEFAULT 0,
       comments int NOT NULL DEFAULT 0,
       reposts int NOT NULL DEFAULT 0,
+      review_score int DEFAULT NULL,
       FOREIGN KEY(author_id) REFERENCES insecure_users(id),
       FOREIGN KEY(book_id) REFERENCES books(id))`
   ).run();
@@ -552,6 +553,7 @@ function getPostsWithFilters(since, until, bookId = null) {
                     b.book_name,
                     p.text_content,
                     p.date AS date,
+                    p.review_score,
                     NULL AS repost_user_id,        -- NULL for original posts
                     NULL AS repost_username         -- NULL for original posts
             FROM posts p
@@ -566,6 +568,7 @@ function getPostsWithFilters(since, until, bookId = null) {
                     b.book_name,
                     p.text_content,
                     rp.date AS date,
+                    p.review_score,
                     rp.user_id AS repost_user_id,  -- ID of the user who reposted
                     repost_user.username AS repost_username  -- Username of the user who reposted
             FROM reposts rp
