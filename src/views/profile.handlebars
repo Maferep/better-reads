@@ -40,21 +40,7 @@
 
  <!-- Integrar el feed aquí -->
   <div id="container">
-    <div id="feed">
-      {{#if posts}}
-      {{#each posts}}
-      {{> individual_post}}
-      {{/each}}
-      {{#if has_more}}
-       <a href="/following-posts?offset={{posts.length}}">Load more posts</a>
-      {{else}}
-      <p>You have reached the bottom! There are no more older posts</p>
-      {{/if}}
-      {{else}}
-      <p>No posts yet</p>
-      {{/if}}
-    </div>
-    </div>
+    {{> feed_of_posts}}
 
   <script src="/static/js/updateLikes.js" type="text/javascript"></script>
   <script src="/static/js/like.js" type="text/javascript" event_listener_location="feed"></script>
