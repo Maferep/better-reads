@@ -1,0 +1,32 @@
+<div class="post" post-id="{{post_id}}">
+  <div class="user-info">
+    {{#if repost_username}}<strong class="repost-indicator"><a
+          href="{{repost_username}}/profile"
+        >@{{repost_username}}</a>
+        ⥂</strong>
+    {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong>
+    on
+    <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+  </div>
+  <div class="review">
+    {{content}}
+  </div>
+  <div class="post-actions">
+    <div style="display: flex; align-items: center;">
+      <a href="#" class="like-button"><span
+          class="like-counter"
+          style="margin-right: 8px;"
+        >🤍 ?</span></a>
+      <a href="#" class="repost-button"><span
+          class="repost-counter"
+          style="margin-right: 8px;"
+        >🔁 ?</span></a>
+      <span class="comment-counter" style="margin-right: 8px;">📩 ?</span>
+    </div>
+    {{#unless hideCommentButton}}
+      <a href="/post/{{post_id}}">Comments</a>
+    {{/unless}}
+  </div>
+</div>
+
+
