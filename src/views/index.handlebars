@@ -68,12 +68,14 @@
           <div class="user-info">
             {{#if repost_username}}<strong class="repost-indicator"><a href="{{repost_username}}/profile">@{{repost_username}}</a> ⥂</strong> {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong> {{#if review_score}}reviewed{{else}}on{{/if}} <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
           </div>
-          {{#if is_review}}
+            {{#if is_review}}
+          
           <div class="ratings">
               <div class="full-stars" style="width:{{review_score}}%"></div>
               <div class="empty-stars"></div>
             </div>
           {{/if}}
+          
           <div class="review">
             {{content}}
           </div>
@@ -100,7 +102,6 @@
 
 <style>
 
-  * { border: 1px solid black; }
 
   
   .ratings {
@@ -122,7 +123,7 @@
 }
 
 .ratings > .empty-stars:before, .ratings > .full-stars:before {
-    font-size: 2em;
+    font-size: 1.5rem;
 }
 
 .empty-stars:before {

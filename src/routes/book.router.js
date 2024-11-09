@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
-  addBookState } from '../database.js';
+  addBookState, createPost } from '../database.js';
 
 const router = Router();
 
@@ -109,8 +109,7 @@ router.post('/:id/review', isAuthenticated, (req, res) => {
         addReview(bookId, userId, rating, reviewText);
 
         if (shareOnFeed) {
-          //TODO: share review on feed
-            // createPost(userId, reviewText, bookId);
+            createPost(userId, reviewText, bookId, rating);
         }
 
         res.json({ success: true, message: 'Review submitted successfully!' });

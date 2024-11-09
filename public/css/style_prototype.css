@@ -90,12 +90,13 @@ a:hover {
 
 #feed .user-info {
   font-size: 1rem;
-  margin-bottom: 8px;
+  /* margin-bottom: 8px; */
 }
 
 #feed .review {
   font-size: 0.95rem;
   margin-bottom: 8px;
+  margin-top: 8px;
   color: #555;
 }
 
