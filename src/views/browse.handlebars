@@ -1,4 +1,6 @@
-  <div id="browse-container">
+<link rel="stylesheet" href="/static/css/style.css" />
+
+<div id="browse-container">
   <h1>Browse Books</h1>
 
   <div id="book-list">
@@ -10,7 +12,7 @@
       {{/each}}
     </select>
   </div>
-  
+
   <button type="submit" onclick="return redirectToBook(event)">View Book</button>
 </div>
 
@@ -41,14 +43,15 @@
     }
   });
 });
-    function redirectToBook(event) {
-      event.preventDefault(); 
-      const select = document.getElementById('book-select');
-      const bookId = select.value;
-      if (bookId) {
+
+function redirectToBook(event) {
+    event.preventDefault();
+    const select = document.getElementById('book-select');
+    const bookId = select.value;
+    if (bookId) {
         window.location.href = `/book/${bookId}`;
-      } else {
-        alert("Please select a book."); 
-      }
+    } else {
+        alert("Please select a book.");
     }
-  </script>
+}
+</script>

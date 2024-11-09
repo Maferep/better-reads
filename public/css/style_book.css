@@ -5,42 +5,7 @@ body {
   background-repeat: repeat;
 }
 
-a {
-  text-decoration: none;
-  color: lavender;
-}
 
-#logo {
-  margin-left: auto;
-  color: lavender;
-}
-
-a:hover {
-  text-decoration:underline;
-}
-
-#logo{
-  margin-left: 15px;
-}
-
-#logo a {
-  text-decoration: none;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.user-actions {
-  margin-right: 15px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  width: 20%;
-}
-  
-  a:hover {
-    text-decoration:underline;
-  }
   
   li { 
     list-style-type: none;

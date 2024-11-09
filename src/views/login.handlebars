@@ -1,28 +1,37 @@
-    <div id="container">
-      <h1>Login</h1>
-      {{#if hasWrongCred}}
-      <div>Wrong username or password.</div><br>
-      {{/if}}
+<link rel="stylesheet" href="/static/css/style.css" />
 
-      <form action="login" method="post">
-        <!-- Campo para el nombre de usuario -->
-        <div class="input-group">
-          <label for="username">Username:</label>
-          <input type="text" name="name" id="username" minlength="3" required /><br>
-        </div>
+<div id="container">
+  <h1>Login</h1>
+  {{#if hasWrongCred}}
+    <div>Wrong username or password.</div><br />
+  {{/if}}
 
-        <!-- Campo para la contraseña -->
-        <div class="input-group">
-          <label for="password">Password:</label>
-          <input type="password" name="password" id="password" minlength="8" required /><br>
-        </div>
-
-        <!-- Botón de envío -->
-        <button type="submit">
-          <span>Send</span>
-        </button>
-      </form>
-      <div class="register-link">
-       <a href="/register">Don't have an account? Register here</a>
-      </div>
+  <form action="login" method="post">
+    <!-- Campo para el nombre de usuario -->
+    <div class="input-group">
+      <label for="username">Username:</label>
+      <input type="text" name="name" id="username" minlength="3" required /><br
+      />
     </div>
+
+    <!-- Campo para la contraseña -->
+    <div class="input-group">
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        minlength="8"
+        required
+      /><br />
+    </div>
+
+    <!-- Botón de envío -->
+    <button type="submit">
+      <span>Send</span>
+    </button>
+  </form>
+  <div class="register-link">
+    <a href="/register">Don't have an account? Register here</a>
+  </div>
+</div>

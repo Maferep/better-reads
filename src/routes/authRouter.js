@@ -35,8 +35,7 @@ authRouter.get('/login', function(req, res) {
     username: "guest", 
     loggedIn: false, 
     hasWrongCred: _hasWrongCred, 
-    title: "Login",
-    style: "style.css" })
+    title: "Login" })
 })
 
 authRouter.post('/login', isAuthenticated, function(req, res) {
@@ -97,8 +96,7 @@ authRouter.get('/register', function(req, res) {
     username: "guest", 
     loggedIn: false, 
     usernameExists: _usernameExists,
-    title: "Home page",
-    style: "style.css"  })
+    title: "Home page" })
 })
 
 authRouter.post('/register', isAuthenticated, function(req, res) {

@@ -131,7 +131,6 @@ function processProfileRequest(req, res, isOwnProfile) {
     following: following,
     isFollowing: isFollowing,
     isOwnProfile: isOwnProfile,
-    style: "style_prototype.css",
     feed: {
       posts: posts_processed,
       paginate_from: paginarDesdeFecha.toISOString(),

@@ -1,14 +1,14 @@
-<link rel="stylesheet" href="/static/css/navbar.css">
+<link rel="stylesheet" href="/static/css/navbar.css" />
 
 <div id="navbar">
-    <div id="logo"><a href="/">Better Reads</a></div>
-    <div class="user-actions">
-      {{#if loggedIn}}
+  <div id="logo"><a href="/">Better Reads</a></div>
+  <div class="user-actions">
+    {{#if loggedIn}}
       <a href="/logout">Logout</a>
       <a href="/profile">Hello, {{username}}</a>
-      {{else}}
+    {{else}}
       <a href="/login">Login</a>
       <a href="/register">Register</a>
-      {{/if}}
-    </div>
+    {{/if}}
   </div>
+</div>
