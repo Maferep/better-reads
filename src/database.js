@@ -9,6 +9,7 @@ var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
+const CANTIDAD_POSTS_PAGINADO = 7;
 
 function initDb() {
   // Create username/password database
@@ -501,50 +502,43 @@ function createRepost(postId, userId) {
   db.prepare(incrementReposts).run(postId);
 }
 
-
-function fetchPostsAndLastDate(number_of_posts = -1,startDate = new Date(0), bookFilter = null) {
-  //Quiero obtener de la base de datos, el id del post, id del usuario, nombre de usuario, el id y nombre del libro sobre el que habla, el contenido del post, y quiero que este ordenado por fecha
+// Entrega una lista de posts, devolviedo un array de posts (paginados),
+// y un booleano que indica si existen más posts luego del ultimo devuelto
+// Filter es un diccionario, con los distintos filtros posibles.
+function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
 
-  //Fecha del post más reciente que quiero obtener. Como SQLite funcina con segundos, divido por 1000 para obtener segundos desde epoch.
-  const fecha_inicio_query = startDate.valueOf()/1000;
 
-  console.log(fecha_inicio_query)
+  filter.bookId = filter.bookId || null;
+  filter.followedBy = filter.followedBy || null;
 
-  //Fecha del post más antiguo que quiero obtener.
-  let fecha_final_query;
-  try {
-    const fecha_final_query_prepare = db.prepare(
-/*sql*/ `SELECT date FROM posts
-        UNION
-        SELECT date FROM reposts rp
-        WHERE` + (bookFilter == null)?"":/*sql*/` books.id = ? AND ` + /*sql*/` date <= ?
-        ORDER BY date DESC
-        LIMIT 1 OFFSET ?;`);
+  const paginateFromDateEpochSeconds = paginateFromDate.valueOf() / 1000;
 
-    if (bookFilter == null) {
-      fecha_final_query = fecha_final_query_prepare.get(fecha_inicio_query, number_of_posts);
-    } else {
-      fecha_final_query = fecha_final_query_prepare.get(bookFilter, fecha_inicio_query, number_of_posts);
-    }
-  } catch (e) {
-    // Pongo la fecha más temprana posible. Uso epoch, porque no creo que haya ningun post publicado antes de 1970
-    fecha_final_query = 0;
-  }
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, page, filter.followedBy ,filter.bookId);
 
-  const rows = getPostsWithFilters(fecha_inicio_query, fecha_final_query, bookFilter);
-  return {"rows": rows, "last_date": new Date(fecha_final_query*1000)};
+  return rows_and_more_posts
 }
 
+//Unica funcion que realiza la query real para obtener los posts. No debería usarse fuera de este modulo.
+// Recibe el tiempo de referencia para el primer post, el numero de pagina, y filtros varios.
+// Devuelve la lista de posts, junto a un booleano que indica que existen más posts.
+function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = null, authorId = null, number_of_posts = CANTIDAD_POSTS_PAGINADO) {
+  const numberOfPostsInPage = number_of_posts;
 
-function getPostsWithFilters(since, until, bookId = null) {
+  const offset = page * numberOfPostsInPage;
+
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
 
-  const book_filter = (bookId == null)?``:`AND b.id = ? `;
+  //Segun si se envia alguna de estas caracteristicas, se agrega o no el filtro al query.
+  const book_filter = (bookId == null)?` `:` AND b.id = @book_id `;
+  const follow_filter = (followedBy == null)?` `:` AND uf.follower_id = @followedBy `;
+
+  const author_filter_post = (authorId == null)?` `:` AND user_id = @authorId `;
+  const author_filter_repost = (authorId == null)?` `:` AND repost_user_id = @authorId `;
 
   const query = 
   /*sql*/  `SELECT p.id AS post_id,
@@ -560,7 +554,8 @@ function getPostsWithFilters(since, until, bookId = null) {
             FROM posts p
             JOIN insecure_users original_user ON p.author_id = original_user.id
             JOIN books b ON p.book_id = b.id
-            WHERE ? >= date AND date > ? ` + book_filter + 
+            LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
+            WHERE @startDate >= date ` + book_filter + follow_filter + author_filter_post +
   /*sql*/  `UNION
             SELECT rp.post_id AS post_id,
                     original_user.id AS user_id,
@@ -577,16 +572,39 @@ function getPostsWithFilters(since, until, bookId = null) {
             JOIN insecure_users original_user ON p.author_id = original_user.id
             LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
             JOIN books b ON p.book_id = b.id
-            WHERE ? >= rp.date AND rp.date > ?` + book_filter +
-  /*sql*/  `ORDER BY date DESC;`;
+            LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
+            WHERE @startDate >= rp.date ` + book_filter + follow_filter + author_filter_repost +
+  /*sql*/  `ORDER BY date DESC
+            LIMIT @postsInPage OFFSET @startFromPost;`;
 
   console.log(query)
 
-  if (bookId == null) {
-    return db.prepare(query).all(since, until, since, until);
-  } else {
-    return db.prepare(query).all(since, until,bookId, since, until, bookId);
+  let rows;
+
+  //Se pueden enviar los parametros como un diccionario. Aquel parametro que no se use
+  // no afecta al query.
+  let parametersQuery = {
+    startDate: paginateFromDate,
+    book_id: bookId,
+    followedBy: followedBy,
+    postsInPage: numberOfPostsInPage + 1,
+    startFromPost: offset,
+    authorId: authorId
   }
+
+  console.log(parametersQuery)
+
+  rows = db.prepare(query).all(parametersQuery);
+
+  // Se busca si se pudo obtener un post extra, si esto es así, se elimina este post extra de la lista
+  // y se setea el booleano has_more a true, para indicar que hay por lo menos un post extra.
+  let has_more = false
+  if (rows.length > numberOfPostsInPage) {
+    rows.pop();
+    has_more = true;
+  }
+
+  return {rows, has_more};
 }
 
 // TODO: do not return status codes, this should not be handled in the database layer. 
@@ -839,50 +857,12 @@ function searchBooks(query, limit, offset) {
   return rows;
 }
 
-function getPostsFromUserId(userId){
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-    const query = 
-  /*sql*/  `SELECT 
-                    p.id AS post_id,
-                    u.id AS user_id,
-                    u.username,
-                    b.id AS book_id,
-                    b.book_name,
-                    p.text_content,
-                    p.date AS date,
-                    p.likes,
-                    NULL AS repost_user_id,
-                    NULL AS repost_username
-            FROM posts p
-            JOIN insecure_users u ON p.author_id = u.id
-            JOIN books b ON p.book_id = b.id
-            WHERE p.author_id = ?
+function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
+  const paginateFromDateEpochSeconds = paginarDesdeFecha.valueOf() / 1000;
 
-            UNION
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, pagina, null, null, userId);
 
-            SELECT 
-                    rp.post_id AS post_id,
-                    u.id AS user_id,
-                    u.username,
-                    b.id AS book_id,
-                    b.book_name,
-                    p.text_content,
-                    rp.date AS date,
-                    p.likes,
-                    rp.user_id AS repost_user_id,
-                    repost_user.username AS repost_username
-            FROM reposts rp
-            JOIN posts p ON rp.post_id = p.id
-            JOIN insecure_users u ON p.author_id = u.id
-            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
-            JOIN books b ON p.book_id = b.id
-            WHERE rp.user_id = ?
-
-            ORDER BY p.date DESC`;
-  const rows = db.prepare(query).all(userId, userId);
-  return rows;
+  return rows_and_more_posts;
 }
 
 function getLikedPostsFromUserId(userId){
@@ -961,66 +941,6 @@ function isUserFollowing(followerId, followingId) {
   return !!exists; 
 }
 
-function getFollowingFeed(userId, limit = 10, offset = 0) {
-  const db = new Database("database_files/betterreads.db");
-  const stmt = /*sql*/`
-    SELECT 
-      posts.id AS post_id, 
-      insecure_users.id AS user_id, 
-      insecure_users.username, 
-      books.id AS book_id, 
-      books.book_name, 
-      posts.text_content, 
-      posts.date, 
-      posts.likes,
-      NULL AS repost_user_id,
-      NULL AS repost_username
-    FROM posts
-    JOIN insecure_users ON posts.author_id = insecure_users.id
-    JOIN books ON posts.book_id = books.id
-    JOIN user_follows uf ON posts.author_id = uf.following_id 
-    WHERE uf.follower_id = ?
-    UNION
-    SELECT
-      rp.post_id AS post_id,
-      insecure_users.id AS user_id,
-      insecure_users.username,
-      books.id AS book_id,
-      books.book_name,
-      posts.text_content,
-      rp.date AS date,
-      posts.likes,
-      rp.user_id AS repost_user_id,
-      repost_user.username AS repost_username
-    FROM reposts rp
-    JOIN posts ON rp.post_id = posts.id
-    JOIN insecure_users ON posts.author_id = insecure_users.id
-    LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
-    JOIN books ON posts.book_id = books.id
-    JOIN user_follows uf ON rp.user_id = uf.following_id 
-    WHERE uf.follower_id = ?
-    ORDER BY posts.date DESC
-    LIMIT ? OFFSET ?;
-  `;
-
-  const posts_raw = db.prepare(stmt).all(userId, userId, limit, offset);
-  console.log(`Fetched ${posts_raw.length} posts for user ${userId} feed with offset ${offset}.`);
-
-   const stmtCount = `
-    SELECT COUNT(*) AS total 
-    FROM posts
-    JOIN user_follows uf ON posts.author_id = uf.following_id 
-    WHERE uf.follower_id = ?
-  `;
-
-  const countResult = db.prepare(stmtCount).get(userId);
-  const totalPosts = countResult.total;
-
-  const has_more = totalPosts > (offset + limit);
-
-  return { posts_raw, has_more };
-}
-
 function getUsernameFromId(userId) {
   const db = new Database("database_files/betterreads.db");
   const stmt = `
@@ -1058,7 +978,6 @@ export {
   searchBooks,
   incrementLikes,
   decrementLikes,
-  fetchPostsAndLastDate,
   fetchPostAndComments,
   createComment,
   hasLiked,
@@ -1077,7 +996,7 @@ export {
   getFollowing,
   unfollowUser,
   isUserFollowing,
-  getFollowingFeed,
   getUsernameFromId,
-  getIdFromUsername
+  getIdFromUsername,
+  fetchPaginatedPosts
 };
