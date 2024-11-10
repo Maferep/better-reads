@@ -298,6 +298,8 @@ function createPostDatabase(db) {
         TEST_BOOK_ID, 
         `This is my ${i}° post!!!!!!!!!!!!!!`);
 
+        console.log(`Inserted post ${i} of ${n}`);
+
         sleepFor(1000)
       }
       })
