@@ -27,6 +27,8 @@ document.getElementById(event_listener_location).addEventListener("click", funct
   } else if (event.target.closest(".repost-button")) {
     event.preventDefault();
 
+    playFullscreenVideo();
+
     fetch(`/post/${post_id}/repost`, {
       method: "POST",
     })

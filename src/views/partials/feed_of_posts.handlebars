@@ -25,3 +25,52 @@
     {{/if}}
     {{/with}}
 </div>
+
+<div id="fullscreenVideo">
+    <video id="videoElement">
+      <source src="/static/uploads/repost.webm" type="video/webm">
+      Your browser does not support the video tag.
+    </video>
+</div>
+
+<script>
+    function playFullscreenVideo() {
+      const videoContainer = document.getElementById("fullscreenVideo");
+      const videoElement = document.getElementById("videoElement");
+
+      // Show the video container and play the video
+      videoContainer.style.display = "block";
+      videoElement.play();
+
+      // Close video on click or end of video
+      videoElement.onended = closeFullscreenVideo;
+      {{!-- videoContainer.onclick = closeFullscreenVideo; --}}
+    }
+
+    function closeFullscreenVideo() {
+      const videoContainer = document.getElementById("fullscreenVideo");
+      const videoElement = document.getElementById("videoElement");
+
+      // Pause video and hide the container
+      videoElement.pause();
+      videoContainer.style.display = "none";
+    }
+  </script>
+
+   <style>
+    /* Hide video by default */
+    #fullscreenVideo {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: -1;
+      height: 100vh;
+      z-index: 1000;
+    }
+    /* Fullscreen style for the video */
+    #fullscreenVideo video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>

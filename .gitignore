@@ -6,3 +6,4 @@ database_files/*
 .vscode
 database_files/books_data.csv
 public/uploads/*
+!public/uploads/repost.webm
