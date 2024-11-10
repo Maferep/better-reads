@@ -38,6 +38,11 @@
             {{else}}
 
           <select name="book" id="book-select" style="width: 100%;" required>
+
+            <fieldset class="type-topic">
+              <input type="radio" id="book-topic" name="type" value="book" checked></input>
+              <input type="radio" id="author-topic" name="type" value="Author"></input>              
+            </fieldset>
             
             <option value="">-- Select a book --</option>
             {{#each bookEntries}}

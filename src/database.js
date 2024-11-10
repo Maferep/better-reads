@@ -264,10 +264,11 @@ function createPostDatabase(db) {
 
   const MAX_POST_LENGTH = 50000
   const stmt = db.prepare(
-    `CREATE TABLE IF NOT EXISTS posts (
+/*sql*/`CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY NOT NULL,
-      author_id int NOT NULL,
-      book_id int NOT NULL,
+      author_id int,
+      book_id int DEFAULT NULL, -- En realidad se refiere a un topic, que en esta columna sería un libro //TODO: renombrar a book_topic
+      author_topic int DEFULT NULL,
       text_content TEXT NOT NULL DEFAULT '',
       date INTEGER NOT NULL,
       likes int NOT NULL DEFAULT 0,
@@ -621,6 +622,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = 
                     original_user.id AS user_id,
                     original_user.username AS username,
                     b.id AS book_id,
+                    p.author_topic,
                     b.book_name,
                     p.text_content,
                     p.date AS date,
@@ -637,6 +639,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = 
                     original_user.id AS user_id,
                     original_user.username AS username,
                     b.id AS book_id,
+                    p.author_topic,
                     b.book_name,
                     p.text_content,
                     rp.date AS date,
