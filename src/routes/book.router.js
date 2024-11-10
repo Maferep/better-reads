@@ -3,43 +3,37 @@ import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
   addBookState, createPost } from '../database.js';
-import { fetchAuthorsFromBook, fetchGenresFromBook } from '../database/authorGenreDatabase.js'
+import { getBookData } from '../processing/book.js'
 
 const router = Router();
 
 router.get('/:id', async function (req, res) {
-    const bookId = req.params.id;
-    const userId = req.session.userId;
-    const bookRow = fetchBook(bookId)
-    //El libro con tal id no existe
-    if (bookRow == null) {
-      res.status(404).send("Book id not found")
-      return;
-    }
-    let authors = fetchAuthorsFromBook(bookId)
-    let genres = fetchGenresFromBook(bookId)
+  const bookId = req.params.id;
+  const bookRow = getBookData(bookId);
 
-    const bookState = fetchBookState(bookId, userId);
-    const reviewsRows = fetchReviews(bookId, userId);
-    const meanText = calculateMean(reviewsRows);
-    const estaAutenticadoBool = estaAutenticado(req);
-    const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
-  
-    res.render("book", {
-      username: req.session.user,
-      loggedIn: estaAutenticadoBool,
-      allowReview: estaAutenticadoBool && !userSubmittedReview,
-      bookId: bookRow.id,
-      bookName: bookRow.book_name,
-      bookDescription: bookRow.description,
-      bookAuthor: (authors.length ? authors : "No authors found"),
-      bookGenre:  (genres.length ? genres : "No genres found"), 
-      bookCover: bookRow.image,
-      title: bookRow.book_name,
-      reviews: reviewsRows,
-      ratingsMean: meanText,
-      bookState: bookState,
-    })
+  const userId = req.session.userId;
+  const bookState = fetchBookState(bookId, userId);
+  const reviewsRows = fetchReviews(bookId, userId);
+  const meanText = calculateMean(reviewsRows);
+  const estaAutenticadoBool = estaAutenticado(req);
+  const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
+  const authors = bookRow.authors;
+  const genres = bookRow.genres;
+  res.render("book", {
+    username: req.session.user,
+    loggedIn: estaAutenticadoBool,
+    allowReview: estaAutenticadoBool && !userSubmittedReview,
+    bookId: bookRow.id,
+    bookName: bookRow.book_name,
+    bookDescription: bookRow.description,
+    bookAuthor: (authors.length ? authors : "No authors found"),
+    bookGenre:  (genres.length ? genres : "No genres found"), 
+    bookCover: bookRow.image,
+    title: bookRow.book_name,
+    reviews: reviewsRows,
+    ratingsMean: meanText,
+    bookState: bookState,
+  })
 });
 
 
