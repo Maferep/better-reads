@@ -237,7 +237,8 @@ function processFeedRequest(req, res, onlyFollowing) {
 
 router.get('/genre/:genre', (req, res) => {
   const books = fetchBooksInGenre(req.params.genre);
-  res.end(books.map(book => "?" +book.book_name).toString());
+  console.log(books)
+  res.end(books.map(rowObject => rowObject.book_name).toString());
 })
 
 export default router;
