@@ -134,6 +134,21 @@ function createBookDb(db, datasetPath) {
     )`
   ).run();
 
+  // create table for book-genre and book-author pairs
+  const books_genres = db.prepare(`CREATE TABLE IF NOT EXISTS books_genres (
+    id INTEGER PRIMARY KEY NOT NULL, 
+    genre_id TEXT, 
+    book_id INTEGER NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books(id)
+  )`).run();
+  
+  const books_authors = db.prepare(`CREATE TABLE IF NOT EXISTS books_authors(
+    id INTEGER PRIMARY KEY NOT NULL, 
+    author_id TEXT, 
+    book_id INTEGER NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books(id)
+  )`).run();
+
   // Check if the table already contains data
   const books_count = "SELECT COUNT(*) FROM books";
   let count = db.prepare(books_count).get();
@@ -150,7 +165,18 @@ function createBookDb(db, datasetPath) {
             image
        ) VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
+    const insert_book_authors = db.prepare(
+      `INSERT INTO books_authors (author_id, book_id) VALUES (?, ?)`
+    );
+    const insert_book_genres = db.prepare(
+      `INSERT INTO books_genres (genre_id, book_id) VALUES (?, ?)`
+    );
+
+    // create example book
     insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
+    
+    // read and store each book from csv
+    // asynchronous: calls a callback every time CSV is loaded, does not stop execution of the app
     loadFromCSV(datasetPath, (books) => {
       let id = 0
 
@@ -162,11 +188,21 @@ function createBookDb(db, datasetPath) {
             book["Title"], 
             book["description"], 
             book["isbn"],
-            JSON.stringify(book["authors"]), // Store authors as a JSON string
-            JSON.stringify(book["categories"]), // Store categories (genres) as a JSON string
+            JSON.stringify(book["authors"]), // TODO remove and replace
+            JSON.stringify(book["categories"]), // TODO remove and replace
             book["image"] // Direct image link
           );
-        }      
+          let authors = book["authors"].substring(1, book["authors"].length - 1);
+          authors = authors.split(",")
+          let genres = book["categories"].substring(1, book["categories"].length - 1);
+          genres = genres.split(",")
+          for (const author of authors) {
+            insert_book_authors.run(author, id)
+          }
+          for (const genre of genres) {
+            insert_book_genres.run(genre, id)
+          }
+        }
       })
 
       // Populate the database with data from the CSV file
