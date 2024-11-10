@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="/static/css/style.css" />
+
+<div id="browse-container">
+  <h1>Browse Users</h1>
+
+  <div id="book-list">
+    <label for="user-select">Select a user:</label>
+    <select name="user" id="user-select" style="width: 100%;">
+      <option value="">-- Select a user --</option>
+      {{#each userEntries}}
+        <option value="{{this.id}}">{{this.username}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <button type="submit" onclick="return redirectToUser(event)">View User</button>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('#user-select').select2({
+      placeholder: "-- Select a user --",
+      ajax: {
+        url: '/users/search',
+        dataType: 'json',
+        delay: 300,
+        data: function(params) {
+          return {
+            search: params.term 
+          };
+        },
+        processResults: function(data) {
+          return {
+            results: data.userEntries.map(user => ({
+            id: user.id,
+            text: user.username
+            }))
+          };
+        },
+        cache: true
+      }
+    });
+  });
+
+  function redirectToUser(event) {
+    event.preventDefault();
+    const select = document.getElementById('user-select');
+    const userId = select.value;
+    const username = select.options[select.selectedIndex].text;
+    if (userId) {
+      window.location.href = `/${username}/profile`;
+    } else {
+      alert("Please select a user.");
+    }
+  }
+</script>
