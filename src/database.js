@@ -193,9 +193,9 @@ function createBookDb(db, datasetPath) {
             book["image"] // Direct image link
           );
           let authors = book["authors"].substring(1, book["authors"].length - 1);
-          authors = authors.split(",")
+          authors = authors.split(",").map(author=>author.trim().substring(1, author.trim().length-1))
           let genres = book["categories"].substring(1, book["categories"].length - 1);
-          genres = genres.split(",")
+          genres = genres.split(",").map(genre=>genre.trim().substring(1, genre.trim().length-1))
           for (const author of authors) {
             if (author && author != "") {
               insert_book_authors.run(author, id)
@@ -1003,25 +1003,6 @@ function getIdFromUsername(username) {
   return id['id']
 }
 
-function fetchAuthorsFromBook(bookId) {
-  const db = new Database("database_files/betterreads.db");
-  const stmt = `
-    SELECT author_id FROM books_authors WHERE book_id=?
-  `;
-  const authors = db.prepare(stmt).all(bookId).map(rowObject => rowObject.author_id);
-  return authors
-}
-
-function fetchGenresFromBook(bookId) {
-  const db = new Database("database_files/betterreads.db");
-  const stmt = `
-    SELECT genre_id FROM books_genres WHERE book_id=?
-  `;
-  const genres = db.prepare(stmt).all(bookId).map(rowObject => rowObject.genre_id);
-  return genres
-}
-
-
 export {
   initDb,
   initSessions,
@@ -1056,7 +1037,5 @@ export {
   isUserFollowing,
   getUsernameFromId,
   getIdFromUsername,
-  fetchPaginatedPosts,
-  fetchGenresFromBook,
-  fetchAuthorsFromBook
+  fetchPaginatedPosts
 };

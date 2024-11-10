@@ -3,6 +3,7 @@ import { isAuthenticated } from '../authenticate.js';
 
 import {uploader} from "../uploader.js";
 import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
 
 const router = Router();
 
@@ -231,5 +232,12 @@ function processFeedRequest(req, res, onlyFollowing) {
   });
 }
 
+
+
+
+router.get('/genre/:genre', (req, res) => {
+  const books = fetchBooksInGenre(req.params.genre);
+  res.end(books.map(book => "?" +book.book_name).toString());
+})
 
 export default router;

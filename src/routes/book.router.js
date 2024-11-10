@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
-  addBookState, createPost, fetchAuthorsFromBook, fetchGenresFromBook } from '../database.js';
+  addBookState, createPost } from '../database.js';
+import { fetchAuthorsFromBook, fetchGenresFromBook } from '../database/authorGenreDatabase.js'
 
 const router = Router();
 
