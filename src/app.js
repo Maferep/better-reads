@@ -7,6 +7,7 @@ import authRouter from './routes/authRouter.js';
 import bookRouter from './routes/book.router.js';
 import browseRouter from './routes/browse.router.js';
 import postRouter from './routes/post.router.js';
+import usersRouter from './routes/users.router.js';
 import path from 'path';
 import __dirname from './path.js';
 import router from './routes/router.js';
@@ -44,6 +45,7 @@ app.use(router)
 app.use('/browse', browseRouter)
 app.use('/book', bookRouter)
 app.use('/post', postRouter)
+app.use('/users', usersRouter)
 // http
 let serverHttp = http.createServer(app)
 serverHttp.listen(port, () => console.log('Example app is listening on port', port))
