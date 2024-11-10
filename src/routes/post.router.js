@@ -35,6 +35,7 @@ router.get('/:id', (req, res) => {
       topic: postRaw.book_name,
       content: postRaw.text_content,
       number_likes: postRaw.likes,
+      review_score: postRaw.review_score,
       number_reposts: 0,
       number_comments: commentsRaw.length,
       comments: comments,

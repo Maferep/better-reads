@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
-  addBookState } from '../database.js';
+  addBookState, createPost } from '../database.js';
 
 const router = Router();
 
@@ -80,8 +80,11 @@ router.post('/:id/review', isAuthenticated, (req, res) => {
         const rating = req.body.rating;
         const reviewText = req.body.reviewText;
 
+        const shareOnFeed = Boolean(req.body.shareOnFeed);
+
         // get user
         const userId = req.session.userId;
+
 
         const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
 
@@ -103,6 +106,11 @@ router.post('/:id/review', isAuthenticated, (req, res) => {
         console.log('Review submitted by', userId, 'for book', bookId, 'with rating', rating, 'and review', reviewText);
 
         addReview(bookId, userId, rating, reviewText);
+
+        if (shareOnFeed) {
+            createPost(userId, reviewText, bookId, rating);
+        }
+
         res.json({ success: true, message: 'Review submitted successfully!' });
 
     } catch (e) {
