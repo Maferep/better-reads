@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import {searchBooks } from '../database.js';
+import {searchBooks, searchBooksByTitleOrAuthor } from '../database.js';
 
 const router = Router();
 
@@ -23,7 +23,7 @@ router.get('/search', function (req, res) {
     const amount = 10;
     const offset = 0;
 
-    const rows = searchBooks(searchTerm, amount, offset);
+    const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
     res.json({ bookEntries: rows });
 });
 
