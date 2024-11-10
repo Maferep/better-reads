@@ -11,24 +11,38 @@ const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
 const CANTIDAD_POSTS_PAGINADO = 7;
 
+const BOOK_DATA_FULL = "./database_files/books_data_full.csv";
+const BOOK_DATA_SMALL = "./database_files/books_data.csv";
+
 function initDb() {
   // Create username/password database
+  console.log("Database initialization started.");
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   }); // create if no connection found
+  console.log("Database connection established.");
   createInsecureUsersDatabase(db);
+  console.log("Created insecure_users table.");
   createUserProfileDb(db);
+  console.log("Created user_profiles table.");
   createUserFollowsDb(db);
-  createBookDb(db, "./database_files/books_data.csv");
+  console.log("Created user_follows table.");
+  createBookDb(db, BOOK_DATA_FULL, BOOK_DATA_SMALL);
+  console.log("Created books table.");
+
 
   createReviewDb(db);
+  console.log("Created reviews table.");
   createBookStatesDb(db);
+  console.log("Created book_states table.");
   createPostDatabase(db);
+  console.log("Created posts table.");
   createRepostsDb(db);
+  console.log("Created reposts table.");
   createCommentDb(db);
+  console.log("Created comments table.");
   createLikeDb(db);
-
-  // create posts database
+  console.log("Created likes table.");
 }
 
 function createUserProfileDb(db) {
@@ -120,7 +134,7 @@ function fetchISBN(infoLink, callback) {
   });
 }
 
-function createBookDb(db, datasetPath) {
+function createBookDb(db, fullDatasetPath, shortDatasetPath) {
   // Create or modify the table structure to include authors, genres, and image fields.
   db.prepare(
     `CREATE TABLE IF NOT EXISTS books (
@@ -177,8 +191,23 @@ function createBookDb(db, datasetPath) {
     
     // read and store each book from csv
     // asynchronous: calls a callback every time CSV is loaded, does not stop execution of the app
+    let datasetPath = "";
+
+    if (fs.existsSync(fullDatasetPath)) {
+      console.log("Found books_data_full.csv for full dataset.");
+      datasetPath = fullDatasetPath;
+    } else if (fs.existsSync(shortDatasetPath)) {
+      console.log("Not found books_data_full.csv for full dataset, using books_data.csv instead for shorten dataset instead.");
+      datasetPath = shortDatasetPath;
+    } else {
+      throw new Error("No dataset found.");
+    }
+    
+    
     loadFromCSV(datasetPath, (books) => {
       let id = 0
+
+      const cantidadLibros = books.length;
 
       const insert_many_books = db.transaction((books) => {
         for (const book of books) {
@@ -206,11 +235,16 @@ function createBookDb(db, datasetPath) {
               insert_book_genres.run(genre, id)
             }
           }
-        }
+          if (id%Math.round(cantidadLibros/100)==0) {
+            console.log(`Cargando libros ${Math.floor(id/cantidadLibros*100)}%`);
+          }
+        }     
       })
 
       // Populate the database with data from the CSV file
       insert_many_books(books);
+
+      console.log("Cargando libros 100%")
     });
   } 
 }
@@ -263,6 +297,8 @@ function createPostDatabase(db) {
       for (let i = 0; i < n; i++) {insert_posts.run(TEST_USER_ID, 
         TEST_BOOK_ID, 
         `This is my ${i}° post!!!!!!!!!!!!!!`);
+
+        console.log(`Inserted post ${i} of ${n}`);
 
         sleepFor(1000)
       }
