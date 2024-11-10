@@ -197,10 +197,14 @@ function createBookDb(db, datasetPath) {
           let genres = book["categories"].substring(1, book["categories"].length - 1);
           genres = genres.split(",")
           for (const author of authors) {
-            insert_book_authors.run(author, id)
+            if (author && author != "") {
+              insert_book_authors.run(author, id)
+            }
           }
           for (const genre of genres) {
-            insert_book_genres.run(genre, id)
+            if (genre && genre != "") {
+              insert_book_genres.run(genre, id)
+            }
           }
         }
       })
@@ -999,6 +1003,24 @@ function getIdFromUsername(username) {
   return id['id']
 }
 
+function fetchAuthorsFromBook(bookId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `
+    SELECT author_id FROM books_authors WHERE book_id=?
+  `;
+  const authors = db.prepare(stmt).all(bookId).map(rowObject => rowObject.author_id);
+  return authors
+}
+
+function fetchGenresFromBook(bookId) {
+  const db = new Database("database_files/betterreads.db");
+  const stmt = `
+    SELECT genre_id FROM books_genres WHERE book_id=?
+  `;
+  const genres = db.prepare(stmt).all(bookId).map(rowObject => rowObject.genre_id);
+  return genres
+}
+
 
 export {
   initDb,
@@ -1034,5 +1056,7 @@ export {
   isUserFollowing,
   getUsernameFromId,
   getIdFromUsername,
-  fetchPaginatedPosts
+  fetchPaginatedPosts,
+  fetchGenresFromBook,
+  fetchAuthorsFromBook
 };

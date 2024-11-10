@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
-  addBookState, createPost } from '../database.js';
+  addBookState, createPost, fetchAuthorsFromBook, fetchGenresFromBook } from '../database.js';
 
 const router = Router();
 
@@ -48,13 +48,9 @@ router.get('/:id', async function (req, res) {
   
     const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
   
-  
-  
-    let authors = bookRow.authors.replace("[","").replace("]","")
-    let genres = bookRow.genre.replace("[","").replace("]","")
-  
-    authors != '""' ? authors : authors = "No authors found"
-    genres != '""' ? genres : genres = "No genres found"
+    // dont do json parsing manually, use library!
+    let authors = fetchAuthorsFromBook(bookId)
+    let genres = fetchGenresFromBook(bookId)
   
     res.render("book", {
       username: req.session.user,
@@ -63,8 +59,8 @@ router.get('/:id', async function (req, res) {
       bookId: bookRow.id,
       bookName: bookRow.book_name,
       bookDescription: bookRow.description,
-      bookAuthor: authors, // Cambiado a authors
-      bookGenre: genres,   // Cambiado a genres
+      bookAuthor: authors.toString(), // Cambiado a authors
+      bookGenre: genres.toString(),   // Cambiado a genres
       bookCover: bookRow.image,
       title: bookRow.book_name,
       reviews: reviewsData.reviews,
