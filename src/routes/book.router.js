@@ -8,50 +8,25 @@ import { fetchAuthorsFromBook, fetchGenresFromBook } from '../database/authorGen
 const router = Router();
 
 router.get('/:id', async function (req, res) {
-    console.log("entro book")
-  
     const bookId = req.params.id;
-    
     const userId = req.session.userId;
-  
-   //Busco el libro por ID en la base de datos
     const bookRow = fetchBook(bookId)
-    const bookState = fetchBookState(bookId, userId);
-  
-    console.log("Libro recibido", bookRow)
-    
-    const reviewsRows = fetchReviews(bookId, userId);
-  
-    const reviewsData = {
-      reviews: reviewsRows
-    };
-  
-    let sum = 0;
-  
-    //Mofidy rating, so its a porcentual value, in the form of a string from 0 to 100
-    for (let review of reviewsData.reviews) {
-      sum += review.rating;
-      review.rating = (review.rating * 20).toString();
-    }
-  
-    const mean = sum / reviewsData.reviews.length;
-  
-    const meanText = (mean * 20).toString()
-  
-    
-    const estaAutenticadoBool = estaAutenticado(req);
-  
     //El libro con tal id no existe
     if (bookRow == null) {
       res.status(404).send("Book id not found")
       return;
     }
-  
-    const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
-  
-    // dont do json parsing manually, use library!
     let authors = fetchAuthorsFromBook(bookId)
     let genres = fetchGenresFromBook(bookId)
+
+    const bookState = fetchBookState(bookId, userId);
+    const reviewsRows = fetchReviews(bookId, userId);
+    const reviewsData = {
+      reviews: reviewsRows
+    };
+    const meanText = calculateMean(reviewsData);
+    const estaAutenticadoBool = estaAutenticado(req);
+    const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
   
     res.render("book", {
       username: req.session.user,
@@ -127,3 +102,18 @@ router.post('/:id/state', isAuthenticated, (req, res) => {
 
 
 export default router;
+
+function calculateMean(reviewsData) {
+  let sum = 0;
+
+  //Mofidy rating, so its a porcentual value, in the form of a string from 0 to 100
+  for (let review of reviewsData.reviews) {
+    sum += review.rating;
+    review.rating = (review.rating * 20).toString();
+  }
+
+  const mean = sum / reviewsData.reviews.length;
+
+  const meanText = (mean * 20).toString();
+  return meanText;
+}
