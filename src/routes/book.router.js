@@ -21,10 +21,7 @@ router.get('/:id', async function (req, res) {
 
     const bookState = fetchBookState(bookId, userId);
     const reviewsRows = fetchReviews(bookId, userId);
-    const reviewsData = {
-      reviews: reviewsRows
-    };
-    const meanText = calculateMean(reviewsData);
+    const meanText = calculateMean(reviewsRows);
     const estaAutenticadoBool = estaAutenticado(req);
     const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
   
@@ -39,7 +36,7 @@ router.get('/:id', async function (req, res) {
       bookGenre:  (genres.length ? genres : "No genres found"), 
       bookCover: bookRow.image,
       title: bookRow.book_name,
-      reviews: reviewsData.reviews,
+      reviews: reviewsRows,
       ratingsMean: meanText,
       bookState: bookState,
     })
@@ -103,16 +100,16 @@ router.post('/:id/state', isAuthenticated, (req, res) => {
 
 export default router;
 
-function calculateMean(reviewsData) {
+function calculateMean(reviews) {
   let sum = 0;
 
   //Mofidy rating, so its a porcentual value, in the form of a string from 0 to 100
-  for (let review of reviewsData.reviews) {
+  for (let review of reviews) {
     sum += review.rating;
     review.rating = (review.rating * 20).toString();
   }
 
-  const mean = sum / reviewsData.reviews.length;
+  const mean = sum / reviews.length;
 
   const meanText = (mean * 20).toString();
   return meanText;
