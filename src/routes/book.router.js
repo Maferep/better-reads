@@ -59,8 +59,8 @@ router.get('/:id', async function (req, res) {
       bookId: bookRow.id,
       bookName: bookRow.book_name,
       bookDescription: bookRow.description,
-      bookAuthor: authors.toString(), // Cambiado a authors
-      bookGenre: genres.toString(),   // Cambiado a genres
+      bookAuthor: (authors.length ? authors : "No authors found"),
+      bookGenre:  (genres.length ? genres : "No genres found"), 
       bookCover: bookRow.image,
       title: bookRow.book_name,
       reviews: reviewsData.reviews,
