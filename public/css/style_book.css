@@ -181,3 +181,68 @@ h1 {
   width: 20px;
   height: 20px;
 }
+
+#book-cover {
+  /* set maximum witdth and hight*/
+  width: 30vw;
+  max-width: 250px;
+}
+
+.review {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+}
+.username {
+  font-weight: bold;
+}
+.stars {
+  font-size: 2em;
+  font-family: FontAwesome;
+}
+
+.stars > .checked {
+  color: gold;
+}
+
+.stars > .unchecked {
+  color: #b5b5b5;
+}
+
+/* Fuente: https://codepen.io/jamesbarnett/pen/najzYK  */
+
+fieldset, label { margin: 0; padding: 0; }
+h1 { font-size: 1.5em; margin: 10px; }
+
+
+/****** Style Star Rating Widget *****/
+
+.ratingInput { 
+  border: none;
+  float: left;
+}
+
+.ratingInput > input { display: none; } 
+.ratingInput > label:before { 
+  margin: 5px;
+  font-size: 2em;
+  font-family: FontAwesome;
+  display: inline-block;
+  content: "\f005";
+}
+
+.ratingInput > label { 
+  color: #ddd; 
+ float: right; 
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.ratingInput > input:checked ~ label, /* show gold star when clicked */
+.ratingInput:not(:checked) > label:hover, /* hover current star */
+.ratingInput:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+.ratingInput > input:checked + label:hover, /* hover current star when changing rating */
+.ratingInput > input:checked ~ label:hover,
+.ratingInput > label:hover ~ input:checked ~ label, /* lighten current selection */
+.ratingInput > input:checked ~ label:hover ~ label { color: #FFED85;  }

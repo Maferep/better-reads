@@ -1,4 +1,10 @@
   <link rel="stylesheet" href="/static/css/style_book.css" />
+  <link rel="stylesheet" href="/static/css/stars_review.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
   
   <div id="content">
   <div id="container">
@@ -82,7 +88,7 @@
 
         <h3>Puntaje Promedio:</h3>
         {{! Dibujar estrellas parcialmente llenas }}
-        <div class="ratingsMean">
+        <div class="ratings ratingsBig">
           <div class="full-stars" style="width:{{ratingsMean}}%"></div>
           <div class="empty-stars"></div>
         </div>
@@ -106,137 +112,9 @@
   </div>
 </div>
 
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-/>
-{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
-
-<style>
-#book-cover {
-  /* set maximum witdth and hight*/
-  width: 30vw;
-  max-width: 250px;
-}
-
-    .ratings {
-    position: relative;
-    vertical-align: middle;
-    display: inline-block;
-    color: #b1b1b1;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.ratingsMean {
-    position: relative;
-    vertical-align: middle;
-    display: inline-block;
-    color: #b1b1b1;
-    overflow: hidden;
-    z-index: 1;
-}
-.full-stars {
-    position: absolute;
-    white-space: nowrap;
-    overflow: hidden;
-    color: #fde16d;
-}
-.empty-stars:before, .full-stars:before {
-    content:"\2605\2605\2605\2605\2605";
-}
-
-.ratings > .empty-stars:before, .ratings > .full-stars:before {
-    font-size: 2em;
-}
-.ratingsMean > .empty-stars:before, .ratingsMean > .full-stars:before {
-    font-size: 4em;
-}
-
-.empty-stars:before {
-    -webkit-text-stroke: 1px #848484;
-}
-.full-stars:before {
-    -webkit-text-stroke: 1px orange;
-}
-/* Webkit-text-stroke is not supported on firefox or IE */
-
-/* Firefox */
- @-moz-document url-prefix() {
-    .full-stars {
-        color: #ECBE24;
-    }
- }
-/* IE */
- <!--[if IE]> .full-stars {
-    color: #ECBE24;
-}
-<![endif]-->
-</style>
-
-<style>
-        .review {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .username {
-            font-weight: bold;
-        }
-        .stars {
-            font-size: 2em;
-            font-family: FontAwesome;
-        }
-
-        .stars > .checked {
-            color: gold;
-        }
-
-        .stars > .unchecked {
-            color: #b5b5b5;
-        }
-</style>
-
-{{! Fuente: https://codepen.io/jamesbarnett/pen/najzYK }}
-<style>
-  @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
-
-fieldset, label { margin: 0; padding: 0; }
-h1 { font-size: 1.5em; margin: 10px; }
 
 
-/****** Style Star Rating Widget *****/
 
-.ratingInput { 
-  border: none;
-  float: left;
-}
-
-.ratingInput > input { display: none; } 
-.ratingInput > label:before { 
-  margin: 5px;
-  font-size: 2em;
-  font-family: FontAwesome;
-  display: inline-block;
-  content: "\f005";
-}
-
-.ratingInput > label { 
-  color: #ddd; 
- float: right; 
-}
-
-/***** CSS Magic to Highlight Stars on Hover *****/
-
-.ratingInput > input:checked ~ label, /* show gold star when clicked */
-.ratingInput:not(:checked) > label:hover, /* hover current star */
-.ratingInput:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
-
-.ratingInput > input:checked + label:hover, /* hover current star when changing rating */
-.ratingInput > input:checked ~ label:hover,
-.ratingInput > label:hover ~ input:checked ~ label, /* lighten current selection */
-.ratingInput > input:checked ~ label:hover ~ label { color: #FFED85;  } 
-</style>
 
 <script>
 document.getElementById('reviewForm').addEventListener('submit', function(event) {

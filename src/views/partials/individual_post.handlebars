@@ -1,3 +1,20 @@
+{{#if unicoPost}}
+  <link rel="stylesheet" href="/static/css/post_individual.css" />
+
+  <link
+  rel="stylesheet"
+  href="/static/css/stars_review.css"/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
+
+{{/if}}
+
+
+
+
 <div class="post" post-id="{{post_id}}">
   <div class="user-info">
     {{#if repost_username}}<strong class="repost-indicator"><a
@@ -5,7 +22,7 @@
         >@{{repost_username}}</a>
         ⥂</strong>
     {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong>
-    on
+    {{#if is_review}}reviews{{else}}on{{/if}}
     <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
   </div>
   {{#if is_review}}
@@ -35,44 +52,5 @@
   </div>
 </div>
 
-<style>
-
-
-  
-  .ratings {
-    position: relative;
-    vertical-align: middle;
-    display: inline-block;
-    color: #b1b1b1;
-    overflow: hidden;
-    z-index: 1;
-}
-.full-stars {
-    position: absolute;
-    white-space: nowrap;
-    overflow: hidden;
-    color: #fde16d;
-}
-.empty-stars:before, .full-stars:before {
-    content:"\2605\2605\2605\2605\2605";
-}
-
-.ratings > .empty-stars:before, .ratings > .full-stars:before {
-    font-size: 1.5rem;
-}
-
-.empty-stars:before {
-    -webkit-text-stroke: 1px #848484;
-}
-.full-stars:before {
-    -webkit-text-stroke: 1px orange;
-}
-</style>
-
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-/>
-{{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
 
 

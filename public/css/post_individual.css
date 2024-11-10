@@ -1,0 +1,64 @@
+.post {
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.post a {
+    color: #0077b6;
+}
+
+
+.post .repost-indicator {
+    color: gray;
+}
+
+.post .repost-indicator>a {
+    color: gray;
+}
+
+.post .post-actions a:hover {
+    text-decoration: underline;
+}
+
+.post .post-actions a {
+    text-decoration: none;
+    color: #0077b6;
+}
+
+.user-info {
+    font-size: 1rem;
+}
+
+.topic-link {
+    color: #0077b6;
+    text-decoration: none;
+}
+
+.topic-link:hover {
+    text-decoration: underline;
+}
+
+/* VER RATINGS */
+
+
+.post-text {
+    font-size: 1rem;
+    margin: 10px 0;
+    color: #555;
+}
+
+.post-actions {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #e63946;
+}
+
+
+
+.post-actions span {
+    margin-right: 8px;
+}

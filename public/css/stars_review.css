@@ -1,0 +1,32 @@
+.ratings {
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    color: #b1b1b1;
+    overflow: hidden;
+    z-index: 1;
+}
+.full-stars {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #fde16d;
+}
+.empty-stars:before, .full-stars:before {
+    content:"\2605\2605\2605\2605\2605";
+}
+
+.ratings > .empty-stars:before, .ratings > .full-stars:before {
+    font-size: 2rem;
+}
+
+.ratingsBig > .empty-stars:before, .ratingsBig > .full-stars:before {
+    font-size: 4em;
+}
+
+.empty-stars:before {
+    -webkit-text-stroke: 1px #848484;
+}
+.full-stars:before {
+    -webkit-text-stroke: 1px orange;
+}
