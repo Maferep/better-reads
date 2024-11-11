@@ -996,6 +996,31 @@ function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
   return authors.concat(books);
 }
 
+function searchAuthorByName(authorName, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const searchQuery = /*sql*/ `
+    SELECT DISTINCT author_id FROM books_authors
+    WHERE author_id LIKE @authorName
+    LIMIT @limit OFFSET @offset;`;
+  
+  const searchTerm = `%${authorName}%`;
+
+  const rows = db.prepare(searchQuery).all(
+    {
+      authorName: searchTerm,
+      limit: limit,
+      offset: offset
+    }
+  );
+  console.log("search results:", rows);
+
+  return rows;
+}
+
+
 function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
   const paginateFromDateEpochSeconds = paginarDesdeFecha.valueOf() / 1000;
 
@@ -1161,5 +1186,6 @@ export {
   searchUsers,
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
-  searchBooksByAuthor
+  searchBooksByAuthor,
+  searchAuthorByName
 };
