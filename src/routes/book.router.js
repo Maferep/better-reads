@@ -71,7 +71,7 @@ router.post('/:id/review', isAuthenticated, (req, res) => {
         addReview(bookId, userId, rating, reviewText);
 
         if (shareOnFeed) {
-            createPost(userId, reviewText, bookId, rating);
+            createPost(userId, reviewText, bookId, "book", rating);
         }
 
         res.json({ success: true, message: 'Review submitted successfully!' });
