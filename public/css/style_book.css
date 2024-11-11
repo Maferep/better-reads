@@ -1,87 +1,6 @@
-body {
-  color: #01010f;
-  background-color: #bed3eb;
-  background-size: 600px 600px;
-  background-repeat: repeat;
-}
-
-
-  
-  li { 
-    list-style-type: none;
-  }
-  
-  #container {
-    padding-top: 5em;
-    padding-left: 2vw;
-    padding-right: 2vw;
-  }
-  
-  svg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    opacity: 0.6;
-  }
-
-  #content {
-    display: flex;
-    justify-content: center;
-  }
-
-  #container {
-    flex-grow: 1;
-    max-width: 600px;
-    padding: 40px;
-    padding-top: 120px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-.input-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #34495E;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 24px;
-}
-
-button {
-  width: 100%;
-  padding: 15px;
-  background-color: #1ABC9C;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
-button:hover {
-  background-color: #16A085;
-}
-
 #seePostsButton {
   background-color: #007bff;
 }
-
 
 .register-link {
   margin-top: 15px;
@@ -96,6 +15,11 @@ h1 {
   color: #2C3E50;
   text-align: center;
   margin-bottom: 20px;
+}
+
+#content {
+  display: flex;
+  justify-content: center;
 }
 
 .redirect-link a {
@@ -158,40 +82,4 @@ h1 {
   color: #b5b5b5;
 }
 
-/* Fuente: https://codepen.io/jamesbarnett/pen/najzYK  */
 
-fieldset, label { margin: 0; padding: 0; }
-h1 { font-size: 1.5em; margin: 10px; }
-
-
-/****** Style Star Rating Widget *****/
-
-.ratingInput { 
-  border: none;
-  float: left;
-}
-
-.ratingInput > input { display: none; } 
-.ratingInput > label:before { 
-  margin: 5px;
-  font-size: 2em;
-  font-family: FontAwesome;
-  display: inline-block;
-  content: "\f005";
-}
-
-.ratingInput > label { 
-  color: #ddd; 
- float: right; 
-}
-
-/***** CSS Magic to Highlight Stars on Hover *****/
-
-.ratingInput > input:checked ~ label, /* show gold star when clicked */
-.ratingInput:not(:checked) > label:hover, /* hover current star */
-.ratingInput:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
-
-.ratingInput > input:checked + label:hover, /* hover current star when changing rating */
-.ratingInput > input:checked ~ label:hover,
-.ratingInput > label:hover ~ input:checked ~ label, /* lighten current selection */
-.ratingInput > input:checked ~ label:hover ~ label { color: #FFED85;  }
