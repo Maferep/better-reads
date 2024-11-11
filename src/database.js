@@ -221,10 +221,15 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
             JSON.stringify(book["categories"]), // TODO remove and replace
             book["image"] // Direct image link
           );
-          let authors = book["authors"].substring(1, book["authors"].length - 1);
-          authors = authors.split(",").map(author=>author.trim().substring(1, author.trim().length-1))
-          let genres = book["categories"].substring(1, book["categories"].length - 1);
-          genres = genres.split(",").map(genre=>genre.trim().substring(1, genre.trim().length-1))
+          let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/
+          let authors = book["authors"].match(re)
+          let genres = book["categories"].match(re)
+          console.log(authors)
+          console.log(genres)
+          authors = authors ? authors.slice(1, authors.length) : [] ;
+          genres = genres ? genres.slice(1, genres.length) : [] ;
+          console.log(authors)
+          console.log(genres)
           for (const author of authors) {
             if (author && author != "") {
               insert_book_authors.run(author, id)
@@ -291,7 +296,7 @@ function createPostDatabase(db) {
     const insert_posts = db.prepare(
       `INSERT INTO posts (
           author_id, book_id, text_content, date, likes
-       ) VALUES (?,?,?,unixepoch('now'), 0)`
+       ) VALUES (?,?,?,unixepoch('subsec'), 0)`
     );
 
     const insert_many_posts = db.transaction((n) => {
@@ -301,7 +306,7 @@ function createPostDatabase(db) {
 
         console.log(`Inserted post ${i} of ${n}`);
 
-        sleepFor(1000)
+        sleepFor(10)
       }
       })
   
@@ -327,7 +332,7 @@ function createRepostsDb(db) {
     const insert_reposts = db.prepare(
       `INSERT INTO reposts (
           post_id, user_id, date
-       ) VALUES (?,?,unixepoch('now'))`
+       ) VALUES (?,?,unixepoch('subsec'))`
     );
 
     insert_reposts.run(
@@ -370,7 +375,7 @@ function createCommentDb(db) {
     const insert_comments = db.prepare(
       `INSERT INTO comments (
           parent_post, author_id, text_content, date
-       ) VALUES (?,?,?,unixepoch('now'))`
+       ) VALUES (?,?,?,unixepoch('subsec'))`
     );
 
     insert_comments.run(
@@ -402,7 +407,7 @@ function createLikeDb(db) {
     const insert_likes = db.prepare(
       `INSERT INTO likes (
           post_id, user_id, date
-       ) VALUES (?,?,unixepoch('now'))`
+       ) VALUES (?,?,unixepoch('subsec'))`
     );
 
     insert_likes.run(
@@ -547,20 +552,33 @@ function addBookState(bookId, userId, state) {
   }
 }
 
-// TODO: ui needs to only let you talk about specific books so we can use a valid book id
-function createPost(userId, content, topic, rating = null) {
-  const bookId = topic // in the future, a topic can be an author or book chapter
+// Crea un nuevo post en la base de datos, usando el contenido y topic seleccionado,
+// y opcionalmente lo registra como una review con cierto rating
+function createPost(userId, content, topic, topic_type, rating = null) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
+
+  let columnNameTopic;
+
+  if (topic_type == "book") {
+    columnNameTopic = "book_id";
+  } else if (topic_type == "author") {
+    columnNameTopic = "author_topic";
+  } else {
+    throw new Error("Invalid topic type");
+  }
+
   const operation = /* sql */ `INSERT INTO posts (
-        author_id, book_id, text_content, date, review_score
-     ) VALUES (?,?,?,unixepoch('now'), ?)`
+        author_id, `+ columnNameTopic + /*sql*/ ` , text_content, date, review_score
+     ) VALUES (@postAuthorId,@topic,@text_content,unixepoch('subsec'), @review_score)`
   db.prepare(operation).run(
-    userId, 
-    bookId,
-    content,
-    rating
+    {
+      postAuthorId: userId,
+      topic: topic,
+      text_content: content,
+      review_score: rating
+    }
   );
 }
 
@@ -571,7 +589,7 @@ function createRepost(postId, userId) {
 
   const operation = /* sql */ `INSERT INTO reposts (
         post_id, user_id, date
-     ) VALUES (?,?,unixepoch('now'))`
+     ) VALUES (?,?,unixepoch('subsec'))`
 
   db.prepare(operation).run(postId, userId);
 
@@ -591,9 +609,9 @@ function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
   filter.bookId = filter.bookId || null;
   filter.followedBy = filter.followedBy || null;
 
-  const paginateFromDateEpochSeconds = paginateFromDate.valueOf() / 1000;
+  const paginateFromDateEpoch = paginateFromDate.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, page, filter.followedBy ,filter.bookId);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, filter.followedBy ,filter.bookId);
 
   return rows_and_more_posts
 }
@@ -631,7 +649,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = 
                     NULL AS repost_username         -- NULL for original posts
             FROM posts p
             JOIN insecure_users original_user ON p.author_id = original_user.id
-            JOIN books b ON p.book_id = b.id
+            LEFT JOIN books b ON p.book_id = b.id
             LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
             WHERE @startDate >= date ` + book_filter + follow_filter + author_filter_post +
   /*sql*/  `UNION
@@ -650,7 +668,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = 
             JOIN posts p ON rp.post_id = p.id
             JOIN insecure_users original_user ON p.author_id = original_user.id
             LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
-            JOIN books b ON p.book_id = b.id
+            LEFT JOIN books b ON p.book_id = b.id
             LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
             WHERE @startDate >= rp.date ` + book_filter + follow_filter + author_filter_repost +
   /*sql*/  `ORDER BY date DESC
@@ -710,7 +728,7 @@ function incrementLikes(postId, userId) {
     // add to db
       const addLike = db.prepare(`INSERT INTO likes (
         post_id, user_id, date
-    ) VALUES (?,?,unixepoch('now'))`);
+    ) VALUES (?,?,unixepoch('subsec'))`);
 
     let info = addLike.run(Number(postId), userId);
     console.log(info.changes)
@@ -909,7 +927,7 @@ function createComment(postId, userId, content) {
   });
   const operation = /* sql */ `INSERT INTO comments (
         parent_post, author_id, text_content, date
-     ) VALUES (?,?,?,unixepoch('now'))`
+     ) VALUES (?,?,?,unixepoch('subsec'))`
   db.prepare(operation).run(postId, userId, content);
 
   const incrementComments = /* sql */ `UPDATE posts SET comments=((posts.comments)+1) WHERE id=?`
@@ -996,10 +1014,35 @@ function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
   return authors.concat(books);
 }
 
-function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
-  const paginateFromDateEpochSeconds = paginarDesdeFecha.valueOf() / 1000;
+function searchAuthorByName(authorName, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, pagina, null, null, userId);
+  const searchQuery = /*sql*/ `
+    SELECT DISTINCT author_id FROM books_authors
+    WHERE author_id LIKE @authorName
+    LIMIT @limit OFFSET @offset;`;
+  
+  const searchTerm = `%${authorName}%`;
+
+  const rows = db.prepare(searchQuery).all(
+    {
+      authorName: searchTerm,
+      limit: limit,
+      offset: offset
+    }
+  );
+  console.log("search results:", rows);
+
+  return rows;
+}
+
+
+function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
+  const paginateFromDateEpoch = paginarDesdeFecha.valueOf();
+
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, userId);
 
   return rows_and_more_posts;
 }
@@ -1161,5 +1204,6 @@ export {
   searchUsers,
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
-  searchBooksByAuthor
+  searchBooksByAuthor,
+  searchAuthorByName
 };

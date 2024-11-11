@@ -48,8 +48,23 @@ router.get('/:id', (req, res) => {
 router.post('/',isAuthenticated, (req, res) => {
     const userId = req.session.userId;
     const postContent = req.body["post-content"];
-    const topic = req.body.book; // this will now be a user id
-    createPost(userId, postContent, topic);
+
+    const book_topic = req.body.book;
+    const author_topic = req.body.author;
+
+    const topic_type = req.body.type;
+    let final_topic;
+
+    if (topic_type == "book") {
+        final_topic = book_topic;
+    } else if (topic_type == "author") {
+        final_topic = author_topic;
+    } else {
+        res.status(400).send("Invalid topic type");
+        return;
+    }
+
+    createPost(userId, postContent, final_topic, topic_type);
     
     //Quiero saber si tengo que volver al feed de libro, o al feed general.
     const goBackToBookFeed = req.body.goBackToBookFeed;

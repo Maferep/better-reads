@@ -24,6 +24,6 @@ export function fetchBooksInGenre(genre_name) {
   const stmt = `
     SELECT * FROM books WHERE books.id IN (SELECT book_id FROM books_genres WHERE genre_id=?)
   `;
-  const genres = db.prepare(stmt).all(genre_name).map(rowObject => rowObject.book_id);
-  return genres
+  const books = db.prepare(stmt).all(genre_name);
+  return books
 }

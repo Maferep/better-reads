@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { isAuthenticated } from '../authenticate.js';
 
 import {uploader} from "../uploader.js";
 import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
 import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
+import { getBookData } from '../processing/book.js';
+import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 
 const router = Router();
 
@@ -167,6 +168,7 @@ function postsRawToFrontEndCompatible(postsRaw) {
       username: post_raw.username,
       book_id: post_raw.book_id,
       book_name: post_raw.book_name,
+      author_topic: post_raw.author_topic,
       content: post_raw.text_content,
       number_reposts: post_raw.reposts,
       number_comments: 0,
@@ -232,12 +234,15 @@ function processFeedRequest(req, res, onlyFollowing) {
   });
 }
 
-
-
-
 router.get('/genre/:genre', (req, res) => {
-  const books = fetchBooksInGenre(req.params.genre);
-  res.end(books.map(book => "?" +book.book_name).toString());
+  const books = fetchBooksInGenre(req.params.genre).map(book => getBookData(book.id));
+  const estaAutenticadoBool = estaAutenticado(req);
+  
+  res.render("books", {
+    username: req.session.user,
+    loggedIn: estaAutenticadoBool,
+    books: books,
+  });
 })
 
 export default router;
