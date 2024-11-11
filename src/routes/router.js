@@ -167,6 +167,7 @@ function postsRawToFrontEndCompatible(postsRaw) {
       username: post_raw.username,
       book_id: post_raw.book_id,
       book_name: post_raw.book_name,
+      author_topic: post_raw.author_topic,
       content: post_raw.text_content,
       number_reposts: post_raw.reposts,
       number_comments: 0,

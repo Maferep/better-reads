@@ -212,11 +212,21 @@ fieldset {
     const authorSelect = document.getElementById("author-select-div");
 
     if (bookTopicInput.checked) {
+      //toggle what select is visible
       bookSelect.style.display = "block";
       authorSelect.style.display = "none";
+      //toggle what select is required
+      bookSelect.querySelector("select").required = true;
+      authorSelect.querySelector("select").required = false;
+      //delete selection of author
+      $('#author-select').empty();
     } else if (authorTopicInput.checked) {
       authorSelect.style.display = "block";
       bookSelect.style.display = "none";
+      authorSelect.querySelector("select").required = true;
+      bookSelect.querySelector("select").required = false;
+      //delete selection of book
+      $('#book-select').empty();
     }
   }
 </script>
