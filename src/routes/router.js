@@ -185,6 +185,7 @@ function processFeedRequest(req, res, onlyFollowing) {
   req.query.paginate_from ??= new Date().toISOString();
   req.query.page ??= 0;
   req.query.book_id ??= null;
+  req.query.experimental ??= false;
 
   const paginarDesdeFecha = new Date(req.query.paginate_from);
   const pagina = Number(req.query.page);
@@ -224,6 +225,7 @@ function processFeedRequest(req, res, onlyFollowing) {
     title: "Home page",
     book: book,
     onlyFollowing: onlyFollowing,
+    experimental: req.query.experimental,
     feed: {
       posts: posts_processed,
       paginate_from: paginarDesdeFecha.toISOString(),

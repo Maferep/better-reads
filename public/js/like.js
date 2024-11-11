@@ -27,7 +27,11 @@ document.getElementById(event_listener_location).addEventListener("click", funct
   } else if (event.target.closest(".repost-button")) {
     event.preventDefault();
 
+    try{
     playFullscreenVideo();
+    } catch (e) {
+      console.log("Experimental feature not enabled. To enable, go to /?experimental=true.")
+    }
 
     fetch(`/post/${post_id}/repost`, {
       method: "POST",
