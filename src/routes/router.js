@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { isAuthenticated } from '../authenticate.js';
 
 import {uploader} from "../uploader.js";
 import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
 import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
+import { getBookData } from '../processing/book.js';
+import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 
 const router = Router();
 
@@ -233,13 +234,15 @@ function processFeedRequest(req, res, onlyFollowing) {
   });
 }
 
-
-
-
 router.get('/genre/:genre', (req, res) => {
-  const books = fetchBooksInGenre(req.params.genre);
-  console.log(books)
-  res.end(books.map(rowObject => rowObject.book_name).toString());
+  const books = fetchBooksInGenre(req.params.genre).map(book => getBookData(book.id));
+  const estaAutenticadoBool = estaAutenticado(req);
+  
+  res.render("books", {
+    username: req.session.user,
+    loggedIn: estaAutenticadoBool,
+    books: books,
+  });
 })
 
 export default router;
