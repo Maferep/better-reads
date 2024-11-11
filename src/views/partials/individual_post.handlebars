@@ -23,7 +23,8 @@
         ⥂</strong>
     {{/if}}<strong><a href="{{username}}/profile">@{{username}}</a></strong>
     {{#if is_review}}reviews{{else}}on{{/if}}
-    <a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>
+    {{#if book_id includeZero=true}}<a href="book/{{book_id}}" class="topic-link"><em>{{book_name}}</em></a>{{/if}}
+    {{#if author_topic}}<a href="author/{{author_topic}}" class="topic-link"><em>{{author_topic}} (Author)</em></a>{{/if}}
   </div>
   {{#if is_review}}
   <div class="ratings">
