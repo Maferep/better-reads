@@ -221,10 +221,15 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
             JSON.stringify(book["categories"]), // TODO remove and replace
             book["image"] // Direct image link
           );
-          let authors = book["authors"].substring(1, book["authors"].length - 1);
-          authors = authors.split(",").map(author=>author.trim().substring(1, author.trim().length-1))
-          let genres = book["categories"].substring(1, book["categories"].length - 1);
-          genres = genres.split(",").map(genre=>genre.trim().substring(1, genre.trim().length-1))
+          let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/
+          let authors = book["authors"].match(re)
+          let genres = book["categories"].match(re)
+          console.log(authors)
+          console.log(genres)
+          authors = authors ? authors.slice(1, authors.length) : [] ;
+          genres = genres ? genres.slice(1, genres.length) : [] ;
+          console.log(authors)
+          console.log(genres)
           for (const author of authors) {
             if (author && author != "") {
               insert_book_authors.run(author, id)
@@ -291,7 +296,7 @@ function createPostDatabase(db) {
     const insert_posts = db.prepare(
       `INSERT INTO posts (
           author_id, book_id, text_content, date, likes
-       ) VALUES (?,?,?,unixepoch('now'), 0)`
+       ) VALUES (?,?,?,unixepoch('subsec'), 0)`
     );
 
     const insert_many_posts = db.transaction((n) => {
@@ -301,7 +306,7 @@ function createPostDatabase(db) {
 
         console.log(`Inserted post ${i} of ${n}`);
 
-        sleepFor(1000)
+        sleepFor(10)
       }
       })
   
@@ -327,7 +332,7 @@ function createRepostsDb(db) {
     const insert_reposts = db.prepare(
       `INSERT INTO reposts (
           post_id, user_id, date
-       ) VALUES (?,?,unixepoch('now'))`
+       ) VALUES (?,?,unixepoch('subsec'))`
     );
 
     insert_reposts.run(
@@ -370,7 +375,7 @@ function createCommentDb(db) {
     const insert_comments = db.prepare(
       `INSERT INTO comments (
           parent_post, author_id, text_content, date
-       ) VALUES (?,?,?,unixepoch('now'))`
+       ) VALUES (?,?,?,unixepoch('subsec'))`
     );
 
     insert_comments.run(
@@ -402,7 +407,7 @@ function createLikeDb(db) {
     const insert_likes = db.prepare(
       `INSERT INTO likes (
           post_id, user_id, date
-       ) VALUES (?,?,unixepoch('now'))`
+       ) VALUES (?,?,unixepoch('subsec'))`
     );
 
     insert_likes.run(
@@ -555,7 +560,7 @@ function createPost(userId, content, topic, rating = null) {
   });
   const operation = /* sql */ `INSERT INTO posts (
         author_id, book_id, text_content, date, review_score
-     ) VALUES (?,?,?,unixepoch('now'), ?)`
+     ) VALUES (?,?,?,unixepoch('subsec'), ?)`
   db.prepare(operation).run(
     userId, 
     bookId,
@@ -571,7 +576,7 @@ function createRepost(postId, userId) {
 
   const operation = /* sql */ `INSERT INTO reposts (
         post_id, user_id, date
-     ) VALUES (?,?,unixepoch('now'))`
+     ) VALUES (?,?,unixepoch('subsec'))`
 
   db.prepare(operation).run(postId, userId);
 
@@ -710,7 +715,7 @@ function incrementLikes(postId, userId) {
     // add to db
       const addLike = db.prepare(`INSERT INTO likes (
         post_id, user_id, date
-    ) VALUES (?,?,unixepoch('now'))`);
+    ) VALUES (?,?,unixepoch('subsec'))`);
 
     let info = addLike.run(Number(postId), userId);
     console.log(info.changes)
@@ -909,7 +914,7 @@ function createComment(postId, userId, content) {
   });
   const operation = /* sql */ `INSERT INTO comments (
         parent_post, author_id, text_content, date
-     ) VALUES (?,?,?,unixepoch('now'))`
+     ) VALUES (?,?,?,unixepoch('subsec'))`
   db.prepare(operation).run(postId, userId, content);
 
   const incrementComments = /* sql */ `UPDATE posts SET comments=((posts.comments)+1) WHERE id=?`
