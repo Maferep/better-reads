@@ -596,9 +596,9 @@ function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
   filter.bookId = filter.bookId || null;
   filter.followedBy = filter.followedBy || null;
 
-  const paginateFromDateEpochSeconds = paginateFromDate.valueOf() / 1000;
+  const paginateFromDateEpoch = paginateFromDate.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, page, filter.followedBy ,filter.bookId);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, filter.followedBy ,filter.bookId);
 
   return rows_and_more_posts
 }
@@ -1002,9 +1002,9 @@ function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
 }
 
 function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
-  const paginateFromDateEpochSeconds = paginarDesdeFecha.valueOf() / 1000;
+  const paginateFromDateEpoch = paginarDesdeFecha.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpochSeconds, pagina, null, null, userId);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, userId);
 
   return rows_and_more_posts;
 }
