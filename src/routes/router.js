@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
 import {uploader} from "../uploader.js";
-import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
 import { getBookData } from '../processing/book.js';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
