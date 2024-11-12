@@ -239,12 +239,19 @@ function processFeedRequest(req, res, onlyFollowing) {
 }
 
 router.get('/genre/:genre', (req, res) => {
-  const books = fetchBooksInGenre(req.params.genre).map(book => getBookData(book.id));
+  const books = fetchBooksInGenre(req.params.genre).map(book => {
+    book = getBookData(book.id);
+    book.description = book.description.substring(0, 100);
+    book.description = book.description + " (...)";
+    console.log(book.description);
+    return book
+  });
   const estaAutenticadoBool = estaAutenticado(req);
   
   res.render("books", {
     username: req.session.user,
     loggedIn: estaAutenticadoBool,
+    genre: req.params.genre,
     books: books,
   });
 })

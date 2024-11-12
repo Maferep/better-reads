@@ -1,0 +1,47 @@
+
+#content {
+  display: flex;
+  justify-content: center;
+}
+
+h1 {
+  text-align: center;
+}
+
+.browse-books {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2em;
+  align-items: flex-start;
+}
+
+.title-container {
+  text-align: center;
+  height: 130px;
+}
+
+.author-container {
+  height: 80px;
+}
+
+.book-title {
+  align-self: center;
+  font-size: medium;
+}
+
+.book-info{
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  align-items: center;
+}
+
+.info-cover-container {
+  min-height: 230px;
+}
+
+.book-info img{
+  object-fit: contain;
+  margin-bottom: 20px;
+}
