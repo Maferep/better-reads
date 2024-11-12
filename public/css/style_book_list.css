@@ -14,12 +14,16 @@
 
 .title-container {
   text-align: center;
-  height: 100px;
+  height: 130px;
+}
+
+.author-container {
+  height: 80px;
 }
 
 .book-title {
   align-self: center;
-  font-size: small;
+  font-size: medium;
 }
 
 .book-info{
@@ -30,7 +34,7 @@
 }
 
 .info-cover-container {
-  min-height: 250px;
+  min-height: 230px;
 }
 
 .book-info img{
