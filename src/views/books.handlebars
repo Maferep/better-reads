@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/static/css/container_style.css" />
-<link rel="stylesheet" href="/static/css/style_book.css" />
+<link rel="stylesheet" href="/static/css/style_book_list.css" />
 <link rel="stylesheet" href="/static/css/stars_review.css" />
 <link
   rel="stylesheet"
@@ -9,15 +9,18 @@
   
   <div id="content">
   <div id="container">
-    {{#each books}}
-    <div class="book-info">
-      <h1>{{book_name}}</h1>
-      <img id="book-cover" src={{image}} alt="">
-      <p>Authors: {{authors}}</p>
-      <p>Genres: {{genres}}</p>
-      <p>{{description}}</p>
+    <div class="browse-books">
+      {{#each books}}
+      <div class="book-info">
+        <h2 class="book-title">{{book_name}}</h2>
+        <img id="book-cover" src={{image}} alt="">
+        <p>Authors: {{authors}}</p>
+        <p>Genres: {{genres}}</p>
+        <h2>{{book_name}}</h2>
+        <p>{{description}}</p>
+      </div>
+      {{/each}}
     </div>
-    {{/each}}
     </div>
   </div>
 </div>
