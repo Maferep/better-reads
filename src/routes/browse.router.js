@@ -12,8 +12,7 @@ router.get('/', function (req, res) {
     res.render("browse", {
         username: req.session.user,
         loggedIn: true,
-        title: "Browse Books",
-        bookEntries: rows
+        title: "Browse Books"
     });
 });
   
@@ -28,6 +27,21 @@ router.get('/search', function (req, res) {
     console.log("RESULTADOS", rows)
 
     res.json({ bookEntries: rows });
+});
+
+router.get('/search/:query', function (req, res) {
+    const searchTerm = req.params.query;
+    const amount = 10;
+    const offset = 0;
+
+    const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
+
+    res.render("browse", {
+        username: req.session.user,
+        loggedIn: true,
+        title: "Browse Books",
+        results: rows
+    });
 });
 
 router.get('/search_author', function (req, res) {
