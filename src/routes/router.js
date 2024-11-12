@@ -242,6 +242,7 @@ function processFeedRequest(req, res, onlyFollowing) {
 router.get('/genre/:genre', (req, res) => {
   const PAGINATION_LIMIT = 7;
   req.query.page ??= 0;
+  const page = Number(req.query.page)
   const books = fetchBooksInGenre(req.params.genre, PAGINATION_LIMIT, req.query.page).map(book => {
     book = getBookData(book.id);
     book.description = book.description.substring(0, 100);
@@ -256,6 +257,8 @@ router.get('/genre/:genre', (req, res) => {
     loggedIn: estaAutenticadoBool,
     genre: req.params.genre,
     books: books,
+    page_number: page + 1,
+    endpoint_route: `genre/${req.params.genre}`
   });
 })
 
