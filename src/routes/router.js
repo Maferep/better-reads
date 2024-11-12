@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
 import {uploader} from "../uploader.js";
-import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
 import { getBookData } from '../processing/book.js';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
@@ -239,7 +240,10 @@ function processFeedRequest(req, res, onlyFollowing) {
 }
 
 router.get('/genre/:genre', (req, res) => {
-  const books = fetchBooksInGenre(req.params.genre).map(book => {
+  const PAGINATION_LIMIT = 7;
+  req.query.page ??= 0;
+  const page = Number(req.query.page)
+  const books = fetchBooksInGenre(req.params.genre, PAGINATION_LIMIT, req.query.page).map(book => {
     book = getBookData(book.id);
     book.description = book.description.substring(0, 100);
     book.description = book.description + " (...)";
@@ -253,6 +257,8 @@ router.get('/genre/:genre', (req, res) => {
     loggedIn: estaAutenticadoBool,
     genre: req.params.genre,
     books: books,
+    page_number: page + 1,
+    endpoint_route: `genre/${req.params.genre}`
   });
 })
 

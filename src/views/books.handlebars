@@ -7,10 +7,11 @@
 />
 {{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
   
-  <div id="content">
-  <div id="container">
-    <h1>Genre: {{genre}}</h1>
-    <div class="browse-books">
+<div id="content">
+<div id="container">
+  <h1>Genre: {{genre}}</h1>
+  <div class="browse-books">
+    {{#if books}}
       {{#each books}}
       <div class="book-info">
         <div class="title-container">
@@ -24,7 +25,15 @@
         <p>{{description}}</p>
       </div>
       {{/each}}
-    </div>
-    </div>
+    {{else}}
+     <p>No books found.</p>
+    {{/if}}
   </div>
+  {{#if books}}
+    {{#if page_number}}
+        <a href="/{{endpoint_route}}?page={{page_number}}">Load more posts</a>
+    {{else}}
+        <p>You have reached the bottom! There are no more older posts</p>
+    {{/if}}
+  {{/if}}
 </div>
