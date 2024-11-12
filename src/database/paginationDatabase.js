@@ -1,8 +1,6 @@
 import Database from "better-sqlite3";
 import _SqliteStore from "better-sqlite3-session-store";
-const TEST_USER_ID = 20000000;
-const TEST_BOOK_ID = 0;
-const TEST_POST_ID = 1;
+
 const CANTIDAD_POSTS_PAGINADO = 7;
 // Entrega una lista de posts, devolviedo un array de posts (paginados),
 // y un booleano que indica si existen más posts luego del ultimo devuelto

@@ -240,9 +240,9 @@ function processFeedRequest(req, res, onlyFollowing) {
 }
 
 router.get('/genre/:genre', (req, res) => {
-  req.query.paginate_from ??= new Date().toISOString();
+  const PAGINATION_LIMIT = 7;
   req.query.page ??= 0;
-  const books = fetchBooksInGenre(req.params.genre, req.query.page, req.query.paginate_from).map(book => {
+  const books = fetchBooksInGenre(req.params.genre, PAGINATION_LIMIT, req.query.page).map(book => {
     book = getBookData(book.id);
     book.description = book.description.substring(0, 100);
     book.description = book.description + " (...)";
