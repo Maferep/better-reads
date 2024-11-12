@@ -620,9 +620,9 @@ function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
 // Recibe el tiempo de referencia para el primer post, el numero de pagina, y filtros varios.
 // Devuelve la lista de posts, junto a un booleano que indica que existen más posts.
 function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId = null, authorTopic = null, genre = null, authorId = null, number_of_posts = CANTIDAD_POSTS_PAGINADO) {
-  const numberOfPostsInPage = number_of_posts;
+  const postsInPage = number_of_posts;
 
-  const offset = page * numberOfPostsInPage;
+  const offset = page * postsInPage;
 
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -698,7 +698,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
     followedBy: followedBy,
     authorTopic: authorTopic,
     genre: genre,
-    postsInPage: numberOfPostsInPage + 1,
+    postsInPage: postsInPage + 1,
     startFromPost: offset,
     authorId: authorId
   }
@@ -710,7 +710,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
   // Se busca si se pudo obtener un post extra, si esto es así, se elimina este post extra de la lista
   // y se setea el booleano has_more a true, para indicar que hay por lo menos un post extra.
   let has_more = false
-  if (rows.length > numberOfPostsInPage) {
+  if (rows.length > postsInPage) {
     rows.pop();
     has_more = true;
   }
@@ -1053,10 +1053,10 @@ function searchAuthorByName(authorName, limit, offset) {
 }
 
 
-function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
-  const paginateFromDateEpoch = paginarDesdeFecha.valueOf();
+function getPostsFromUserId(userId, paginateFromDate, page){
+  const paginateFromDateEpoch = paginateFromDate.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, null, null, userId);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, null, null, null, null, userId);
 
   return rows_and_more_posts;
 }
