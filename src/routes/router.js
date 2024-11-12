@@ -189,11 +189,12 @@ function processFeedRequest(req, res, onlyFollowing) {
   const paginarDesdeFecha = new Date(req.query.paginate_from);
   const pagina = Number(req.query.page);
   const deLibro = req.query.book_id;
-
+  const deAutor = req.query.author
   const userId = req.session.userId;
 
   const filter = {};
   filter.bookId = deLibro;
+  filter.authorTopic = deAutor;
   if (onlyFollowing) {
     filter.followedBy = userId;
   }
