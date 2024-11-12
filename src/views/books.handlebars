@@ -12,7 +12,9 @@
     <div class="browse-books">
       {{#each books}}
       <div class="book-info">
-        <h2 class="book-title">{{book_name}}</h2>
+        <div class="title-container">
+          <h2 class="book-title">{{book_name}}</h2>
+        </div>
         <div class="info-cover-container">
           <img id="book-cover" src={{image}} alt="">
         </div>

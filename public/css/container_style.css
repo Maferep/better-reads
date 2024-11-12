@@ -26,8 +26,8 @@ svg {
 #container {
   flex-grow: 1;
   max-width: 600px;
-  padding: 40px;
-  padding-top: 120px;
+  padding: 1em;
+  padding-top: 4em;
   border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #FFFFFF;

@@ -12,9 +12,14 @@
   align-items: flex-start;
 }
 
-.book-title {
-  font-size: small;
+.title-container {
+  text-align: center;
   height: 100px;
+}
+
+.book-title {
+  align-self: center;
+  font-size: small;
 }
 
 .book-info{
