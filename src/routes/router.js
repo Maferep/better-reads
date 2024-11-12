@@ -251,6 +251,7 @@ router.get('/genre/:genre', (req, res) => {
   res.render("books", {
     username: req.session.user,
     loggedIn: estaAutenticadoBool,
+    genre: req.params.genre,
     books: books,
   });
 })

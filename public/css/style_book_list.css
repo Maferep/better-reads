@@ -4,6 +4,10 @@
   justify-content: center;
 }
 
+h1 {
+  text-align: center;
+}
+
 .browse-books {
   display: flex;
   flex-direction: row;
