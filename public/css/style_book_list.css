@@ -9,17 +9,23 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 10px;
-  align-items: flex-startS;
+  align-items: flex-start;
 }
 
 .book-title {
   font-size: small;
+  height: 100px;
 }
 
 .book-info{
   display: flex;
   flex-direction: column;
-  flex: 1 0 30%;
+  flex: 1 0 28%;
+  align-items: center;
+}
+
+.info-cover-container {
+  min-height: 250px;
 }
 
 .book-info img{
