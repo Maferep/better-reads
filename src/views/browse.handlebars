@@ -1,43 +1,72 @@
 <link rel="stylesheet" href="/static/css/container_style.css" />
 <link rel="stylesheet" href="/static/css/style.css" />
+<link rel="stylesheet" href="/static/css/browse_style.css" />
 
 <div id="browse-container">
   <h1>Browse Books</h1>
 
   <div id="book-list">
     <label for="book-select">Select a book:</label>
-    <select name="book" id="book-select" style="width: 100%;">
-      <option value="">-- Select a book --</option>
-      {{#each bookEntries}}
-        <option value="{{this.id}}">{{this.book_name}}</option>
-      {{/each}}
+    <div class="select-button-container">
+    <select name="book" id="book-select">
     </select>
-  </div>
 
-  <button type="submit" onclick="return redirectToBook(event)">View Book</button>
+  <button type="submit" onclick="return redirectToBook(event)">🔎︎</button>
+  </div>
+  </div>
 </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script>
+
+
+
     $(document).ready(function() {
   $('#book-select').select2({
     placeholder: "-- Select a book --",
+    tags: true,
+    //Hace que el tag custom del usuario aparezca al principio de lista
+    insertTag: function(data, tag) {
+      data.unshift(tag);
+    },
+    //Le asigna al tag custom del usuario el id "custom",
+    //Para poder saber cuando hacer la query personalizada
+    createTag: function(params) {
+      return {
+        id: "custom-" + params.term,
+        text: params.term,
+        newOption: true
+      }
+    },
     ajax: {
       url: '/browse/search',
       dataType: 'json',
-      delay: 300,
+      delay: 100,
       data: function(params) {
         return {
           search: params.term 
         };
       },
       processResults: function(data) {
-        return {
-          results: data.bookEntries.map(book => ({
+        let result = data.bookEntries.map(function(book) {
+
+          const isCoincidenceByAuthor = book.coincidence_type === "author_name";
+
+          let text = book.book_name
+
+          if (isCoincidenceByAuthor) {
+            text += ` (by ${book.author_coincidence})`;
+          }
+
+          return {
             id: book.id,
-            text: book.book_name
-          }))
+            text: text
+          };
+        });
+
+        return {
+          results: result
         };
       },
       cache: true
@@ -50,7 +79,13 @@ function redirectToBook(event) {
     const select = document.getElementById('book-select');
     const bookId = select.value;
     if (bookId) {
-        window.location.href = `/book/${bookId}`;
+
+        if (bookId.startsWith("custom")) {
+          const searchTerm = bookId.substring(7);
+          alert("TODO: Implement search by custom term: " + searchTerm);
+        } else {
+            window.location.href = `/book/${bookId}`;
+        }
     } else {
         alert("Please select a book.");
     }

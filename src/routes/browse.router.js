@@ -24,6 +24,9 @@ router.get('/search', function (req, res) {
     const offset = 0;
 
     const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
+
+    console.log("RESULTADOS", rows)
+
     res.json({ bookEntries: rows });
 });
 

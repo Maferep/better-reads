@@ -1,0 +1,19 @@
+#book-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .select-button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  #book-select {
+    width: 100%;
+  }
+
+button{
+    margin: 0;
+    width:min-content;
+}
