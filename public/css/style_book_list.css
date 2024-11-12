@@ -1,0 +1,28 @@
+
+#content {
+  display: flex;
+  justify-content: center;
+}
+
+.browse-books {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-startS;
+}
+
+.book-title {
+  font-size: small;
+}
+
+.book-info{
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 30%;
+}
+
+.book-info img{
+  object-fit: contain;
+  margin-bottom: 20px;
+}
