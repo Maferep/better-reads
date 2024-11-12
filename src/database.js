@@ -611,7 +611,7 @@ function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
 
   const paginateFromDateEpoch = paginateFromDate.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, filter.followedBy ,filter.bookId, filter.authorTopic);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, filter.followedBy ,filter.bookId, filter.authorTopic, filter.genre);
 
   return rows_and_more_posts
 }
@@ -619,7 +619,7 @@ function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
 //Unica funcion que realiza la query real para obtener los posts. No debería usarse fuera de este modulo.
 // Recibe el tiempo de referencia para el primer post, el numero de pagina, y filtros varios.
 // Devuelve la lista de posts, junto a un booleano que indica que existen más posts.
-function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId = null, authorTopic = null, authorId = null, number_of_posts = CANTIDAD_POSTS_PAGINADO) {
+function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId = null, authorTopic = null, genre = null, authorId = null, number_of_posts = CANTIDAD_POSTS_PAGINADO) {
   const numberOfPostsInPage = number_of_posts;
 
   const offset = page * numberOfPostsInPage;
@@ -639,6 +639,10 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
   ? '' 
   : ` AND (books_authors.author_id LIKE @authorTopic OR p.author_topic LIKE @authorTopic)`;
 
+  const genre_filter = (genre == null) 
+  ? '' 
+  : ` AND (books_genres.genre_id LIKE @genre)`;
+
   const query = 
   /*sql*/  `SELECT p.id AS post_id,
                     original_user.id AS user_id,
@@ -655,8 +659,9 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
             JOIN insecure_users original_user ON p.author_id = original_user.id
             LEFT JOIN books b ON p.book_id = b.id
             LEFT JOIN books_authors ON b.id = books_authors.book_id
+            LEFT JOIN books_genres ON b.id = books_genres.book_id
             LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
-            WHERE @startDate >= date ` + book_filter + follow_filter + author_filter_post + author_topic_filter +
+            WHERE @startDate >= date ` + book_filter + follow_filter + author_filter_post + author_topic_filter + genre_filter +
   /*sql*/  `UNION
             SELECT rp.post_id AS post_id,
                     original_user.id AS user_id,
@@ -675,8 +680,9 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
             LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
             LEFT JOIN books b ON p.book_id = b.id
             LEFT JOIN books_authors ON b.id = books_authors.book_id
+            LEFT JOIN books_genres ON b.id = books_genres.book_id
             LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
-            WHERE @startDate >= rp.date ` + book_filter + follow_filter + author_filter_repost + author_topic_filter +
+            WHERE @startDate >= rp.date ` + book_filter + follow_filter + author_filter_repost + author_topic_filter + genre_filter +
   /*sql*/  `ORDER BY date DESC
             LIMIT @postsInPage OFFSET @startFromPost;`;
 
@@ -691,6 +697,7 @@ function getPostsWithFilters(paginateFromDate, page, followedBy = null, bookId =
     book_id: bookId,
     followedBy: followedBy,
     authorTopic: authorTopic,
+    genre: genre,
     postsInPage: numberOfPostsInPage + 1,
     startFromPost: offset,
     authorId: authorId
@@ -1049,7 +1056,7 @@ function searchAuthorByName(authorName, limit, offset) {
 function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
   const paginateFromDateEpoch = paginarDesdeFecha.valueOf();
 
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, null, userId);
+  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, null, null, userId);
 
   return rows_and_more_posts;
 }
