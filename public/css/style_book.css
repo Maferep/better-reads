@@ -36,7 +36,7 @@ h1 {
 .share-option {
   display: flex;
   align-items: center;
-  margin-top: 10px;
+  margin: 1em;
 }
 
 .share-option label {
