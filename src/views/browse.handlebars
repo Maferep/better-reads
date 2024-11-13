@@ -9,7 +9,7 @@
   <h1>Browse</h1>
 
   <div id="book-list">
-    <label for="book-select">Search for a book, genre or user!:</label>
+    <label for="book-select">Search for a book, genre or user!</label>
     <div class="select-button-container">
     <select name="book" id="book-select">
     </select>
@@ -60,11 +60,76 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script>
 
+    function parseSearchAllForResults(data) {
+
+      console.log(data)
+
+      let books = data.bookEntries.map(function(book) {
+        const isCoincidenceByAuthor = book.coincidence_type === "author_name";
+        let text = book.book_name
+        if (isCoincidenceByAuthor) {
+          text += ` (by ${book.author_coincidence})`;
+        }
+
+        return {
+          id: "book-" + String(book.id),
+          text: text
+        };
+      });
+
+      console.log("Books:", books)
+
+
+      let genres = data.genreEntries.map(function(genre) {
+        return {
+          id: "genre-" + String(genre.genre_id),
+          text: genre.genre_id
+        };
+      });
+
+      console.log("Genres:", genres)
+
+      let users = data.userEntries.map(function(user) {
+        return {
+          id: "user-" + String(user.username),
+          text: user.username
+        };
+      });
+
+      console.log("Users:", users)
+
+      let finalResult = {
+        results: []
+      }
+
+      if (books.length > 0) {
+        finalResult.results.push({
+          text: "Books",
+          children: books
+        });
+      }
+
+      if (genres.length > 0) {
+        finalResult.results.push({
+          text: "Genres",
+          children: genres
+        });
+      }
+
+      if (users.length > 0) {
+        finalResult.results.push({
+          text: "Users",
+          children: users
+        });
+      }
+
+      return finalResult;
+    }
 
 
     $(document).ready(function() {
   $('#book-select').select2({
-    placeholder: "-- Select a book --",
+    placeholder: "-- Search something --",
     tags: true,
     //Hace que el tag custom del usuario aparezca al principio de lista
     insertTag: function(data, tag) {
@@ -83,35 +148,15 @@
       }
     },
     ajax: {
-      url: '/browse/search',
+      url: '/browse/search_all',
       dataType: 'json',
       delay: 100,
       data: function(params) {
         return {
-          search: params.term 
+          search: params.term
         };
       },
-      processResults: function(data) {
-        let result = data.bookEntries.map(function(book) {
-
-          const isCoincidenceByAuthor = book.coincidence_type === "author_name";
-
-          let text = book.book_name
-
-          if (isCoincidenceByAuthor) {
-            text += ` (by ${book.author_coincidence})`;
-          }
-
-          return {
-            id: book.id,
-            text: text
-          };
-        });
-
-        return {
-          results: result
-        };
-      },
+      processResults: parseSearchAllForResults,
       cache: true
     }
   });
@@ -120,19 +165,22 @@
 function redirectToSearch(event) {
     event.preventDefault();
     const select = document.getElementById('book-select');
-    const bookId = select.value;
-    if (bookId) {
+    const selectionId = select.value;
 
-        if (bookId.startsWith("custom")) {
-          const searchTerm = bookId.substring(7);
-          window.location.href = `/browse/search/${searchTerm}`;
-          {{!-- alert("TODO: Implement search by custom term: " + searchTerm); --}}
-        } else {
-            window.location.href = `/book/${bookId}`;
-        }
-    } else {
-        alert("Please select a book.");
+    if (selectionId.startsWith("custom-")) {
+      const search = selectionId.replace("custom-", "");
+      window.location.href = `/browse/search/${search}`;
+    } else if (selectionId.startsWith("book-")) {
+      const bookId = selectionId.replace("book-", "");
+      window.location.href = `/book/${bookId}`;
+    } else if (selectionId.startsWith("genre-")) {
+      const genreId = selectionId.replace("genre-", "");
+      window.location.href = `/genre/${genreId}`;
+    } else if (selectionId.startsWith("user-")) {
+      const userId = selectionId.replace("user-", "");
+      window.location.href = `/${userId}/profile`;
     }
+    
 }
 </script>
 
