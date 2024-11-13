@@ -17,11 +17,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-#content {
-  display: flex;
-  justify-content: center;
-}
-
 .redirect-link a {
   color: #3498DB;
 }

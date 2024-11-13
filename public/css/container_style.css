@@ -1,4 +1,8 @@
+html {height: 100%;}
+
+
 body {
+  height: 100%;
   color: #01010f;
   background-color: #bed3eb;
   background-size: 600px 600px;
@@ -26,13 +30,20 @@ svg {
 #container {
   flex-grow: 1;
   max-width: 600px;
-  padding: 1em;
-  padding-top: 4em;
+  min-width: 275px;
+  padding: 2em;
   border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #FFFFFF;
-  margin-bottom: 10px;
+  margin: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
 }
 
 .input-group {
