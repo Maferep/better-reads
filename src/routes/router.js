@@ -246,9 +246,15 @@ router.get('/genre/:genre', (req, res) => {
   const result = fetchBooksInGenre(req.params.genre, PAGINATION_LIMIT, req.query.page)
   const books = result.books.map(book => {
     book = getBookData(book.id);
-    book.description = book.description.substring(0, 100);
-    book.description = book.description + " (...)";
-    console.log(book.description);
+
+    if (book.book_name.length > 90) {
+      book.book_name = book.book_name.substring(0, 90);
+      book.book_name = book.book_name + "...";
+    }
+    if (book.description.length > 100) {
+      book.description = book.description.substring(0, 100);
+      book.description = book.description + " (...)";
+    }
     return book
   });
   const estaAutenticadoBool = estaAutenticado(req);
