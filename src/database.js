@@ -211,6 +211,20 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
 
       const insert_many_books = db.transaction((books) => {
         for (const book of books) {
+          let empty_fields = 0;
+
+          const important_fields = ["Title", "description", "authors", "image", "categories"];
+          for (const key of important_fields) {
+            if (book[key] === undefined || book[key] === "") {
+              empty_fields += 1;
+            }
+          }
+
+          if (empty_fields >= 2) {
+            //Descarto libro con muchos faltantes
+            continue;
+          }
+
           id += 1;
           insert_books.run(
             id,
@@ -224,12 +238,12 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
           let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/
           let authors = book["authors"].match(re)
           let genres = book["categories"].match(re)
-          console.log(authors)
-          console.log(genres)
+          // console.log(authors)
+          // console.log(genres)
           authors = authors ? authors.slice(1, authors.length) : [] ;
           genres = genres ? genres.slice(1, genres.length) : [] ;
-          console.log(authors)
-          console.log(genres)
+          // console.log(authors)
+          // console.log(genres)
           for (const author of authors) {
             if (author && author != "") {
               insert_book_authors.run(author, id)
