@@ -52,6 +52,8 @@ h1 {
   padding: 1em;
   width: 10em;
   word-break: break-word;
+
+  min-width: 8em;
 }
 
 .info-cover-container {
@@ -73,3 +75,4 @@ h1 {
   text-align: center;
   width: 7em;
 }
+
