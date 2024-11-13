@@ -30,10 +30,10 @@
     {{/if}}
   </div>
   {{#if books}}
-    {{#if page_number}}
-        <a href="/{{endpoint_route}}?page={{page_number}}">Load more posts</a>
+    {{#if next_page}}
+        <a href="/{{endpoint_route}}?page={{next_page}}">Next page</a>
     {{else}}
-        <p>You have reached the bottom! There are no more older posts</p>
+        <p>No more books.</p>
     {{/if}}
   {{/if}}
 </div>

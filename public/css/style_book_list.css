@@ -13,7 +13,7 @@ h1 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 2em;
-  align-items: flex-start;
+  justify-content: center;
 }
 
 .title-container {
@@ -33,12 +33,12 @@ h1 {
 .book-info{
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
+  flex: 0 1 0;
   align-items: center;
 }
 
 .info-cover-container {
-  min-height: 230px;
+  min-height: 220px;
 }
 
 .book-info img{

@@ -22,10 +22,15 @@ export function fetchGenresFromBook(bookId) {
 
 export function fetchBooksInGenre(genre_name, limit=PAGINATION_LIMIT, page=0) {
   const db = new Database("database_files/betterreads.db", { verbose: console.log });
+
+  // we ask for one more than the pages we want in order to know if there is more
   const stmt = `
     SELECT * FROM books WHERE books.id IN (SELECT book_id FROM books_genres WHERE genre_id=? LIMIT ? OFFSET ?)
   `;
   const offset = page * limit;
-  const books = db.prepare(stmt).all(genre_name, limit, offset);
-  return books
+  const books = db.prepare(stmt).all(genre_name, limit +1, offset);
+
+  // if we got the pages we wanted, then there are more pages left
+  const has_more = (books.length == limit+1);
+  return { books: books, has_more: has_more };
 }
