@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import {searchBooks, searchBooksByTitleOrAuthor, searchBooksByAuthor, searchBooksByTitle, searchAuthorByName } from '../database.js';
+import { searchBooksByTitleOrAuthor, searchBooksByAuthor, searchBooksByTitle, searchAuthorByName
+    , searchUsers, searchGenres
+ } from '../database.js';
 
 const router = Router();
 
@@ -19,6 +21,25 @@ router.get('/search', function (req, res) {
 
     const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
     res.json({ bookEntries: rows });
+});
+
+//Busca tanto libros, como generos y usuarios. Busca primero libros,
+// luego generos, y finalmente usuarios, buscando ocupar el cupo total de resultados
+router.get('/search_all', function (req, res) {
+    const searchTerm = req.query.search || "";
+    let results = 20
+    const offset = 0;
+
+    const bookRows = searchBooksByTitleOrAuthor(searchTerm, Math.ceil(results/2), offset);
+    results -= bookRows.length;
+    
+    const genresRows = searchGenres(searchTerm, Math.ceil(results/2), offset);
+    results -= genresRows.length;
+    
+    const userRows = searchUsers(searchTerm, results, offset);
+
+
+    res.json({ bookEntries: bookRows, userEntries: userRows, genreEntries: genresRows });
 });
 
 router.get('/search/:query', function (req, res) {

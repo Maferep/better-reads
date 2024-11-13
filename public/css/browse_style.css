@@ -45,7 +45,7 @@ html {
 
 .without-results {
   position: absolute;
-  top: 50%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 70px 40px;
@@ -125,3 +125,9 @@ html {
     background-color: #007BFF;
     color: white;
 }
+
+/* Modifica el largo del dropdown */
+.select2-container--default .select2-results > .select2-results__options {
+  max-height: 300px;
+  overflow-y: auto;
+  }

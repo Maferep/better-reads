@@ -1045,7 +1045,24 @@ function searchUsers(query, limit, offset) {
   const searchTerm = `%${query}%`;
 
   const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
-  console.log("search results:", rows);
+
+  return rows;
+}
+
+function searchGenres(query, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  
+
+  const searchQuery = `
+    SELECT DISTINCT genre_id FROM books_genres
+    WHERE genre_id LIKE ?
+    LIMIT ? OFFSET ?`;
+
+  const searchTerm = `%${query}%`;
+
+  const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
 
   return rows;
 }
@@ -1085,6 +1102,7 @@ export {
   getUsernameFromId,
   getIdFromUsername,
   searchUsers,
+  searchGenres,
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
   searchBooksByAuthor,
