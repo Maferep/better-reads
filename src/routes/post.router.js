@@ -67,9 +67,12 @@ router.post('/',isAuthenticated, (req, res) => {
     createPost(userId, postContent, final_topic, topic_type);
     
     //Quiero saber si tengo que volver al feed de libro, o al feed general.
-    const goBackToBookFeed = req.body.goBackToBookFeed;
-    if (goBackToBookFeed == "true") {
-        res.redirect(`/?book_id=${topic}`);
+    const goBackToFeed = req.body.goBackToFeed;
+
+    if (goBackToFeed == "book") {
+        res.redirect(`/?book_id=${final_topic}`);
+    } else if (goBackToFeed == "author") {
+        res.redirect(`/?author=${final_topic}`);
     } else {
         res.redirect('/')
     }
