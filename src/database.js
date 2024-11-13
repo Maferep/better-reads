@@ -1067,6 +1067,20 @@ function searchGenres(query, limit, offset) {
   return rows;
 }
 
+// Function to paginate db request in the form of request(queryParameter, limit, offset)
+function genericPaginatedSearch(function_request, queryParameter, results_per_page, page) {
+  const offset = page * results_per_page;
+  const limit = results_per_page + 1;
+  const rows = function_request(queryParameter, limit, offset);
+
+  const has_more = rows.length > results_per_page;
+  if (has_more) {
+    rows.pop();
+  }
+
+  return { rows, has_more };
+}
+
 
 export {
   initDb,
@@ -1106,5 +1120,6 @@ export {
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
   searchBooksByAuthor,
-  searchAuthorByName
+  searchAuthorByName,
+  genericPaginatedSearch
 };

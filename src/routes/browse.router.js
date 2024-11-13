@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { searchBooksByTitleOrAuthor, searchBooksByAuthor, searchBooksByTitle, searchAuthorByName
-    , searchUsers, searchGenres
+    , searchUsers, searchGenres,
+    genericPaginatedSearch
  } from '../database.js';
+ 
+import { getBookData } from '../processing/book.js';
 
 const router = Router();
 
@@ -43,35 +46,51 @@ router.get('/search_all', function (req, res) {
 });
 
 router.get('/search/:query', function (req, res) {
+    req.query.page ??= 0;
+    const page = Number(req.query.page);
+
     const searchTerm = req.params.query;
-    const amount = 20;
-    const offset = 0;
 
     const tipoBusqueda = req.query.type ?? "book_and_author_name"
 
-    let rows;
+    
 
     const validTypes = {};
+    let queryFunction;
 
     if (tipoBusqueda == "book_and_author_name") {
-        rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
+        queryFunction = searchBooksByTitleOrAuthor;
         validTypes["book_and_author_name"] = true;
     } else if (tipoBusqueda == "book_name") {
-        rows = searchBooksByTitle(searchTerm, amount, offset);
+        queryFunction = searchBooksByTitle;
         validTypes["book_name"] = true;
     } else if (tipoBusqueda == "author_name") {
-        rows = searchBooksByAuthor(searchTerm, amount, offset);
+        queryFunction = searchBooksByAuthor;
         validTypes["author_name"] = true;
     } else {
         res.status(400).send("Invalid search type");
     }
+
+    const result = genericPaginatedSearch(queryFunction, searchTerm, 10, page);
+
+    const books = result.rows.map(book => {
+        book = getBookData(book.id);
+        book.description = book.description.substring(0, 100);
+        book.description = book.description + " (...)";
+        console.log(book.description);
+        return book
+      });
+
+    const has_more = result.has_more;
 
     res.render("browse", {
         username: req.session.user,
         loggedIn: true,
         title: "Browse Books",
         search: searchTerm,
-        results: rows,
+        books: books,
+        next_page: has_more ? page + 1 : null,
+        prev_page: page > 0 ? page - 1 : null,
         validTypes: validTypes
     });
 });

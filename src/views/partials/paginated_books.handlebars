@@ -1,0 +1,36 @@
+
+<link rel="stylesheet" href="/static/css/style_book_list.css" />
+
+<div class="paginated-books">
+  <div class="browse-books">
+    {{#if books}}
+      {{#each books}}
+      <div class="book-info">
+        <div class="title-container">
+          <a href="/book/{{id}}"><h2 class="book-title">{{book_name}}</h2></a>
+        </div>
+        <div class="info-cover-container">
+          <a href="/book/{{id}}"><img id="book-cover" src={{image}} alt=""></a>
+        </div>
+        <div class="genre-container"><p>{{genres}}</p></div>
+        <div class="author-container"><p>{{authors}}</p></div>
+        <p>{{description}}</p>
+      </div>
+      {{/each}}
+    {{else}}
+     <p>No books found.</p>
+    {{/if}}
+  </div>
+  {{#if books}}
+    <div class="paginator">
+      {{#if prev_page}}
+          <a href="/{{endpoint_route}}?page={{prev_page}}">< Prev</a>
+      {{/if}}
+      {{#if next_page}}
+          <a href="/{{endpoint_route}}?page={{next_page}}">Next ></a>
+      {{else}}
+          <p>No more books.</p>
+      {{/if}}
+    </div>
+  {{/if}}
+</div>

@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="/static/css/style_book_list.css" />
 
 
-<div id="browse-container-flex">
 <div id="browse-container" class="{{#if search}}with-results{{else}}without-results{{/if}}">
+
   <h1>Browse</h1>
 
   <div id="book-list">
@@ -25,36 +25,16 @@
   <a href='/browse/search/{{search}}?type=book_name' class="{{#if validTypes.book_name}}selected{{/if}}">Only book</a>
   <a href="/browse/search/{{search}}?type=author_name" class="{{#if validTypes.author_name}}selected{{/if}}">Only author</a>
 </div>
+</div>
 
 {{/if}}
-</div>
-</div>
 
 
 
 {{#if search}}
-{{#if results}} 
-<div class="browse-books">
-      {{#each results}}
-      <div class="book-info">
-        <div class="title-container">
-          <a href="/book/{{id}}"><h2 class="book-title">{{book_name}}</h2></a>
-        </div>
-        <div class="info-cover-container">
-          <img id="book-cover" src={{image}} alt="">
-        </div>
-        <div class="author-container"><p>Authors:<br>{{authors}}</p></div>
-        <div class="author-container"><p>Genres:<br>{{genres}}</p></div>
-        <p>{{description}}</p>
-      </div>
-      {{/each}}
-    </div>
-{{else}}
-  {{!-- No se encontró ningun resultado --}}
-  <div class="no-results">
-    <p>No results found</p>
+{{> paginated_books}}
 {{/if}}
-{{/if}}
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
