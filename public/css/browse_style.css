@@ -89,7 +89,39 @@ html {
   margin-bottom: 15px;
 }
 
-#browse-container p {
+/* #browse-container p {
     font-size: 18px;
     
+} */
+
+.search-options {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+    margin: 0 10px;
+    gap: 5px;
+}
+
+.search-options * {
+    padding: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    margin: 0;
+}
+
+.search-options a {
+    text-decoration: none;
+    background-color: auto;
+    color: black;
+    font-weight: bold;
+}
+
+.search-options a:hover {
+    text-decoration: underline;
+}
+
+.search-options a.selected {
+    font-weight: bold;
+    background-color: #007BFF;
+    color: white;
 }

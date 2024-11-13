@@ -1,14 +1,9 @@
 import { Router } from 'express';
-import {searchBooks, searchBooksByTitleOrAuthor, searchAuthorByName } from '../database.js';
+import {searchBooks, searchBooksByTitleOrAuthor, searchBooksByAuthor, searchBooksByTitle, searchAuthorByName } from '../database.js';
 
 const router = Router();
 
 router.get('/', function (req, res) {
-    const amount = 10;
-    const offset = 0;
-
-    const rows = searchBooks("", amount, offset);
-
     res.render("browse", {
         username: req.session.user,
         loggedIn: true,
@@ -23,24 +18,40 @@ router.get('/search', function (req, res) {
     const offset = 0;
 
     const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
-
-    console.log("RESULTADOS", rows)
-
     res.json({ bookEntries: rows });
 });
 
 router.get('/search/:query', function (req, res) {
     const searchTerm = req.params.query;
-    const amount = 10;
+    const amount = 20;
     const offset = 0;
 
-    const rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
+    const tipoBusqueda = req.query.type ?? "book_and_author_name"
+
+    let rows;
+
+    const validTypes = {};
+
+    if (tipoBusqueda == "book_and_author_name") {
+        rows = searchBooksByTitleOrAuthor(searchTerm, amount, offset);
+        validTypes["book_and_author_name"] = true;
+    } else if (tipoBusqueda == "book_name") {
+        rows = searchBooksByTitle(searchTerm, amount, offset);
+        validTypes["book_name"] = true;
+    } else if (tipoBusqueda == "author_name") {
+        rows = searchBooksByAuthor(searchTerm, amount, offset);
+        validTypes["author_name"] = true;
+    } else {
+        res.status(400).send("Invalid search type");
+    }
 
     res.render("browse", {
         username: req.session.user,
         loggedIn: true,
         title: "Browse Books",
-        results: rows
+        search: searchTerm,
+        results: rows,
+        validTypes: validTypes
     });
 });
 
