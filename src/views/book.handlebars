@@ -1,5 +1,7 @@
-  <link rel="stylesheet" href="/static/css/style_book.css" />
-  <link rel="stylesheet" href="/static/css/stars_review.css" />
+<link rel="stylesheet" href="/static/css/container_style.css" />
+<link rel="stylesheet" href="/static/css/style_book.css" />
+<link rel="stylesheet" href="/static/css/stars_review.css" />
+<link rel="stylesheet" href="/static/css/style_star_input.css" />
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -11,8 +13,12 @@
     <div class="book-info">
       <h1>{{bookName}}</h1>
       <img id="book-cover" src={{bookCover}} alt="">
-      <p>Authors: {{bookAuthor}}</p>
-      <p>Genres: {{bookGenre}}</p>
+      <p>Authors: 
+        <a href="/?author={{bookAuthor}}">{{bookAuthor}}</a>
+      </p>
+      <p>Genres: 
+        <a href="/genre/{{bookGenre}}">{{bookGenre}}</a>
+      </p>
       <p>{{bookDescription}}</p>
     </div>
 

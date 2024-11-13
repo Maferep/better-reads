@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import _SqliteStore from "better-sqlite3-session-store";
+const PAGINATION_LIMIT = 7;
 
 export function fetchAuthorsFromBook(bookId) {
   const db = new Database("database_files/betterreads.db");
@@ -19,11 +20,17 @@ export function fetchGenresFromBook(bookId) {
   return genres
 }
 
-export function fetchBooksInGenre(genre_name) {
+export function fetchBooksInGenre(genre_name, limit=PAGINATION_LIMIT, page=0) {
   const db = new Database("database_files/betterreads.db", { verbose: console.log });
+
+  // we ask for one more than the pages we want in order to know if there is more
   const stmt = `
-    SELECT * FROM books WHERE books.id IN (SELECT book_id FROM books_genres WHERE genre_id=?)
+    SELECT * FROM books WHERE books.id IN (SELECT book_id FROM books_genres WHERE genre_id=? LIMIT ? OFFSET ?)
   `;
-  const books = db.prepare(stmt).all(genre_name);
-  return books
+  const offset = page * limit;
+  const books = db.prepare(stmt).all(genre_name, limit +1, offset);
+
+  // if we got the pages we wanted, then there are more pages left
+  const has_more = (books.length == limit+1);
+  return { books: books, has_more: has_more };
 }

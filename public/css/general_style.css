@@ -6,3 +6,25 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+a {
+    text-decoration: none;
+    color: rgb(45, 62, 62);
+}
+
+a:visited {
+    color: rgb(62, 81, 90);
+}
+
+a:focus {
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: none;
+    color: rgb(83, 85, 86);
+}
+
+a:active {
+    text-decoration: underline;
+}

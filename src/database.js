@@ -211,6 +211,20 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
 
       const insert_many_books = db.transaction((books) => {
         for (const book of books) {
+          let empty_fields = 0;
+
+          const important_fields = ["Title", "description", "authors", "image", "categories"];
+          for (const key of important_fields) {
+            if (book[key] === undefined || book[key] === "") {
+              empty_fields += 1;
+            }
+          }
+
+          if (empty_fields >= 2) {
+            //Descarto libro con muchos faltantes
+            continue;
+          }
+
           id += 1;
           insert_books.run(
             id,
@@ -224,12 +238,12 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
           let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/
           let authors = book["authors"].match(re)
           let genres = book["categories"].match(re)
-          console.log(authors)
-          console.log(genres)
+          // console.log(authors)
+          // console.log(genres)
           authors = authors ? authors.slice(1, authors.length) : [] ;
           genres = genres ? genres.slice(1, genres.length) : [] ;
-          console.log(authors)
-          console.log(genres)
+          // console.log(authors)
+          // console.log(genres)
           for (const author of authors) {
             if (author && author != "") {
               insert_book_authors.run(author, id)
@@ -597,113 +611,6 @@ function createRepost(postId, userId) {
   db.prepare(incrementReposts).run(postId);
 }
 
-// Entrega una lista de posts, devolviedo un array de posts (paginados),
-// y un booleano que indica si existen más posts luego del ultimo devuelto
-// Filter es un diccionario, con los distintos filtros posibles.
-function fetchPaginatedPosts(paginateFromDate, page, filter = {}) {
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-
-
-  filter.bookId = filter.bookId || null;
-  filter.followedBy = filter.followedBy || null;
-
-  const paginateFromDateEpoch = paginateFromDate.valueOf();
-
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, page, filter.followedBy ,filter.bookId);
-
-  return rows_and_more_posts
-}
-
-//Unica funcion que realiza la query real para obtener los posts. No debería usarse fuera de este modulo.
-// Recibe el tiempo de referencia para el primer post, el numero de pagina, y filtros varios.
-// Devuelve la lista de posts, junto a un booleano que indica que existen más posts.
-function getPostsWithFilters(paginateFromDate, page, followedBy = null,bookId = null, authorId = null, number_of_posts = CANTIDAD_POSTS_PAGINADO) {
-  const numberOfPostsInPage = number_of_posts;
-
-  const offset = page * numberOfPostsInPage;
-
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-
-  //Segun si se envia alguna de estas caracteristicas, se agrega o no el filtro al query.
-  const book_filter = (bookId == null)?` `:` AND b.id = @book_id `;
-  const follow_filter = (followedBy == null)?` `:` AND uf.follower_id = @followedBy `;
-
-  const author_filter_post = (authorId == null)?` `:` AND user_id = @authorId `;
-  const author_filter_repost = (authorId == null)?` `:` AND repost_user_id = @authorId `;
-
-  const query = 
-  /*sql*/  `SELECT p.id AS post_id,
-                    original_user.id AS user_id,
-                    original_user.username AS username,
-                    b.id AS book_id,
-                    p.author_topic,
-                    b.book_name,
-                    p.text_content,
-                    p.date AS date,
-                    p.review_score,
-                    NULL AS repost_user_id,        -- NULL for original posts
-                    NULL AS repost_username         -- NULL for original posts
-            FROM posts p
-            JOIN insecure_users original_user ON p.author_id = original_user.id
-            LEFT JOIN books b ON p.book_id = b.id
-            LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
-            WHERE @startDate >= date ` + book_filter + follow_filter + author_filter_post +
-  /*sql*/  `UNION
-            SELECT rp.post_id AS post_id,
-                    original_user.id AS user_id,
-                    original_user.username AS username,
-                    b.id AS book_id,
-                    p.author_topic,
-                    b.book_name,
-                    p.text_content,
-                    rp.date AS date,
-                    p.review_score,
-                    rp.user_id AS repost_user_id,  -- ID of the user who reposted
-                    repost_user.username AS repost_username  -- Username of the user who reposted
-            FROM reposts rp
-            JOIN posts p ON rp.post_id = p.id
-            JOIN insecure_users original_user ON p.author_id = original_user.id
-            LEFT JOIN insecure_users repost_user ON rp.user_id = repost_user.id
-            LEFT JOIN books b ON p.book_id = b.id
-            LEFT JOIN user_follows uf ON user_id = uf.following_id -- JOIN to get posts from followed users, not always used
-            WHERE @startDate >= rp.date ` + book_filter + follow_filter + author_filter_repost +
-  /*sql*/  `ORDER BY date DESC
-            LIMIT @postsInPage OFFSET @startFromPost;`;
-
-  console.log(query)
-
-  let rows;
-
-  //Se pueden enviar los parametros como un diccionario. Aquel parametro que no se use
-  // no afecta al query.
-  let parametersQuery = {
-    startDate: paginateFromDate,
-    book_id: bookId,
-    followedBy: followedBy,
-    postsInPage: numberOfPostsInPage + 1,
-    startFromPost: offset,
-    authorId: authorId
-  }
-
-  console.log(parametersQuery)
-
-  rows = db.prepare(query).all(parametersQuery);
-
-  // Se busca si se pudo obtener un post extra, si esto es así, se elimina este post extra de la lista
-  // y se setea el booleano has_more a true, para indicar que hay por lo menos un post extra.
-  let has_more = false
-  if (rows.length > numberOfPostsInPage) {
-    rows.pop();
-    has_more = true;
-  }
-
-  return {rows, has_more};
-}
-
 // TODO: do not return status codes, this should not be handled in the database layer. 
 // Return error / info instead
 // TODO: run inside transaction to ensure correctness
@@ -988,30 +895,31 @@ function searchBooksByAuthor(author, limit, offset) {
 
 //Busca la mitad de limite por autor, y la mitad por titulo.
 function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
-  // const db = new Database("database_files/betterreads.db", {
-  //   verbose: console.log,
-  // });
-  // const searchQuery = /*sql*/`
-  // SELECT *, 'book_name' AS coincidence_type FROM books 
-  // WHERE book_name LIKE @query
-  // UNION
-  // SELECT books.*, 'author_name' AS coincidence_type FROM books 
-  // JOIN books_authors ON books.id = books_authors.book_id
-  // WHERE books_authors.author_id LIKE @query
-  // ORDER BY coincidence_type DESC
-  // LIMIT @limit OFFSET @offset`;
-  // const searchTerm = `%${titleOrAuthor}%`;
-  // const rows = db.prepare(searchQuery).all({
-  //   query: searchTerm,
-  //   limit: limit,
-  //   offset: offset
-  // });
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const searchQuery = /*sql*/`
+  SELECT *, 'book_name' AS coincidence_type, NULL AS author_coincidence FROM books 
+  WHERE book_name LIKE @query
+  UNION
+  SELECT books.*, 'author_name' AS coincidence_type, books_authors.author_id as author_coincidence FROM books 
+  JOIN books_authors ON books.id = books_authors.book_id
+  WHERE books_authors.author_id LIKE @query
+  ORDER BY coincidence_type DESC
+  LIMIT @limit OFFSET @offset`;
+  const searchTerm = `%${titleOrAuthor}%`;
+  const rows = db.prepare(searchQuery).all({
+    query: searchTerm,
+    limit: limit,
+    offset: offset
+  });
   // console.log("search results:", rows);
 
-  const authors = searchBooksByAuthor(titleOrAuthor, Math.ceil(limit/2), offset);
-  const books = searchBooksByTitle(titleOrAuthor, (limit - authors.length), offset);
+  // const authors = searchBooksByAuthor(titleOrAuthor, Math.ceil(limit/2), offset);
+  // const books = searchBooksByTitle(titleOrAuthor, (limit - authors.length), offset);
 
-  return authors.concat(books);
+  // return authors.concat(books);
+  return rows;
 }
 
 function searchAuthorByName(authorName, limit, offset) {
@@ -1036,15 +944,6 @@ function searchAuthorByName(authorName, limit, offset) {
   console.log("search results:", rows);
 
   return rows;
-}
-
-
-function getPostsFromUserId(userId, paginarDesdeFecha, pagina){
-  const paginateFromDateEpoch = paginarDesdeFecha.valueOf();
-
-  const rows_and_more_posts = getPostsWithFilters(paginateFromDateEpoch, pagina, null, null, userId);
-
-  return rows_and_more_posts;
 }
 
 function getLikedPostsFromUserId(userId){
@@ -1160,9 +1059,40 @@ function searchUsers(query, limit, offset) {
   const searchTerm = `%${query}%`;
 
   const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
-  console.log("search results:", rows);
 
   return rows;
+}
+
+function searchGenres(query, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  
+
+  const searchQuery = `
+    SELECT DISTINCT genre_id FROM books_genres
+    WHERE genre_id LIKE ?
+    LIMIT ? OFFSET ?`;
+
+  const searchTerm = `%${query}%`;
+
+  const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
+
+  return rows;
+}
+
+// Function to paginate db request in the form of request(queryParameter, limit, offset)
+function genericPaginatedSearch(function_request, queryParameter, results_per_page, page) {
+  const offset = page * results_per_page;
+  const limit = results_per_page + 1;
+  const rows = function_request(queryParameter, limit, offset);
+
+  const has_more = rows.length > results_per_page;
+  if (has_more) {
+    rows.pop();
+  }
+
+  return { rows, has_more };
 }
 
 
@@ -1187,7 +1117,6 @@ export {
   getLikesCount,
   getRepostsCount,
   getInfoCount,
-  getPostsFromUserId,
   getLikedPostsFromUserId,
   getUserProfile,
   updateUserProfile,
@@ -1200,10 +1129,11 @@ export {
   isUserFollowing,
   getUsernameFromId,
   getIdFromUsername,
-  fetchPaginatedPosts,
   searchUsers,
+  searchGenres,
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
   searchBooksByAuthor,
-  searchAuthorByName
+  searchAuthorByName,
+  genericPaginatedSearch
 };

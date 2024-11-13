@@ -1,0 +1,133 @@
+#book-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .select-button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  #book-select {
+    width: 100%;
+  }
+
+button{
+    margin: 0;
+    width:min-content;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+
+#browse-container {
+  min-width: 250px;
+  max-width: fit-content;
+  /* width: 600px; */
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.with-results {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.without-results {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 70px 40px;
+}
+
+#browse-container h1 {
+    font-size: 28px;
+    margin: 0;
+}
+
+#browse-container h2 {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+#browse-container form {
+    margin-bottom: 20px;
+}
+
+#browse-container select {
+    padding: 10px;
+    font-size: 16px;
+    width: 600px; /* Ajusta el tamaño según sea necesario */
+}
+
+#browse-container button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#browse-container button:hover {
+    background-color: #0056b3;
+}
+
+#browse-container label {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+/* #browse-container p {
+    font-size: 18px;
+    
+} */
+
+.search-options {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+    margin: 0 10px;
+    gap: 5px;
+}
+
+.search-options * {
+    padding: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    margin: 0;
+}
+
+.search-options a {
+    text-decoration: none;
+    background-color: auto;
+    color: black;
+    font-weight: bold;
+}
+
+.search-options a:hover {
+    text-decoration: underline;
+}
+
+.search-options a.selected {
+    font-weight: bold;
+    background-color: #007BFF;
+    color: white;
+}
+
+/* Modifica el largo del dropdown */
+.select2-container--default .select2-results > .select2-results__options {
+  max-height: 300px;
+  overflow-y: auto;
+  }

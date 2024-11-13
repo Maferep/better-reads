@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
 import {uploader} from "../uploader.js";
-import {fetchPaginatedPosts, fetchBook, followUser, unfollowUser, getPostsFromUserId, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { fetchBooksInGenre } from '../database/authorGenreDatabase.js'
 import { getBookData } from '../processing/book.js';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
@@ -190,11 +191,15 @@ function processFeedRequest(req, res, onlyFollowing) {
   const paginarDesdeFecha = new Date(req.query.paginate_from);
   const pagina = Number(req.query.page);
   const deLibro = req.query.book_id;
-
+  const deAutor = req.query.author;
+  const deGenero = req.query.genre;
+  console.log(deGenero);
   const userId = req.session.userId;
 
   const filter = {};
   filter.bookId = deLibro;
+  filter.authorTopic = deAutor;
+  filter.genre = deGenero;
   if (onlyFollowing) {
     filter.followedBy = userId;
   }
@@ -237,13 +242,38 @@ function processFeedRequest(req, res, onlyFollowing) {
 }
 
 router.get('/genre/:genre', (req, res) => {
-  const books = fetchBooksInGenre(req.params.genre).map(book => getBookData(book.id));
+  const PAGINATION_LIMIT = 7;
+  req.query.page ??= 0;
+  const page = Number(req.query.page)
+  const result = fetchBooksInGenre(req.params.genre, PAGINATION_LIMIT, req.query.page)
+  const books = result.books.map(book => {
+    book = getBookData(book.id);
+
+    if (book.book_name.length > 90) {
+      book.book_name = book.book_name.substring(0, 90);
+      book.book_name = book.book_name + "...";
+    }
+    if (book.description.length > 100) {
+      book.description = book.description.substring(0, 100);
+      book.description = book.description + " (...)";
+    }
+    return book
+  });
   const estaAutenticadoBool = estaAutenticado(req);
+
+  const next_page = result.has_more ? page + 1 : null;
+  const prev_page = (page > 0) ? page - 1 : null;
+
+  console.log(`${prev_page} ${next_page}`)
   
   res.render("books", {
     username: req.session.user,
     loggedIn: estaAutenticadoBool,
+    genre: req.params.genre,
     books: books,
+    next_page: next_page,
+    prev_page: prev_page,
+    endpoint_route: `genre/${req.params.genre}`
   });
 })
 
