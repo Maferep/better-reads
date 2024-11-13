@@ -30,10 +30,15 @@
     {{/if}}
   </div>
   {{#if books}}
-    {{#if next_page}}
-        <a href="/{{endpoint_route}}?page={{next_page}}">Next page</a>
-    {{else}}
-        <p>No more books.</p>
-    {{/if}}
+    <div class="paginator">
+      {{#if has_prev_page}}
+          <a href="/{{endpoint_route}}?page={{prev_page}}">< Prev</a>
+      {{/if}}
+      {{#if next_page}}
+          <a href="/{{endpoint_route}}?page={{next_page}}">Next ></a>
+      {{else}}
+          <p>No more books.</p>
+      {{/if}}
+    </div>
   {{/if}}
 </div>
