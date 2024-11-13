@@ -1,3 +1,6 @@
+p {
+  font-size: small;
+}
 
 #content {
   display: flex;
@@ -26,13 +29,18 @@ h1 {
   height: 80px;
 }
 
+.genre-container {
+  text-align: center;
+  height: 50px;
+}
+
 .book-title {
   align-self: center;
   font-size: medium;
 }
 
 .book-info{
-  margin: 1em;
+  margin: .4em;
   display: flex;
   flex-direction: column;
   flex: 0 1 0;
