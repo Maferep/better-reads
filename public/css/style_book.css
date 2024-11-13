@@ -81,8 +81,15 @@ h1 {
   display: flex;
   flex-direction: row;
   gap: 1em;
+  height: 2.5em;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 #saveStateButton {
+  padding: 0;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: center;
   max-width: 5em;
 }
