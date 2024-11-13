@@ -82,6 +82,17 @@ h1 {
   grid-template-columns:  1fr 1fr;
 }
 
+.see-posts-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.see-posts-container a {
+  flex-grow: 1;
+}
+
 .book-state-container {
   display: flex;
   flex-direction: row;

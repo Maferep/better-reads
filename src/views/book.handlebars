@@ -24,7 +24,6 @@
 
     {{#if loggedIn}}
       <div id="bookStateDropdown">
-        <label for="bookState">Book State:</label>
         <div class="buttons-container">
           <div class="book-state-container">
             <select id="bookState" name="bookState">
@@ -35,7 +34,9 @@
             </select>
             <button id="saveStateButton" type="button">Save</button>
           </div>
-          <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button" class="wide-button">💬 See Posts</button></a>
+          <div class="see-posts-container">
+            <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button" class="wide-button">💬 See Posts</button></a>
+          </div>
         </div>
       </div>
     {{/if}}
