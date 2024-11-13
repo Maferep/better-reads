@@ -25,6 +25,7 @@
     {{#if loggedIn}}
       <div id="bookStateDropdown">
         <label for="bookState">Book State:</label>
+        <div class="book-state-container">
         <select id="bookState" name="bookState">
             <option value="none" {{#if (eq bookState 'none')}}selected{{/if}}>Unread</option>
             <option value="reading" {{#if (eq bookState 'reading')}}selected{{/if}}>Reading</option>
@@ -32,6 +33,7 @@
             <option value="plan-to-read" {{#if (eq bookState 'plan-to-read')}}selected{{/if}}>Plan to Read</option>
         </select>
         <button id="saveStateButton" type="button">Save</button>
+        </div>
         <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button">See Posts</button></a>
       </div>
     {{/if}}

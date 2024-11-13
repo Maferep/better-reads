@@ -77,4 +77,12 @@ h1 {
   color: #b5b5b5;
 }
 
+.book-state-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
 
+#saveStateButton {
+  max-width: 5em;
+}
