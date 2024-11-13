@@ -7,3 +7,5 @@ database_files/*
 database_files/books_data.csv
 public/uploads/*
 !public/uploads/repost.webm
+!public/uploads/like.webm
+!public/uploads/dislike.webm

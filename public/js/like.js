@@ -15,6 +15,16 @@ document.getElementById(event_listener_location).addEventListener("click", funct
       return res.json();
     })
     .then(data => {
+      try{
+        if (!data.liked) {
+          playLikeVideo();
+        } else {
+          playDislikeVideo();
+        }
+      } catch (e) {
+        console.log("Experimental feature not enabled. To enable, go to /?experimental=true.")
+      }
+
       return fetch(`/post/${post_id}/` + (data.liked?"unlike":"like"), {
         method: "POST",
       })
@@ -28,7 +38,7 @@ document.getElementById(event_listener_location).addEventListener("click", funct
     event.preventDefault();
 
     try{
-    playFullscreenVideo();
+      playRepostVideo();
     } catch (e) {
       console.log("Experimental feature not enabled. To enable, go to /?experimental=true.")
     }

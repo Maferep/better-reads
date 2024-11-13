@@ -30,11 +30,29 @@
 <div id="fullscreenVideo">
     <video id="videoElement">
       <source src="/static/uploads/repost.webm" type="video/webm">
-      Your browser does not support the video tag.
     </video>
 </div>
 
 <script>
+    function playRepostVideo() {
+      const videoElement = document.getElementById("videoElement");
+      videoElement.src = "/static/uploads/repost.webm";
+      playFullscreenVideo();
+    }
+
+    function playLikeVideo() {
+      const videoElement = document.getElementById("videoElement");
+      videoElement.src = "/static/uploads/like.webm";
+      playFullscreenVideo();
+    }
+
+    function playDislikeVideo() {
+      const videoElement = document.getElementById("videoElement");
+      videoElement.src = "/static/uploads/dislike.webm";
+      playFullscreenVideo();
+    }
+
+
     function playFullscreenVideo() {
       const videoContainer = document.getElementById("fullscreenVideo");
       const videoElement = document.getElementById("videoElement");
