@@ -1,3 +1,6 @@
+p {
+  font-size: small;
+}
 
 #content {
   display: flex;
@@ -17,28 +20,39 @@ h1 {
 }
 
 .title-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
   height: 130px;
 }
 
 .author-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
   height: 80px;
 }
 
+.genre-container {
+  text-align: center;
+  height: 30px;
+}
+
 .book-title {
   align-self: center;
-  font-size: medium;
+  font-size: small;
 }
 
 .book-info{
-  margin: 1em;
+  margin: .4em;
   display: flex;
   flex-direction: column;
   flex: 0 1 0;
   align-items: center;
-  background-color: rgb(215, 221, 237);
-  border-radius: .5em;
+  background-color: rgb(247, 248, 251);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 1em;
   width: 10em;
   word-break: break-word;
