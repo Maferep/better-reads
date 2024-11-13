@@ -14,10 +14,12 @@
       <h1>{{bookName}}</h1>
       <img id="book-cover" src={{bookCover}} alt="">
       <p>Authors: 
-        <a href="/browse/author/{{bookAuthor}}">{{bookAuthor}}</a>
+        {{#each authors}}
+        <a href="/browse/author/{{.}}">{{.}}, </a>
+        {{/each}}
       </p>
       <p>Genres: 
-        <a href="/browse/genre/{{bookGenre}}">{{bookGenre}}</a>
+        <a href="/browse/genre/{{genres}}">{{genres}}</a>
       </p>
       <p>{{bookDescription}}</p>
     </div>

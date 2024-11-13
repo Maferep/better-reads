@@ -146,12 +146,14 @@ function processTopicBooksRequest(res, req, topic_type, topic) {
     const prev_page = (page > 0) ? page - 1 : null;
   
     console.log(`${prev_page} ${next_page}`)
+
     
     res.render("books", {
       username: req.session.user,
       loggedIn: estaAutenticadoBool,
       topic_type: topic_type,
       topic: topic,
+      topic_url: encodeURIComponent(topic),
       books: books,
       next_page: next_page,
       prev_page: prev_page,
