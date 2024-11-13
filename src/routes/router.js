@@ -252,13 +252,20 @@ router.get('/genre/:genre', (req, res) => {
     return book
   });
   const estaAutenticadoBool = estaAutenticado(req);
+
+  const next_page = result.has_more ? page + 1 : null;
+  const prev_page = (page > 0) ? page - 1 : null;
+
+  console.log(`${prev_page} ${next_page}`)
   
   res.render("books", {
     username: req.session.user,
     loggedIn: estaAutenticadoBool,
     genre: req.params.genre,
     books: books,
-    next_page: result.has_more ? page + 1 : null,
+    next_page: next_page,
+    has_prev_page: page > 0,
+    prev_page: prev_page,
     endpoint_route: `genre/${req.params.genre}`
   });
 })

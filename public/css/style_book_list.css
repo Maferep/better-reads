@@ -51,3 +51,14 @@ h1 {
 .book-info img{
   object-fit: contain;
 }
+
+.paginator {
+  display: flex;
+  justify-content: center;
+  gap: 5em;
+}
+
+.paginator * {
+  text-align: center;
+  width: 7em;
+}
