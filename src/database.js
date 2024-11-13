@@ -895,30 +895,31 @@ function searchBooksByAuthor(author, limit, offset) {
 
 //Busca la mitad de limite por autor, y la mitad por titulo.
 function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
-  // const db = new Database("database_files/betterreads.db", {
-  //   verbose: console.log,
-  // });
-  // const searchQuery = /*sql*/`
-  // SELECT *, 'book_name' AS coincidence_type FROM books 
-  // WHERE book_name LIKE @query
-  // UNION
-  // SELECT books.*, 'author_name' AS coincidence_type FROM books 
-  // JOIN books_authors ON books.id = books_authors.book_id
-  // WHERE books_authors.author_id LIKE @query
-  // ORDER BY coincidence_type DESC
-  // LIMIT @limit OFFSET @offset`;
-  // const searchTerm = `%${titleOrAuthor}%`;
-  // const rows = db.prepare(searchQuery).all({
-  //   query: searchTerm,
-  //   limit: limit,
-  //   offset: offset
-  // });
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const searchQuery = /*sql*/`
+  SELECT *, 'book_name' AS coincidence_type, NULL AS author_coincidence FROM books 
+  WHERE book_name LIKE @query
+  UNION
+  SELECT books.*, 'author_name' AS coincidence_type, books_authors.author_id as author_coincidence FROM books 
+  JOIN books_authors ON books.id = books_authors.book_id
+  WHERE books_authors.author_id LIKE @query
+  ORDER BY coincidence_type DESC
+  LIMIT @limit OFFSET @offset`;
+  const searchTerm = `%${titleOrAuthor}%`;
+  const rows = db.prepare(searchQuery).all({
+    query: searchTerm,
+    limit: limit,
+    offset: offset
+  });
   // console.log("search results:", rows);
 
-  const authors = searchBooksByAuthor(titleOrAuthor, Math.ceil(limit/2), offset);
-  const books = searchBooksByTitle(titleOrAuthor, (limit - authors.length), offset);
+  // const authors = searchBooksByAuthor(titleOrAuthor, Math.ceil(limit/2), offset);
+  // const books = searchBooksByTitle(titleOrAuthor, (limit - authors.length), offset);
 
-  return authors.concat(books);
+  // return authors.concat(books);
+  return rows;
 }
 
 function searchAuthorByName(authorName, limit, offset) {
@@ -1058,9 +1059,40 @@ function searchUsers(query, limit, offset) {
   const searchTerm = `%${query}%`;
 
   const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
-  console.log("search results:", rows);
 
   return rows;
+}
+
+function searchGenres(query, limit, offset) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  
+
+  const searchQuery = `
+    SELECT DISTINCT genre_id FROM books_genres
+    WHERE genre_id LIKE ?
+    LIMIT ? OFFSET ?`;
+
+  const searchTerm = `%${query}%`;
+
+  const rows = db.prepare(searchQuery).all(searchTerm, limit, offset);
+
+  return rows;
+}
+
+// Function to paginate db request in the form of request(queryParameter, limit, offset)
+function genericPaginatedSearch(function_request, queryParameter, results_per_page, page) {
+  const offset = page * results_per_page;
+  const limit = results_per_page + 1;
+  const rows = function_request(queryParameter, limit, offset);
+
+  const has_more = rows.length > results_per_page;
+  if (has_more) {
+    rows.pop();
+  }
+
+  return { rows, has_more };
 }
 
 
@@ -1098,8 +1130,10 @@ export {
   getUsernameFromId,
   getIdFromUsername,
   searchUsers,
+  searchGenres,
   searchBooksByTitleOrAuthor,
   searchBooksByTitle,
   searchBooksByAuthor,
-  searchAuthorByName
+  searchAuthorByName,
+  genericPaginatedSearch
 };

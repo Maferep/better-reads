@@ -270,7 +270,6 @@ router.get('/genre/:genre', (req, res) => {
     genre: req.params.genre,
     books: books,
     next_page: next_page,
-    has_prev_page: page > 0,
     prev_page: prev_page,
     endpoint_route: `genre/${req.params.genre}`
   });
