@@ -3,7 +3,8 @@ import { searchBooksByTitleOrAuthor, searchBooksByAuthor, searchBooksByTitle, se
     , searchUsers, searchGenres,
     genericPaginatedSearch
  } from '../database.js';
- 
+import { estaAutenticado, isAuthenticated } from '../authenticate.js';    
+import { fetchBooksInGenre, fetchBooksByAuthor } from '../database/authorGenreDatabase.js'
 import { getBookData } from '../processing/book.js';
 
 const router = Router();
@@ -35,6 +36,9 @@ router.get('/search_all', function (req, res) {
 
     const bookRows = searchBooksByTitleOrAuthor(searchTerm, Math.ceil(results/2), offset);
     results -= bookRows.length;
+
+    const authorRows = searchAuthorByName(searchTerm, Math.ceil(results/2), offset);
+    results -= authorRows.length;
     
     const genresRows = searchGenres(searchTerm, Math.ceil(results/2), offset);
     results -= genresRows.length;
@@ -42,7 +46,7 @@ router.get('/search_all', function (req, res) {
     const userRows = searchUsers(searchTerm, results, offset);
 
 
-    res.json({ bookEntries: bookRows, userEntries: userRows, genreEntries: genresRows });
+    res.json({ bookEntries: bookRows, authorEntries: authorRows, userEntries: userRows, genreEntries: genresRows });
 });
 
 router.get('/search/:query', function (req, res) {
@@ -105,5 +109,64 @@ router.get('/search_author', function (req, res) {
     const rows = searchAuthorByName(searchTerm, amount, offset);
     res.json({ authorEntries: rows });
 });
+
+
+function processTopicBooksRequest(res, req, topic_type, topic) {
+    const PAGINATION_LIMIT = 7;
+    req.query.page ??= 0;
+    const page = Number(req.query.page)
+    
+    let result;
+
+    if (topic_type == "genre") {
+        result = fetchBooksInGenre(topic, PAGINATION_LIMIT, page);
+    } else if (topic_type == "author") {
+        result = fetchBooksByAuthor(topic, PAGINATION_LIMIT, page);
+    } else {
+        res.status(400).send("Invalid topic type");
+    }
+
+
+    const books = result.books.map(book => {
+      book = getBookData(book.id);
+  
+      if (book.book_name.length > 90) {
+        book.book_name = book.book_name.substring(0, 90);
+        book.book_name = book.book_name + "...";
+      }
+      if (book.description.length > 100) {
+        book.description = book.description.substring(0, 100);
+        book.description = book.description + " (...)";
+      }
+      return book
+    });
+    const estaAutenticadoBool = estaAutenticado(req);
+  
+    const next_page = result.has_more ? page + 1 : null;
+    const prev_page = (page > 0) ? page - 1 : null;
+  
+    console.log(`${prev_page} ${next_page}`)
+    
+    res.render("books", {
+      username: req.session.user,
+      loggedIn: estaAutenticadoBool,
+      topic_type: topic_type,
+      topic: topic,
+      books: books,
+      next_page: next_page,
+      prev_page: prev_page,
+      endpoint_route: `browse/${topic_type}/${req.params.genre}`
+    });
+}
+
+
+router.get('/genre/:genre', (req, res) => {
+    processTopicBooksRequest(res, req, "genre", req.params.genre);
+});
+
+router.get('/author/:author', (req, res) => {
+    processTopicBooksRequest(res, req, "author", req.params.author);
+});
+
 
 export default router;

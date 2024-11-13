@@ -1,5 +1,6 @@
 p {
   font-size: small;
+  color:rgb(33, 48, 48);
 }
 
 
@@ -48,10 +49,17 @@ h1 {
   flex: 0 1 0;
   align-items: center;
   background-color: rgb(247, 248, 251);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 1em;
   width: 10em;
   word-break: break-word;
+
+  min-width: 8em;
+}
+
+.book-info:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+
 }
 
 .info-cover-container {
@@ -73,3 +81,4 @@ h1 {
   text-align: center;
   width: 7em;
 }
+

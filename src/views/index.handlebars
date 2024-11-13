@@ -10,23 +10,42 @@
         <img src="{{book.cover_url}}" alt="Book cover" id="book-cover">
         <h2>{{book.title}}</h2>
       </div>
+    {{else if author}}
+      <a href="browse/author/{{author}}"><button id="goBackButton">Go back to author</button></a>
+      <div id="author-info">
+        <h2>{{author}}</h2>
+      </div>
+    {{else if genre}}
+      <a href="browse/genre/{{genre}}"><button id="goBackButton">Go back to genre</button></a>
+      <div id="genre-info">
+        <h2>{{genre}}</h2>
+      </div> 
     {{else}}
       <ul>
         <li><a href="/profile">My User</a></li>
         <li><a href="/browse">Browse</a></li>
-        <li><a href="/my-reviews">My Books</a></li>
+        <li><a href="/profile">My Posts</a></li>
         <li><a href="/following-posts">Following</a></li>
-        {{!-- <li><a href="/settings">Settings</a></li> --}}
-        {{!-- <li><a href="/users">Search Users</a></li> --}}
       </ul>
     {{/if}}
     </div>
 
     <div id="container">
-      {{#unless onlyFollowing}}
+      {{#if allowPosting}}
       <div id="new-post">
         <form action="/post" method="post">
           <textarea name="post-content" placeholder="Post your opinion" maxlength="50000" required></textarea>
+
+          <fieldset>
+            <legend>Publicar sobre</legend>
+            <div class="toggle">
+              <input type="radio" id="book-topic" name="type" value="book" hideInput {{#if book}}class="readonly"{{/if}}></input>
+              <label for="book-topic">libro</label>
+              <input type="radio" id="author-topic" name="type" value="author" hideInput {{#if book}}class="readonly"{{/if}}></input> 
+              <label for="author-topic">autor</label>
+            </div>
+            </fieldset>
+
 {{!-- Si es feed de libro, existe solo un libro como opcion de publicacion, --}}
           {{#if book}}
           <select name="book" style="width: 100%;" disabled>
@@ -34,18 +53,16 @@
           </select>
           {{!-- Tengo que agregar este input hidden, porque el select esta desactivado, por lo que no se envia --}}
           <input type="hidden" name="book" value="{{book.id}}" />
-          <input type="hidden" name="goBackToBookFeed" value="true" />
-            {{else}}
+          <input type="hidden" name="goBackToFeed" value="book" />
+          {{else if author}}
+          <select name="author" style="width: 100%;" disabled>
+            <option selected="true" value="{{author}}">{{author}}</option>
+          </select>
+          <input type="hidden" name="author" value="{{author}}" />
+          <input type="hidden" name="goBackToFeed" value="author" />
+          {{else}}
 
-            <fieldset>
-            <legend>Publicar sobre</legend>
-            <div class="toggle">
-              <input type="radio" id="book-topic" name="type" value="book" checked hideInput></input>
-              <label for="book-topic">libro</label>
-              <input type="radio" id="author-topic" name="type" value="author" hideInput></input> 
-              <label for="author-topic">autor</label>
-            </div>
-            </fieldset>
+            
 
           <div id="author-select-div">
             <select name="author" id="author-select" style="width: 100%;" required>
@@ -63,7 +80,7 @@
           <button type="submit">Post</button>
         </form>
       </div>
-      {{/unless}}
+      {{/if}}
       {{> feed_of_posts}}
     </div>
 
@@ -118,6 +135,18 @@ fieldset {
     box-shadow: 0 0 100px rgba(#0077b6, .5)
   }
   input:focus + label {@include focusOutline;}
+  input.readonly + label {
+    background-color: #DDD;
+    color: #AAA;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  input.readonly:checked + label {
+    background-color: #AAA;
+    color: #FFF;
+  }
+  input.readonly:hover + label {border-color: #DDD;}
+
 
   @include breakpoint(800) {
     input + label {
@@ -190,7 +219,37 @@ fieldset {
 
 
 <script>
+  function changeToggle(type) {
+      // type can be 'book' or 'author' or 'genre' or 'none'
+      //in the case of book or author, the toggle has to be disabled, and selected the correct one.
+      //in the case of none, the toggle has to be enabled, and selected by default book
+
+      const bookTopicInput = document.getElementById("book-topic");
+      const authorTopicInput = document.getElementById("author-topic");
+
+      if (type === 'book') {
+        bookTopicInput.checked = true;
+        authorTopicInput.checked = false;
+        //Add class "readonly"
+        bookTopicInput.classList.add("readonly");
+        authorTopicInput.classList.add("readonly");
+      } else if (type === 'author') {
+        bookTopicInput.checked = false;
+        authorTopicInput.checked = true;
+        bookTopicInput.classList.add("readonly");
+        authorTopicInput.classList.add("readonly");
+      } else {
+        bookTopicInput.checked = true;
+        authorTopicInput.checked = false;
+      }     
+    }
+
+
   document.addEventListener("DOMContentLoaded", function() {
+
+    
+    changeToggle({{#if book}}"book"{{else if author}}"author"{{else}}"none"{{/if}});
+
     const bookTopicInput = document.getElementById("book-topic");
     const authorTopicInput = document.getElementById("author-topic");
 
