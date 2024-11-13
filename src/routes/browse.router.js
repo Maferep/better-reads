@@ -91,7 +91,9 @@ router.get('/search/:query', function (req, res) {
         books: books,
         next_page: has_more ? page + 1 : null,
         prev_page: page > 0 ? page - 1 : null,
-        validTypes: validTypes
+        validTypes: validTypes,
+        endpoint_route: `browse/search/${searchTerm}`,
+        more_link_parameters: `&type=${tipoBusqueda}`
     });
 });
 

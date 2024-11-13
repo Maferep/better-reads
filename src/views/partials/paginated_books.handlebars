@@ -23,11 +23,11 @@
   </div>
   {{#if books}}
     <div class="paginator">
-      {{#if prev_page}}
-          <a href="/{{endpoint_route}}?page={{prev_page}}">< Prev</a>
+      {{#if prev_page includeZero=true}}
+          <a href="/{{endpoint_route}}?page={{prev_page}}{{more_link_parameters}}">< Prev</a>
       {{/if}}
-      {{#if next_page}}
-          <a href="/{{endpoint_route}}?page={{next_page}}">Next ></a>
+      {{#if next_page includeZero=true}}
+          <a href="/{{endpoint_route}}?page={{next_page}}{{more_link_parameters}}">Next ></a>
       {{else}}
           <p>No more books.</p>
       {{/if}}

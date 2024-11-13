@@ -64,6 +64,7 @@ h1 {
 
 .book-info img{
   object-fit: contain;
+  min-width: 128px;
 }
 
 .paginator {
