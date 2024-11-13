@@ -77,6 +77,11 @@ h1 {
   color: #b5b5b5;
 }
 
+.buttons-container {
+  display: grid;
+  grid-template-columns:  1fr 1fr;
+}
+
 .book-state-container {
   display: flex;
   flex-direction: row;
