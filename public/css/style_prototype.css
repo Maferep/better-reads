@@ -47,43 +47,6 @@
   background-color: #005f8a;
 }
 
-
-
-#sidebar {
-  width: 10vw;
-  min-width: 10px;
-  height: fit-content;
-  background-color: #f4f4f4;
-  padding: 20px;
-  position: sticky;
-  top: 0;
-}
-
-#book-cover {
-  width: 100%;
-  border-radius: 5px;
-}
-
-#sidebar ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-#sidebar ul li {
-  margin-bottom: 20px;
-}
-
-#sidebar ul li a {
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
-}
-
-#sidebar ul li a:hover {
-  color: #0077b6;
-}
-
-
 #book-selection {
   width: 100%;
   height: 40px;
@@ -116,13 +79,6 @@
   
   #container {
     width: 90%;
-  }
-
-  #sidebar {
-    width: 100%;
-    text-align: center;
-    padding: 10px;
-    position: relative;
   }
 
   #book-cover {
