@@ -28,3 +28,9 @@ a:hover {
 a:active {
     text-decoration: underline;
 }
+
+#layout-sidebar {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping for smaller screens */
+  justify-content: center;
+}
