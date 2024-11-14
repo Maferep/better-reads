@@ -1,11 +1,9 @@
 
 #sidebar {
-  width: 10vw;
-  min-width: 10px;
   height: fit-content;
   background-color: #f4f4f4;
-  padding: 20px;
-  position: sticky;
+  padding: 1em;
+  margin-right: 4em;
   top: 0;
 }
 
