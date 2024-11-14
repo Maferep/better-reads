@@ -1,35 +1,7 @@
 <link rel="stylesheet" href="/static/css/style_prototype.css">
 
   <div id="main-layout">
-    <!-- Left sidebar -->
-    <div id="sidebar">
-      {{!-- Si es feed de libro, se muestra info de libro en vez de menu de navegacion --}}
-    {{#if book}}
-      <a href="/book/{{book.id}}"><button id="goBackButton">Go back to book</button></a>
-      <div id="book-info">
-        <img src="{{book.cover_url}}" alt="Book cover" id="book-cover">
-        <h2>{{book.title}}</h2>
-      </div>
-    {{else if author}}
-      <a href="browse/author/{{author}}"><button id="goBackButton">Go back to author</button></a>
-      <div id="author-info">
-        <h2>{{author}}</h2>
-      </div>
-    {{else if genre}}
-      <a href="browse/genre/{{genre}}"><button id="goBackButton">Go back to genre</button></a>
-      <div id="genre-info">
-        <h2>{{genre}}</h2>
-      </div> 
-    {{else}}
-      <ul>
-        <li><a href="/profile">My User</a></li>
-        <li><a href="/browse">Browse</a></li>
-        <li><a href="/profile">My Posts</a></li>
-        <li><a href="/following-posts">Following</a></li>
-      </ul>
-    {{/if}}
-    </div>
-
+    {{> sidebar}}
     <div id="container">
       {{#if allowPosting}}
       <div id="new-post">
