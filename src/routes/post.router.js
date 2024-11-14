@@ -28,6 +28,7 @@ router.get('/:id', (req, res) => {
   
     let liked_by_user = estaAutenticadoBool ? hasLiked(postRaw.id, req.session.userId) : false;
     res.render('post', {
+      do_sidebar: estaAutenticadoBool,
       username: req.session.user,
       loggedIn: estaAutenticadoBool,
       username_post: postRaw.username,

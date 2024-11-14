@@ -10,7 +10,9 @@
 <body>
     {{> navbar }}
     <div id="layout-sidebar">
-        {{> sidebar}}
+        {{#if do_sidebar}}
+            {{> sidebar}}
+        {{/if}}
         {{{body}}}
     </div>
 </body>

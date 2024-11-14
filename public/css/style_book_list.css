@@ -42,10 +42,15 @@ h1 {
   font-size: small;
 }
 
+.book-info-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .book-info{
   margin: .4em;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex: 0 1 0;
   align-items: center;
   background-color: rgb(247, 248, 251);

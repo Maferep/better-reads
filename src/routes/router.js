@@ -120,6 +120,7 @@ function processProfileRequest(req, res, isOwnProfile) {
   const has_more = all_raw.has_more;
   
   res.render("profile", { 
+    do_sidebar: true,
     my_username: req.session.user, 
     username: isOwnProfile ? req.session.user : req.params.profileUsername, 
     userId: userId,
@@ -224,6 +225,7 @@ function processFeedRequest(req, res, onlyFollowing) {
 
 
   res.render("index", {
+    do_sidebar: true,
     username: req.session.user,
     loggedIn: true,
     title: "Home page",
