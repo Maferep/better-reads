@@ -3,8 +3,6 @@
   flex-wrap: wrap; /* Allows wrapping for smaller screens */
 }
 
-
-
 #container {
   flex-grow: 1;
   width: 100%;
@@ -70,22 +68,6 @@
 
 #go-back:hover {
   background-color: #16A085;
-}
-
-@media (max-width: 920px) {
-  #main-layout {
-    flex-direction: column;
-  }
-  
-  #container {
-    width: 90%;
-  }
-
-  #book-cover {
-    width: 100%;
-    max-width: 200px;
-    border-radius: 5px;
-  }
 }
 
 

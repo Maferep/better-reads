@@ -75,12 +75,6 @@
   background-color: #005f8a;
 }
 
-@media (max-width: 768px) {
-  #container {
-    width: 90%;
-  }
-}
-
 
 #back-to-feed {
   display: inline-block;
