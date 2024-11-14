@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm install 
 
 #COPY ./views ./views
-COPY ./static ./static
+#COPY ./static ./static
 
 RUN mkdir ./database_files
 COPY ./database_files/books_data.csv ./database_files/
@@ -26,7 +26,7 @@ CMD ["npm", "run", "dev"]
 
 # production 
 FROM base AS prod
-COPY ./views /app/views
+COPY ./public /app/public
 COPY ./src /app/src
 
 CMD ["npm", "run", "prod"]
