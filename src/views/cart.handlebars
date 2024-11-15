@@ -2,6 +2,9 @@
 
 <div class="cart-container">
     <h1>My Cart</h1>
+    {{#if empty_cart}}
+    <h2>Your cart is empty</h2>
+    {{else}}
     <div class="items">
         {{#each books}}
         <div class="item">
@@ -13,9 +16,22 @@
                 <p>Genres: {{this.genre}}</p>
                 <p>Total price: ??</p>
                 <div class="amount-buttons"></div>
-                <button onclick="removeFromCart('{{userId}}','{{bookId}}')">Remove</button>
+                <button onclick="removeFromCart('{{this.userId}}','{{this.id}}')">Remove</button>
             </div>
         </div>
         {{/each}} 
     </div>
+    {{/if}}
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    function removeFromCart(userId, bookId) {
+        socket.emit('removeFromCart', {userId: userId, bookId: bookId});
+    }
+
+    socket.on('bookRemovedFromCart', () => {
+        window.location.reload();
+    });
+</script>

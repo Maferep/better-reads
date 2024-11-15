@@ -9,12 +9,20 @@ router.get('/', isAuthenticated,function (req, res) {
     let books = data.map((book) => {
         return fetchBook(book.book_id);
     });
-    console.log(books);
+    //format the author and the genre of the book, removing the [] and the "".
+    books = books.map((book) => {
+        book.authors = book.authors.replace(/[\[\]"]+/g, '');
+        book.genre = book.genre.replace(/[\[\]"]+/g, '');
+        book.userId = req.session.userId;
+        return book;
+    });
+    const empty_cart = books.length === 0;
     res.render("cart", {
         do_sidebar: true,
         loggedIn: true,
         title: "Cart",
-        books
+        empty_cart,
+        books,
     });
 });
 

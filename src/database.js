@@ -68,6 +68,14 @@ function addBookToCart(userId, bookId) {
   insertCart.run(userId, bookId);
 }
 
+function removeFromCart(userId, bookId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const removeBook = db.prepare("DELETE FROM cart WHERE user_id = ? AND book_id = ?");
+  removeBook.run(userId, bookId);
+}
+
 function retrieveFromCart(userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -1169,5 +1177,6 @@ export {
   searchAuthorByName,
   genericPaginatedSearch,
   addBookToCart,
-  retrieveFromCart
+  retrieveFromCart,
+  removeFromCart
 };
