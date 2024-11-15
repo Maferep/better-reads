@@ -14,6 +14,8 @@ body {
   color: white;
 }
 
+
+
 #navbar a {
   color: white;
   padding: 0 10px;
@@ -35,6 +37,7 @@ body {
   margin-right: 15px;
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: space-around;
   width: 20%;
 }
