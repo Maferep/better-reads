@@ -5,6 +5,7 @@ import csv from "csv-parser";
 import fs from "fs";
 import axios from "axios";
 import { start } from "repl";
+import { create } from "domain";
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
@@ -43,6 +44,28 @@ function initDb() {
   console.log("Created comments table.");
   createLikeDb(db);
   console.log("Created likes table.");
+  createCartDB(db);
+  console.log("Created cart table.");
+}
+
+function createCartDB(db) {
+  const db_stmt = `CREATE TABLE IF NOT EXISTS cart (
+    id INTEGER PRIMARY KEY NOT NULL,
+    user_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES insecure_users(id),
+    FOREIGN KEY (book_id) REFERENCES books(id)
+  )`;
+  db.prepare(db_stmt).run();
+  console.log("Created cart table.");
+}
+
+function addBookToCart(userId, bookId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const insertCart = db.prepare("INSERT INTO cart (user_id, book_id) VALUES (?, ?)");
+  insertCart.run(userId, bookId);
 }
 
 function createUserProfileDb(db) {
@@ -1135,5 +1158,6 @@ export {
   searchBooksByTitle,
   searchBooksByAuthor,
   searchAuthorByName,
-  genericPaginatedSearch
+  genericPaginatedSearch,
+  addBookToCart
 };

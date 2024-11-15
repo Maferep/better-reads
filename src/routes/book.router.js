@@ -21,6 +21,7 @@ router.get('/:id', async function (req, res) {
   const genres = bookRow.genres;
   res.render("book", {
     do_sidebar: estaAutenticadoBool,
+    userId: userId,
     username: req.session.user,
     loggedIn: estaAutenticadoBool,
     allowReview: estaAutenticadoBool && !userSubmittedReview,

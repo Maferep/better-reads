@@ -35,6 +35,7 @@
                 <option value="plan-to-read" {{#if (eq bookState 'plan-to-read')}}selected{{/if}}>Plan to Read</option>
             </select>
             <button id="saveStateButton" type="button">Save</button>
+            <button id="saveStateButton" onclick="addToCart('{{userId}}','{{bookId}}')" type="button">Add to Cart</button>
           </div>
           <div class="see-posts-container">
             <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button" class="wide-button">💬 See Posts</button></a>
@@ -127,9 +128,14 @@
 
 
 
-
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
+const socket = io();
+function addToCart(userId, bookId) {
+  const data = {userId,bookId}
+  socket.emit('addBookToCart', data);
+}
+
 document.getElementById('reviewForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission behavior
 

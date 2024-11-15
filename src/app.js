@@ -8,9 +8,12 @@ import bookRouter from './routes/book.router.js';
 import browseRouter from './routes/browse.router.js';
 import postRouter from './routes/post.router.js';
 import usersRouter from './routes/users.router.js';
+import cartRouter from './routes/cart.router.js';
 import path from 'path';
 import __dirname from './path.js';
 import router from './routes/router.js';
+import {Server} from "socket.io";
+import websocket from "./websocket.js";
 
 // database
 initDb()
@@ -46,6 +49,11 @@ app.use('/browse', browseRouter)
 app.use('/book', bookRouter)
 app.use('/post', postRouter)
 app.use('/users', usersRouter)
+app.use('/cart', cartRouter)
 // http
 let serverHttp = http.createServer(app)
 serverHttp.listen(port, () => console.log('Example app is listening on port', port))
+
+const socketServer = new Server(serverHttp);
+
+websocket(socketServer);
