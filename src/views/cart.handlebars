@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/static/css/cart.css">
+
+<div class="cart-container">
+    <h1>My Cart</h1>
+    <div class="items">
+        {{#each books}}
+        <div class="item">
+            <img src="{{this.image}}" alt="">
+            <div class="info">
+                <h2>{{this.book_name}}</h2>
+                <p id="description">{{this.description}}</p>
+                <p>Authors: {{this.authors}}</p>
+                <p>Genres: {{this.genre}}</p>
+                <p>Total price: ??</p>
+                <div class="amount-buttons"></div>
+                <button onclick="removeFromCart('{{userId}}','{{bookId}}')">Remove</button>
+            </div>
+        </div>
+        {{/each}} 
+    </div>
+</div>

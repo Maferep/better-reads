@@ -68,6 +68,15 @@ function addBookToCart(userId, bookId) {
   insertCart.run(userId, bookId);
 }
 
+function retrieveFromCart(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const retrieveCart = db.prepare("SELECT * FROM cart WHERE user_id = ?");
+  const rows = retrieveCart.all(userId);
+  return rows;
+}
+
 function createUserProfileDb(db) {
   const db_stmt = `CREATE TABLE IF NOT EXISTS user_profiles (
     user_id INTEGER PRIMARY KEY NOT NULL,
@@ -1159,5 +1168,6 @@ export {
   searchBooksByAuthor,
   searchAuthorByName,
   genericPaginatedSearch,
-  addBookToCart
+  addBookToCart,
+  retrieveFromCart
 };

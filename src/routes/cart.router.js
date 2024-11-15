@@ -1,32 +1,23 @@
 import { Router } from "express";
+import { retrieveFromCart,fetchBook } from "../database.js";
+import { isAuthenticated } from "../authenticate.js";
 
 const router = Router();
 
-router.get('/', function (req, res) {
+router.get('/', isAuthenticated,function (req, res) {
+    const data = retrieveFromCart(req.session.userId);
+    let books = data.map((book) => {
+        return fetchBook(book.book_id);
+    });
+    console.log(books);
     res.render("cart", {
-        username: req.session.user,
         do_sidebar: true,
         loggedIn: true,
         title: "Cart",
+        books
     });
 });
 
-// Endpoint to add a book to the cart
-router.post('/', function (req, res) {
-    
-    const data = req.body;
-    console.log(data);
-
-
-    // try {
-    //     const stmt = db.prepare("INSERT INTO cart (user_id, book_id) VALUES (?, ?)");
-    //     stmt.run(userId, bookId);
-    //     res.status(200).send("Book added to cart successfully!");
-    // } catch (error) {
-    //     console.error("Error adding book to cart:", error);
-    //     res.status(500).send("An error occurred while adding the book to the cart.");
-    // }
-});
 
 
 export default router;
