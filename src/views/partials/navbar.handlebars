@@ -4,8 +4,11 @@
   <div id="logo"><a href="/">Better Reads</a></div>
   <div class="user-actions">
     {{#if loggedIn}}
-      <a href="/cart"><img src="/static/assets/icons8-cart-48.png" alt=""></a>
-      <a id="notification_button" href="/notification">🔔</a>
+      <a href="/cart"><img src="/static/assets/icons8-cart-48.png" alt="Cart"></a>
+      <a id="notification-button" href="/notification">
+        <img id="notification-icon" src="/static/assets/notification_icon.svg" alt="Notifications">
+        <span id="notification-count" class="notification-count">5</span>
+      </a>
       <a href="/logout">Logout</a>
       <a href="/profile">Hello, {{username}}</a>
     {{else}}
@@ -14,19 +17,3 @@
     {{/if}}
   </div>
 </div>
-
-<script>
-  //When someone presses the notification button, it shows an alert
-  document.getElementById("notification_button").addEventListener("click", function() {
-    //Prevent the default action
-    {{!-- event.preventDefault();
-
-    //Get the number of notifications from /notification/count
-    fetch("/notification/count")
-      .then(response => response.json())
-      .then(data => {
-        //Show the number of notifications
-        alert("You have " + data.count + " notifications");
-      });
-  }); --}}
-</script>

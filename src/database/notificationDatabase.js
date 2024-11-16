@@ -10,6 +10,7 @@ function createNotificationsDB(db) {
       type TEXT NOT NULL, -- like_milestone, repost, comment, follow
       message TEXT NOT NULL, -- notification message
       date INTEGER NOT NULL, -- date of the interaction
+      read BOOLEAN NOT NULL DEFAULT 0, -- whether the notification has been read
       FOREIGN KEY (user_id) REFERENCES insecure_users(id)
       FOREIGN KEY (post_id) REFERENCES posts(id)
       FOREIGN KEY (interaction_with_user_id) REFERENCES insecure_users(id)
@@ -77,6 +78,15 @@ function createNotificationsDB(db) {
 
 
 
+  function getNotificationsForUserId(user_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `SELECT * FROM notifications WHERE user_id=? ORDER BY date DESC`;
+    const notifications = db.prepare(query).all(user_id);
+    return notifications;
+  }
+
+
+
 
   export { createNotificationsDB,
     createCommentNotification,
@@ -84,5 +94,6 @@ function createNotificationsDB(db) {
   createLikeMilestoneNotification,
   removeLikeMilestoneNotificacion,
   createFollowNotification,
-  removeFollowNotification
+  removeFollowNotification,
+  getNotificationsForUserId
    }

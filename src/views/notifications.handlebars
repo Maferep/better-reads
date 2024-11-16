@@ -5,12 +5,16 @@
   <div id="container">
     <h1>Notificaciones</h1>
     {{#if notifications.length}}
+      <button id="delete-all-button" onclick="deleteAllNotifications()">Delete All</button>
       <div class="notifications-list">
         {{#each notifications}}
-          <div class="notification-item">
+          <a class="notification-link" notification_id="{{id}}" redirect_to="{{link}}">
+          <div class="notification-item {{#unless read}}unread{{/unless}}" notification_id="{{id}}">
             <p>{{this.message}}</p>
             <span>{{this.date}}</span>
+            <button class="delete-button">🗑</button>
           </div>
+          </a>
         {{/each}}
       </div>
     {{else}}
@@ -18,3 +22,77 @@
     {{/if}}
   </div>
 </div>
+
+
+
+
+<script>
+  function deleteNotification(notificationId) {
+    fetch(`/notifications/${notificationId}`, {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error al eliminar la notificación');
+      }
+    });
+  }
+
+  function deleteAllNotifications() {
+    alert("LEIMINAT TODAS")
+    fetch('/notifications', {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error al eliminar todas las notificaciones');
+      }
+    });
+  }
+
+
+  function readNotification(notificationId) {
+    fetch(`/notifications/read/${notificationId}`, {
+      method: 'PUT'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+        // sacar la clase unread al div de la notificación
+        document.querySelector(`.notification-item[notification_id="${notificationId}"]`).classList.remove('unread');
+      } else {
+        alert('Error al marcar la notificación como leída');
+        return;
+      }
+    });
+  }
+
+
+  //Add event listener to all notification links
+  document.querySelectorAll('.notification-link').forEach(link => {
+    link.addEventListener('click', function() {
+      const notificationId = link.getAttribute('notification_id');
+      const redirectTo = link.getAttribute('redirect_to');
+      {{!-- window.location.href = redirectTo; --}}
+      alert("PRESIONO NOTIFICACION, REDIRECCIONN A: " + redirectTo);
+      
+        document.querySelector(`.notification-item[notification_id="${notificationId}"]`).classList.remove('unread');
+    });
+  });
+
+  //Add event listener to every delete button
+  document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.stopPropagation();
+      const notificationId = button.parentElement.getAttribute('notification_id');
+      alert("ELIMINANDO NOTIFICACION CON ID: " + notificationId);
+    });
+  });
+</script>
