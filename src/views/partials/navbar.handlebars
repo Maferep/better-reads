@@ -5,6 +5,7 @@
   <div class="user-actions">
     {{#if loggedIn}}
       <a href="/cart"><img src="/static/assets/icons8-cart-48.png" alt=""></a>
+      <a id="notification_button" href="/notification">🔔</a>
       <a href="/logout">Logout</a>
       <a href="/profile">Hello, {{username}}</a>
     {{else}}
@@ -13,3 +14,19 @@
     {{/if}}
   </div>
 </div>
+
+<script>
+  //When someone presses the notification button, it shows an alert
+  document.getElementById("notification_button").addEventListener("click", function() {
+    //Prevent the default action
+    {{!-- event.preventDefault();
+
+    //Get the number of notifications from /notification/count
+    fetch("/notification/count")
+      .then(response => response.json())
+      .then(data => {
+        //Show the number of notifications
+        alert("You have " + data.count + " notifications");
+      });
+  }); --}}
+</script>

@@ -1,0 +1,26 @@
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+  
+  .notification-item {
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .notification-item p {
+    margin: 0;
+    font-size: 1em;
+    color: #333;
+  }
+  
+  .notification-item span {
+    display: block;
+    margin-top: 0.5em;
+    font-size: 0.8em;
+    color: #777;
+  }

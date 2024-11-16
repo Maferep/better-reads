@@ -9,6 +9,7 @@ import browseRouter from './routes/browse.router.js';
 import postRouter from './routes/post.router.js';
 import usersRouter from './routes/users.router.js';
 import cartRouter from './routes/cart.router.js';
+import notificationRouter from './routes/notification.router.js';
 import path from 'path';
 import __dirname from './path.js';
 import router from './routes/router.js';
@@ -50,6 +51,7 @@ app.use('/book', bookRouter)
 app.use('/post', postRouter)
 app.use('/users', usersRouter)
 app.use('/cart', cartRouter)
+app.use('/notification', notificationRouter)
 // http
 let serverHttp = http.createServer(app)
 serverHttp.listen(port, () => console.log('Example app is listening on port', port))
