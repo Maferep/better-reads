@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
-import { getNotificationsForUserId } from '../database/notificationDatabase.js';
+import { getNotificationsForUserId, readNotification, 
+    deleteAllNotificationsFromUser,
+    deleteNotification, getCountOfNotificationsForUserId } from '../database/notificationDatabase.js';
 import { getUsernameFromId } from '../database.js';
 
 
@@ -8,7 +10,7 @@ const router = Router();
 
 
 router.get('/count', isAuthenticated , function (req, res) {
-    res.json({ count: getRandomInt(101) });
+    res.json({ count: getCountOfNotificationsForUserId(req.session.userId) });
     });
 
 
@@ -31,6 +33,24 @@ router.get('/', isAuthenticated , function (req, res) {
     );
     }
 );
+
+
+router.put('/read/:id', isAuthenticated , function (req, res) {
+    readNotification(req.params.id);
+    res.json({ success: true });
+});
+
+
+router.delete('', isAuthenticated , function (req, res) {
+    deleteAllNotificationsFromUser(req.session.userId);
+    res.json({ success: true });
+});
+
+router.delete('/:id', isAuthenticated , function (req, res) {
+    deleteNotification(req.params.id);
+    res.json({ success: true });
+});
+
 
 export default router;
 

@@ -85,6 +85,31 @@ function createNotificationsDB(db) {
     return notifications;
   }
 
+  function getCountOfNotificationsForUserId(user_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `SELECT COUNT(1) FROM notifications WHERE user_id=?`;
+    const count = db.prepare(query).get(user_id)["COUNT(1)"];
+    return count;
+  }
+
+  function readNotification(notification_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `UPDATE notifications SET read=1 WHERE id=?`;
+    db.prepare(query).run(notification_id);
+  }
+
+
+  function deleteAllNotificationsFromUser(user_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `DELETE FROM notifications WHERE user_id=?`;
+    db.prepare(query).run(user_id);
+  }
+
+  function deleteNotification(notification_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `DELETE FROM notifications WHERE id=?`;
+    db.prepare(query).run(notification_id);
+  }
 
 
 
@@ -95,5 +120,9 @@ function createNotificationsDB(db) {
   removeLikeMilestoneNotificacion,
   createFollowNotification,
   removeFollowNotification,
-  getNotificationsForUserId
+  getNotificationsForUserId,
+  readNotification,
+  deleteAllNotificationsFromUser,
+  deleteNotification,
+  getCountOfNotificationsForUserId
    }

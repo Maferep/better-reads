@@ -13,6 +13,11 @@
     
   padding-right: 50px; /* to clear delete button*/
   position: relative;
+  cursor: pointer;
+  }
+
+  .notification-item:hover {
+    border-color: #3498db;
   }
   
   .notification-item p {

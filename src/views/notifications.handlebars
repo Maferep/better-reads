@@ -24,11 +24,18 @@
 </div>
 
 
-
-
 <script>
+  function checkToPullNewNotifications() {
+    const notificationCountElement = document.getElementById('notification-count');
+    
+    if (parseInt(notificationCountElement.innerText) > {{notifications.length}}) {
+      location.reload();
+    };
+  }
+
+
   function deleteNotification(notificationId) {
-    fetch(`/notifications/${notificationId}`, {
+    fetch(`/notification/${notificationId}`, {
       method: 'DELETE'
     })
     .then(response => response.json())
@@ -42,8 +49,7 @@
   }
 
   function deleteAllNotifications() {
-    alert("LEIMINAT TODAS")
-    fetch('/notifications', {
+    fetch('/notification', {
       method: 'DELETE'
     })
     .then(response => response.json())
@@ -57,16 +63,17 @@
   }
 
 
-  function readNotification(notificationId) {
-    fetch(`/notifications/read/${notificationId}`, {
+  function readNotification(notificationId, redirect_to) {
+    fetch(`/notification/read/${notificationId}`, {
       method: 'PUT'
     })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        location.reload();
         // sacar la clase unread al div de la notificación
         document.querySelector(`.notification-item[notification_id="${notificationId}"]`).classList.remove('unread');
+        //Redigir a la página correspondiente
+        window.location.href = redirect_to;
       } else {
         alert('Error al marcar la notificación como leída');
         return;
@@ -80,10 +87,8 @@
     link.addEventListener('click', function() {
       const notificationId = link.getAttribute('notification_id');
       const redirectTo = link.getAttribute('redirect_to');
-      {{!-- window.location.href = redirectTo; --}}
-      alert("PRESIONO NOTIFICACION, REDIRECCIONN A: " + redirectTo);
-      
-        document.querySelector(`.notification-item[notification_id="${notificationId}"]`).classList.remove('unread');
+
+      readNotification(notificationId, redirectTo);
     });
   });
 
@@ -92,7 +97,18 @@
     button.addEventListener('click', function(event) {
       event.stopPropagation();
       const notificationId = button.parentElement.getAttribute('notification_id');
-      alert("ELIMINANDO NOTIFICACION CON ID: " + notificationId);
+      
+      deleteNotification(notificationId);
     });
   });
+
+  //add event listener to delete all
+  document.getElementById('delete-all-button').addEventListener('click', function() {
+    deleteAllNotifications();
+  });
+
+
+  setInterval(() => {
+    checkToPullNewNotifications();
+  }, 5000);
 </script>

@@ -7,7 +7,7 @@
       <a href="/cart"><img src="/static/assets/icons8-cart-48.png" alt="Cart"></a>
       <a id="notification-button" href="/notification">
         <img id="notification-icon" src="/static/assets/notification_icon.svg" alt="Notifications">
-        <span id="notification-count" class="notification-count">5</span>
+        <span id="notification-count" class="notification-count" hidden>0</span>
       </a>
       <a href="/logout">Logout</a>
       <a href="/profile">Hello, {{username}}</a>
@@ -17,3 +17,27 @@
     {{/if}}
   </div>
 </div>
+
+<script>
+  function updateNotificationCountElement(numberOfNotifications) {
+    const notificationCountElement = document.getElementById('notification-count');
+    notificationCountElement.innerText = numberOfNotifications;
+    if (numberOfNotifications === 0) {
+      notificationCountElement.style.display = 'none';
+    } else {
+      notificationCountElement.style.display = 'block';
+    }
+  }
+
+  function updateNotificationCount() {
+    console.log("Actualizando numero de notificaciones");
+    fetch('/notification/count')
+      .then(response => response.json())
+      .then(data => updateNotificationCountElement(data.count));
+  }
+
+  setInterval(updateNotificationCount, 5000);
+
+  //update number of notifications when the page loads
+  updateNotificationCount();
+</script>
