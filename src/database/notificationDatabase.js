@@ -92,6 +92,13 @@ function createNotificationsDB(db) {
     return count;
   }
 
+  function getCountOfUnreadNotificationsForUserId(user_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `SELECT COUNT(1) FROM notifications WHERE user_id=? AND read=FALSE`;
+    const count = db.prepare(query).get(user_id)["COUNT(1)"];
+    return count;
+  }
+
   function readNotification(notification_id) {
     const db = new Database("database_files/betterreads.db", {verbose: console.log});
     const query = /* sql */ `UPDATE notifications SET read=1 WHERE id=?`;
@@ -124,5 +131,6 @@ function createNotificationsDB(db) {
   readNotification,
   deleteAllNotificationsFromUser,
   deleteNotification,
-  getCountOfNotificationsForUserId
+  getCountOfNotificationsForUserId,
+  getCountOfUnreadNotificationsForUserId
    }

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { getNotificationsForUserId, readNotification, 
     deleteAllNotificationsFromUser,
-    deleteNotification, getCountOfNotificationsForUserId } from '../database/notificationDatabase.js';
+    deleteNotification, getCountOfNotificationsForUserId, getCountOfUnreadNotificationsForUserId } from '../database/notificationDatabase.js';
 import { getUsernameFromId } from '../database.js';
 
 
@@ -11,7 +11,11 @@ const router = Router();
 
 router.get('/count', isAuthenticated , function (req, res) {
     res.json({ count: getCountOfNotificationsForUserId(req.session.userId) });
-    });
+});
+
+router.get('/unread-count', isAuthenticated , function (req, res) {
+    res.json({ count: getCountOfUnreadNotificationsForUserId(req.session.userId) });
+});
 
 
 router.get('/', isAuthenticated , function (req, res) {

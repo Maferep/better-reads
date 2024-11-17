@@ -31,7 +31,7 @@
 
   function updateNotificationCount() {
     console.log("Actualizando numero de notificaciones");
-    fetch('/notification/count')
+    fetch('/notification/unread-count')
       .then(response => response.json())
       .then(data => updateNotificationCountElement(data.count));
   }
