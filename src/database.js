@@ -6,6 +6,8 @@ import fs from "fs";
 import axios from "axios";
 import { start } from "repl";
 import { create } from "domain";
+import { createNotificationsDB } from "./database/notificationDatabase.js";
+
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
@@ -45,7 +47,8 @@ function initDb() {
   createLikeDb(db);
   console.log("Created likes table.");
   createCartDB(db);
-  console.log("Created cart table.");
+
+  createNotificationsDB(db);
 }
 
 function createCartDB(db) {
@@ -1135,6 +1138,17 @@ function genericPaginatedSearch(function_request, queryParameter, results_per_pa
   return { rows, has_more };
 }
 
+function getPostAuthor(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT author_id FROM posts WHERE id=?`;
+  const result = db.prepare(query).get(post_id);
+  console.log("RESULT", result)
+
+  return result.author_id;
+}
+
 
 export {
   initDb,
@@ -1178,5 +1192,6 @@ export {
   genericPaginatedSearch,
   addBookToCart,
   retrieveFromCart,
-  removeFromCart
+  removeFromCart,
+  getPostAuthor
 };

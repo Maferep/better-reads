@@ -3,7 +3,9 @@ import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
   fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
-  getRepostsCount} from '../database.js';
+  getRepostsCount,} from '../database.js';
+
+import { createCommentNotification, createLikeMilestoneNotification, createRepostNotification, removeLikeMilestoneNotificacion } from '../database/notificationDatabase.js';
 
 const router = Router();
 
@@ -85,6 +87,8 @@ router.post('/:id/comment',isAuthenticated, (req, res) => {
     const commentContent = req.body["comment-content"];
     createComment(postId, userId, commentContent);
     res.redirect(`/post/${postId}`);
+
+    createCommentNotification(postId, userId);
 });
 
 // Endpoint for liking a post
@@ -93,16 +97,7 @@ router.post('/:id/like', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
 
-    if (postId != "null") {
-        // TODO: fetch like count should be a separate method
-        const {code, like_count, msg } = incrementLikes(postId, userId)
-        const data = {
-        message: msg,
-        like_count: like_count,
-        result: code,
-        };
-        res.json(data);
-    } else {
+    if (postId == "null" || postId == "undefined") {
         const code = 500;
         const like_count = 0;
         const msg = "bad post id";
@@ -112,8 +107,31 @@ router.post('/:id/like', isAuthenticated, (req, res) => {
         result: code,
         };
         res.json(data);
+
+        return; 
+    }
+
+    // TODO: fetch like count should be a separate method
+    const {code, like_count, msg } = incrementLikes(postId, userId)
+    const data = {
+    message: msg,
+    like_count: like_count,
+    result: code,
+    };
+    res.json(data);
+
+    if (isLikeMilestone(like_count)) {
+        createLikeMilestoneNotification(postId, like_count);
     }
 });
+
+
+function isLikeMilestone(like_count) {
+    const esPotenciaDe10 = Math.log10(like_count) % 1 === 0 ; //1,10,100,1000,10000
+    const esPotenciaDe10Por5 = Math.log10(like_count/5) % 1 === 0; //5,50,500,5000,50000
+
+    return esPotenciaDe10 || esPotenciaDe10Por5;
+}
 
 // Endpoint for liking a post
 // test: curl -X POST /post/1/like
@@ -128,6 +146,12 @@ router.post('/:id/unlike', isAuthenticated, (req, res) => {
     result: code,
     };
     res.json(data);
+
+    if (isLikeMilestone(like_count+1)) {
+        //Si la cantidad de likes actual +1 es un milestone, quiere decir
+        //que se esta bajando de un milestone, por lo que se debe borrar la notificacion
+        removeLikeMilestoneNotificacion(postId);
+    }
 });
 
 // Endpoint for checking if user likes a post
@@ -168,6 +192,8 @@ router.post('/:id/repost', isAuthenticated, (req, res) => {
     if (canRepost(postId, userId)) {
         createRepost(postId, userId);
         res.sendStatus(201)
+
+        createRepostNotification(postId, userId);
     } else {
         res.sendStatus(403)
     }

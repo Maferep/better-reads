@@ -1,11 +1,4 @@
 
-#main-layout {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-
 #container {
   width: 80%;
   max-width: 700px;

@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="/static/css/container_style.css" />
+<link rel="stylesheet" href="/static/css/notifications_style.css" />
+
+<div id="content">
+  <div id="container">
+    <h1>Notificaciones</h1>
+    {{#if notifications.length}}
+      <button id="delete-all-button" onclick="deleteAllNotifications()">Delete All</button>
+      <div class="notifications-list">
+        {{#each notifications}}
+          <a class="notification-link" notification_id="{{id}}" redirect_to="{{link}}">
+          <div class="notification-item {{#unless read}}unread{{/unless}}" notification_id="{{id}}">
+            <p>{{this.message}}</p>
+            <span>{{this.date}}</span>
+            <button class="delete-button">🗑</button>
+          </div>
+          </a>
+        {{/each}}
+      </div>
+    {{else}}
+      <p>No tienes notificaciones.</p>
+    {{/if}}
+  </div>
+</div>
+
+
+<script>
+  function checkToPullNewNotifications() {
+    const notificationCountElement = document.getElementById('notification-count');
+    
+    if (parseInt(notificationCountElement.innerText) > {{notifications.length}}) {
+      location.reload();
+    };
+  }
+
+
+  function deleteNotification(notificationId) {
+    fetch(`/notification/${notificationId}`, {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error al eliminar la notificación');
+      }
+    });
+  }
+
+  function deleteAllNotifications() {
+    fetch('/notification', {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error al eliminar todas las notificaciones');
+      }
+    });
+  }
+
+
+  function readNotification(notificationId, redirect_to) {
+    fetch(`/notification/read/${notificationId}`, {
+      method: 'PUT'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // sacar la clase unread al div de la notificación
+        document.querySelector(`.notification-item[notification_id="${notificationId}"]`).classList.remove('unread');
+        //Redigir a la página correspondiente
+        window.location.href = redirect_to;
+      } else {
+        alert('Error al marcar la notificación como leída');
+        return;
+      }
+    });
+  }
+
+
+  //Add event listener to all notification links
+  document.querySelectorAll('.notification-link').forEach(link => {
+    link.addEventListener('click', function() {
+      const notificationId = link.getAttribute('notification_id');
+      const redirectTo = link.getAttribute('redirect_to');
+
+      readNotification(notificationId, redirectTo);
+    });
+  });
+
+  //Add event listener to every delete button
+  document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.stopPropagation();
+      const notificationId = button.parentElement.getAttribute('notification_id');
+      
+      deleteNotification(notificationId);
+    });
+  });
+
+  //add event listener to delete all
+  document.getElementById('delete-all-button').addEventListener('click', function() {
+    deleteAllNotifications();
+  });
+
+
+  setInterval(() => {
+    checkToPullNewNotifications();
+  }, 5000);
+
+
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
