@@ -9,6 +9,13 @@
 </head>
 <body>
     {{> navbar }}
-    {{{body}}}
+    <div id="layout-sidebar">
+        {{#if do_sidebar}}
+            {{> sidebar}}
+        {{/if}}
+        <div id="main-layout">
+        {{{body}}}
+        </div>
+    </div>
 </body>
 </html>

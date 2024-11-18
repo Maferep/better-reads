@@ -4,6 +4,7 @@ import {uploader} from "../uploader.js";
 import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
 import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
+import { createFollowNotification, removeFollowNotification } from '../database/notificationDatabase.js';
 
 const router = Router();
 
@@ -32,9 +33,13 @@ router.post('/follow/:followingId', isAuthenticated, async function (req, res) {
   try {
     await followUser(followerId, followingId);
     res.status(200).json({ message: `User ${followerId} now follows user ${followingId}` });
+
   } catch (error) {
     res.status(400).json({ error: error.message });
+    return;
   }
+
+  createFollowNotification(followerId, followingId);
 });
 
 // Dejar de seguir a un usuario
@@ -47,7 +52,10 @@ router.post('/unfollow/:followingId', isAuthenticated, async function (req, res)
     res.status(200).json({ message: `User ${followerId} unfollowed user ${followingId}` });
   } catch (error) {
     res.status(400).json({ error: error.message });
+    return;
   }
+
+  removeFollowNotification(followerId, followingId);
 });
 
 // Ver seguidores de un usuario
@@ -120,6 +128,7 @@ function processProfileRequest(req, res, isOwnProfile) {
   const has_more = all_raw.has_more;
   
   res.render("profile", { 
+    do_sidebar: true,
     my_username: req.session.user, 
     username: isOwnProfile ? req.session.user : req.params.profileUsername, 
     userId: userId,
@@ -224,6 +233,7 @@ function processFeedRequest(req, res, onlyFollowing) {
 
 
   res.render("index", {
+    do_sidebar: true,
     username: req.session.user,
     loggedIn: true,
     title: "Home page",

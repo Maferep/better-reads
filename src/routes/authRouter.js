@@ -32,6 +32,7 @@ authRouter.get('/login', function(req, res) {
   const _hasWrongCred = req.query.wrong_cred == 1;
   console.log("Has wrong cred?", _hasWrongCred)
   res.render('login', { 
+    do_sidebar: false,
     username: "guest", 
     loggedIn: false, 
     hasWrongCred: _hasWrongCred, 
@@ -93,6 +94,7 @@ authRouter.get('/register', function(req, res) {
   const _usernameExists = req.query.username_exists == 1;
   console.log("Existing name", _usernameExists)
   res.render('register', { 
+    do_sidebar: false,
     username: "guest", 
     loggedIn: false, 
     usernameExists: _usernameExists,

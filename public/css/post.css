@@ -1,11 +1,4 @@
 
-#main-layout {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-
 #container {
   width: 80%;
   max-width: 700px;
@@ -73,12 +66,6 @@
 
 #new-comment-form button:hover {
   background-color: #005f8a;
-}
-
-@media (max-width: 768px) {
-  #container {
-    width: 90%;
-  }
 }
 
 

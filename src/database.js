@@ -5,6 +5,9 @@ import csv from "csv-parser";
 import fs from "fs";
 import axios from "axios";
 import { start } from "repl";
+import { create } from "domain";
+import { createNotificationsDB } from "./database/notificationDatabase.js";
+
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = 20000000;
 const TEST_BOOK_ID = 0;
@@ -43,6 +46,46 @@ function initDb() {
   console.log("Created comments table.");
   createLikeDb(db);
   console.log("Created likes table.");
+  createCartDB(db);
+
+  createNotificationsDB(db);
+}
+
+function createCartDB(db) {
+  const db_stmt = `CREATE TABLE IF NOT EXISTS cart (
+    id INTEGER PRIMARY KEY NOT NULL,
+    user_id INTEGER NOT NULL,
+    book_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES insecure_users(id),
+    FOREIGN KEY (book_id) REFERENCES books(id)
+  )`;
+  db.prepare(db_stmt).run();
+  console.log("Created cart table.");
+}
+
+function addBookToCart(userId, bookId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const insertCart = db.prepare("INSERT INTO cart (user_id, book_id) VALUES (?, ?)");
+  insertCart.run(userId, bookId);
+}
+
+function removeFromCart(userId, bookId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const removeBook = db.prepare("DELETE FROM cart WHERE user_id = ? AND book_id = ?");
+  removeBook.run(userId, bookId);
+}
+
+function retrieveFromCart(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const retrieveCart = db.prepare("SELECT * FROM cart WHERE user_id = ?");
+  const rows = retrieveCart.all(userId);
+  return rows;
 }
 
 function createUserProfileDb(db) {
@@ -1095,6 +1138,17 @@ function genericPaginatedSearch(function_request, queryParameter, results_per_pa
   return { rows, has_more };
 }
 
+function getPostAuthor(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT author_id FROM posts WHERE id=?`;
+  const result = db.prepare(query).get(post_id);
+  console.log("RESULT", result)
+
+  return result.author_id;
+}
+
 
 export {
   initDb,
@@ -1135,5 +1189,9 @@ export {
   searchBooksByTitle,
   searchBooksByAuthor,
   searchAuthorByName,
-  genericPaginatedSearch
+  genericPaginatedSearch,
+  addBookToCart,
+  retrieveFromCart,
+  removeFromCart,
+  getPostAuthor
 };

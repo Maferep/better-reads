@@ -1,0 +1,120 @@
+<link rel="stylesheet" href="/static/css/cart.css">
+
+
+<div class="cart-container">
+    <h1>My Cart</h1>
+    {{#if empty_cart}}
+    <h2>Your cart is empty</h2>
+    {{else}}
+    <div class="items">
+        {{#each books}}
+        <div class="item">
+            <img src="{{this.image}}" alt="">
+            <div class="info">
+                <h2>{{this.book_name}}</h2>
+                <p id="description">{{this.description}}</p>
+                <p>Authors: {{this.authors}}</p>
+                <p>Genres: {{this.genre}}</p>
+                <p>Total price: ??</p>
+                <div class="amount-buttons"></div>
+                <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}','{{this.id}}')">Remove</button>
+            </div>
+        </div>
+        {{/each}} 
+    </div>
+    {{/if}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Function to remove a book from the cart
+    function removeFromCart(userId, bookId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This action will delete the book from your cart!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+            if (result.isConfirmed) {
+                socket.emit('removeFromCart', { userId: userId, bookId: bookId });
+            }
+        });
+    }
+
+    // Update the DOM when a book is removed from the cart
+    socket.on('bookRemovedFromCart', (remaining_books) => {
+
+        const itemsDiv = document.querySelector('.items');
+
+        // Clear the existing content in the items div
+        itemsDiv.innerHTML = '';
+
+        // Check if the cart is empty
+        if (remaining_books.length === 0) {
+            window.location.href = '/cart';
+            return;
+        }
+
+        // Recreate the items list with the remaining books
+        remaining_books.forEach(book => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+
+            // Create the book image element
+            const img = document.createElement('img');
+            img.src = book.image;
+            img.alt = 'Book Cover';
+            itemDiv.appendChild(img);
+
+            // Create the info div
+            const infoDiv = document.createElement('div');
+            infoDiv.classList.add('info');
+
+            // Book name
+            const bookName = document.createElement('h2');
+            bookName.textContent = book.book_name;
+            infoDiv.appendChild(bookName);
+
+            // Description
+            const description = document.createElement('p');
+            description.id = 'description';
+            description.textContent = book.description;
+            infoDiv.appendChild(description);
+
+            // Authors
+            const authors = document.createElement('p');
+            authors.textContent = `Authors: ${book.authors}`;
+            infoDiv.appendChild(authors);
+
+            // Genre
+            const genre = document.createElement('p');
+            genre.textContent = `Genres: ${book.genre}`;
+            infoDiv.appendChild(genre);
+
+            // Total price (you can add the actual price logic here if needed)
+            const price = document.createElement('p');
+            price.textContent = 'Total price: ??'; // Update with actual price logic if available
+            infoDiv.appendChild(price);
+
+            // Remove button
+            const removeButton = document.createElement('button');
+            removeButton.id = 'add-to-cart-btn';
+            removeButton.textContent = 'Remove';
+            removeButton.onclick = () => removeFromCart(book.userId, book.id);
+            infoDiv.appendChild(removeButton);
+
+            // Append the infoDiv to the itemDiv
+            itemDiv.appendChild(infoDiv);
+
+            // Append the itemDiv to the itemsDiv
+            itemsDiv.appendChild(itemDiv);
+        });
+    });
+</script>
+
