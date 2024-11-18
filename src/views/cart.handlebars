@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="/static/css/cart.css">
 
-
 <div class="cart-container">
     <h1>My Cart</h1>
     {{#if empty_cart}}
@@ -9,21 +8,16 @@
     <div class="items">
         {{#each books}}
         <div class="item">
-            <img src="{{this.image}}" alt="">
+            <img src="{{this.image}}" alt="Book Cover">
             <div class="info">
                 <h2>{{this.book_name}}</h2>
                 <p>Authors: {{this.authors}}</p>
                 <p>Genres: {{this.genre}}</p>
                 <p>Price: ${{this.price}}</p>
             </div>
-            {{!-- <div class="ctrl-buttons">
-                <button id="cart-btn">+</button>
-                <span>0</span>
-                <button id="cart-btn">-</button>
-            </div> --}}
-            <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}','{{this.id}}')">Remove</button>
+            <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}', '{{this.id}}')">Remove</button>
         </div>
-        {{/each}} 
+        {{/each}}
     </div>
     <button id="buy-btn">Purchase</button>
     {{/if}}
@@ -44,7 +38,7 @@
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
                 socket.emit('removeFromCart', { userId: userId, bookId: bookId });
             }
@@ -53,7 +47,6 @@
 
     // Update the DOM when a book is removed from the cart
     socket.on('bookRemovedFromCart', (remaining_books) => {
-
         const itemsDiv = document.querySelector('.items');
 
         // Clear the existing content in the items div
@@ -61,7 +54,7 @@
 
         // Check if the cart is empty
         if (remaining_books.length === 0) {
-            window.location.href = '/cart';
+            window.location.href = '/cart'; // Redirect to /cart if empty
             return;
         }
 
@@ -101,9 +94,9 @@
             genre.textContent = `Genres: ${book.genre}`;
             infoDiv.appendChild(genre);
 
-            // Total price (you can add the actual price logic here if needed)
+            // Price
             const price = document.createElement('p');
-            price.textContent = 'Total price: ??'; // Update with actual price logic if available
+            price.textContent = `Price: $${book.price}`;
             infoDiv.appendChild(price);
 
             // Remove button
@@ -111,14 +104,13 @@
             removeButton.id = 'add-to-cart-btn';
             removeButton.textContent = 'Remove';
             removeButton.onclick = () => removeFromCart(book.userId, book.id);
-            infoDiv.appendChild(removeButton);
-
-            // Append the infoDiv to the itemDiv
+            
+            // Append the removeButton directly to itemDiv to ensure it's visible
             itemDiv.appendChild(infoDiv);
+            itemDiv.appendChild(removeButton); // Ensure the button is part of the itemDiv
 
             // Append the itemDiv to the itemsDiv
             itemsDiv.appendChild(itemDiv);
         });
     });
 </script>
-
