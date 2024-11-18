@@ -18,7 +18,6 @@ router.get('/', isAuthenticated,function (req, res) {
     });
     const empty_cart = books.length === 0;
     res.render("cart", {
-        do_sidebar: true,
         loggedIn: true,
         title: "Cart",
         empty_cart,

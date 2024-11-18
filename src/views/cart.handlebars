@@ -12,16 +12,20 @@
             <img src="{{this.image}}" alt="">
             <div class="info">
                 <h2>{{this.book_name}}</h2>
-                <p id="description">{{this.description}}</p>
                 <p>Authors: {{this.authors}}</p>
                 <p>Genres: {{this.genre}}</p>
-                <p>Total price: ??</p>
-                <div class="amount-buttons"></div>
-                <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}','{{this.id}}')">Remove</button>
+                <p>Price: ${{this.price}}</p>
             </div>
+            {{!-- <div class="ctrl-buttons">
+                <button id="cart-btn">+</button>
+                <span>0</span>
+                <button id="cart-btn">-</button>
+            </div> --}}
+            <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}','{{this.id}}')">Remove</button>
         </div>
         {{/each}} 
     </div>
+    <button id="buy-btn">Purchase</button>
     {{/if}}
 </div>
 
