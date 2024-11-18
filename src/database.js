@@ -15,7 +15,7 @@ const TEST_POST_ID = 1;
 const CANTIDAD_POSTS_PAGINADO = 7;
 
 const BOOK_DATA_FULL = "./database_files/books_data_full.csv";
-const BOOK_DATA_SMALL = "./database_files/books_data.csv";
+const BOOK_DATA_SMALL = "./database_files/books_data_prices.csv";
 
 function initDb() {
   // Create username/password database
@@ -178,33 +178,38 @@ function fetchISBN(infoLink, callback) {
 }
 
 function createBookDb(db, fullDatasetPath, shortDatasetPath) {
-  // Create or modify the table structure to include authors, genres, and image fields.
+  // Create or modify the table structure to include authors, genres, image, and price fields.
   db.prepare(
     `CREATE TABLE IF NOT EXISTS books (
       id INTEGER PRIMARY KEY NOT NULL, 
       book_name TEXT UNIQUE NOT NULL, 
-      description TEXT  NOT NULL, 
+      description TEXT NOT NULL, 
       isbn TEXT, 
       authors TEXT,
       genre TEXT,
-      image TEXT
+      image TEXT,
+      price REAL
     )`
   ).run();
 
-  // create table for book-genre and book-author pairs
-  const books_genres = db.prepare(`CREATE TABLE IF NOT EXISTS books_genres (
-    id INTEGER PRIMARY KEY NOT NULL, 
-    genre_id TEXT, 
-    book_id INTEGER NOT NULL,
-    FOREIGN KEY (book_id) REFERENCES books(id)
-  )`).run();
-  
-  const books_authors = db.prepare(`CREATE TABLE IF NOT EXISTS books_authors(
-    id INTEGER PRIMARY KEY NOT NULL, 
-    author_id TEXT, 
-    book_id INTEGER NOT NULL,
-    FOREIGN KEY (book_id) REFERENCES books(id)
-  )`).run();
+  // Create tables for book-genre and book-author pairs
+  db.prepare(
+    `CREATE TABLE IF NOT EXISTS books_genres (
+      id INTEGER PRIMARY KEY NOT NULL, 
+      genre_id TEXT, 
+      book_id INTEGER NOT NULL,
+      FOREIGN KEY (book_id) REFERENCES books(id)
+    )`
+  ).run();
+
+  db.prepare(
+    `CREATE TABLE IF NOT EXISTS books_authors (
+      id INTEGER PRIMARY KEY NOT NULL, 
+      author_id TEXT, 
+      book_id INTEGER NOT NULL,
+      FOREIGN KEY (book_id) REFERENCES books(id)
+    )`
+  ).run();
 
   // Check if the table already contains data
   const books_count = "SELECT COUNT(*) FROM books";
@@ -217,10 +222,11 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
           book_name, 
           description, 
           isbn,
-            authors,
-            genre,
-            image
-       ) VALUES (?, ?, ?, ?, ?, ?, ?)`
+          authors,
+          genre,
+          image,
+          price
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     );
     const insert_book_authors = db.prepare(
       `INSERT INTO books_authors (author_id, book_id) VALUES (?, ?)`
@@ -229,34 +235,30 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
       `INSERT INTO books_genres (genre_id, book_id) VALUES (?, ?)`
     );
 
-    // create example book
-    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg");
-    
-    // read and store each book from csv
-    // asynchronous: calls a callback every time CSV is loaded, does not stop execution of the app
-    let datasetPath = "";
+    // Create example book
+    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg", 0.0);
 
+    // Determine dataset path
+    let datasetPath = "";
     if (fs.existsSync(fullDatasetPath)) {
       console.log("Found books_data_full.csv for full dataset.");
       datasetPath = fullDatasetPath;
     } else if (fs.existsSync(shortDatasetPath)) {
-      console.log("Not found books_data_full.csv for full dataset, using books_data.csv instead for shorten dataset instead.");
+      console.log("Using books_data.csv for shortened dataset.");
       datasetPath = shortDatasetPath;
     } else {
       throw new Error("No dataset found.");
     }
-    
-    
-    loadFromCSV(datasetPath, (books) => {
-      let id = 0
 
+    // Load and parse books from CSV
+    loadFromCSV(datasetPath, (books) => {
+      let id = 0;
       const cantidadLibros = books.length;
 
       const insert_many_books = db.transaction((books) => {
         for (const book of books) {
           let empty_fields = 0;
-
-          const important_fields = ["Title", "description", "authors", "image", "categories"];
+          const important_fields = ["Title", "description", "authors", "image", "categories", "price"];
           for (const key of important_fields) {
             if (book[key] === undefined || book[key] === "") {
               empty_fields += 1;
@@ -264,52 +266,54 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
           }
 
           if (empty_fields >= 2) {
-            //Descarto libro con muchos faltantes
+            // Discard book with too many missing fields
             continue;
           }
 
           id += 1;
+          const price = parseFloat(book["price"]) || 0.0; // Parse price, default to 0.0 if invalid
           insert_books.run(
             id,
-            book["Title"], 
-            book["description"], 
+            book["Title"],
+            book["description"],
             book["isbn"],
-            JSON.stringify(book["authors"]), // TODO remove and replace
-            JSON.stringify(book["categories"]), // TODO remove and replace
-            book["image"] // Direct image link
+            JSON.stringify(book["authors"]),
+            JSON.stringify(book["categories"]),
+            book["image"],
+            price
           );
-          let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/
-          let authors = book["authors"].match(re)
-          let genres = book["categories"].match(re)
-          // console.log(authors)
-          // console.log(genres)
-          authors = authors ? authors.slice(1, authors.length) : [] ;
-          genres = genres ? genres.slice(1, genres.length) : [] ;
-          // console.log(authors)
-          // console.log(genres)
+
+          // Extract authors and genres
+          let re = /\[(?:'([^']*)'(?:, *(?:'([^']*)'))*)?\]/;
+          let authors = book["authors"].match(re);
+          let genres = book["categories"].match(re);
+          authors = authors ? authors.slice(1) : [];
+          genres = genres ? genres.slice(1) : [];
+
           for (const author of authors) {
-            if (author && author != "") {
-              insert_book_authors.run(author, id)
+            if (author && author !== "") {
+              insert_book_authors.run(author, id);
             }
           }
           for (const genre of genres) {
-            if (genre && genre != "") {
-              insert_book_genres.run(genre, id)
+            if (genre && genre !== "") {
+              insert_book_genres.run(genre, id);
             }
           }
-          if (id%Math.round(cantidadLibros/100)==0) {
-            console.log(`Cargando libros ${Math.floor(id/cantidadLibros*100)}%`);
+
+          if (id % Math.round(cantidadLibros / 100) === 0) {
+            console.log(`Cargando libros ${Math.floor((id / cantidadLibros) * 100)}%`);
           }
-        }     
-      })
+        }
+      });
 
-      // Populate the database with data from the CSV file
+      // Populate the database
       insert_many_books(books);
-
-      console.log("Cargando libros 100%")
+      console.log("Cargando libros 100%");
     });
-  } 
+  }
 }
+
 
 function createPostDatabase(db) {
   /*
