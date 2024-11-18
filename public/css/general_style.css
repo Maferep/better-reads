@@ -34,3 +34,11 @@ a:active {
   flex-wrap: wrap; /* Allows wrapping for smaller screens */
   justify-content: center;
 }
+
+#main-layout {
+    margin-left: 5%;
+    margin-right: 5%;
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping for smaller screens */
+    flex-grow: 1;
+}

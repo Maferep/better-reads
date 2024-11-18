@@ -37,12 +37,10 @@ body {
 }
 
 .user-actions {
-  margin-right: 15px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  width: 20%;
 }
 
 .user-actions a {

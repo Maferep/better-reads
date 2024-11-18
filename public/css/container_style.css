@@ -13,11 +13,6 @@ li {
   list-style-type: none;
 }
 
-#container {
-  padding-top: 5em;
-  padding-left: 2vw;
-  padding-right: 2vw;
-}
 
 svg {
   position: absolute;
@@ -28,9 +23,13 @@ svg {
 }
 
 #container {
+  padding-top: 5em;
+  padding-left: 2vw;
+  padding-right: 2vw;
   flex-grow: 1;
   max-width: 600px;
   min-width: 275px;
+  width: 100%;
   padding: 2em;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -43,6 +42,7 @@ svg {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 }
 
 .input-group {
