@@ -1,4 +1,4 @@
-import { addBookToCart,removeFromCart,retrieveFromCart,fetchBook } from "./database.js";
+import { addBookToCart,removeFromCart,retrieveFromCart,fetchBook,clearUserCart } from "./database.js";
 
 export default io => {
     io.on('connection', socket => {
@@ -27,6 +27,11 @@ export default io => {
             }else{
                 socket.emit("bookRemovedFromCart",remaining_books);
             }
+        });
+
+        socket.on("clearCart",(userId)=>{
+            console.log("Clearing cart for user: ", userId);
+            clearUserCart(userId);
         });
     });
 }

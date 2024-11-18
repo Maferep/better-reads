@@ -19,7 +19,10 @@
         </div>
         {{/each}}
     </div>
-    <button id="buy-btn">Purchase</button>
+    <div class="cart-btns">
+        <button id="buy-btn">Purchase</button>
+        <button id="buy-btn" onclick="clearCart('{{userId}}')">Clear Cart</button>
+    </div>
     {{/if}}
 </div>
 
@@ -41,6 +44,24 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 socket.emit('removeFromCart', { userId: userId, bookId: bookId });
+            }
+        });
+    }
+
+    function clearCart(userId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This action will clear your cart!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, clear it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                socket.emit('clearCart',userId);
+                //reload windows
+                window.location.href = '/cart';
             }
         });
     }

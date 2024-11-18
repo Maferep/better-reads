@@ -70,11 +70,11 @@
     background-color: #005691;
 }
 
-.ctrl-buttons{
+.cart-btns{
     display: flex;
     flex-direction: row;
-    gap: 15px;
-    align-items: center;
+    justify-content: space-evenly;
+    width: 50%;
 }
 
 #cart-btn{

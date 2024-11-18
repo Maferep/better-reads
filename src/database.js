@@ -88,6 +88,14 @@ function retrieveFromCart(userId) {
   return rows;
 }
 
+function clearUserCart(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const clearCart = db.prepare("DELETE FROM cart WHERE user_id = ?");
+  clearCart.run(userId);
+}
+
 function createUserProfileDb(db) {
   const db_stmt = `CREATE TABLE IF NOT EXISTS user_profiles (
     user_id INTEGER PRIMARY KEY NOT NULL,
@@ -1197,5 +1205,6 @@ export {
   addBookToCart,
   retrieveFromCart,
   removeFromCart,
-  getPostAuthor
+  getPostAuthor,
+  clearUserCart
 };

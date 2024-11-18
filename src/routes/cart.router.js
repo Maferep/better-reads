@@ -17,11 +17,13 @@ router.get('/', isAuthenticated,function (req, res) {
         return book;
     });
     const empty_cart = books.length === 0;
+    const userId = req.session.userId;
     res.render("cart", {
         loggedIn: true,
         title: "Cart",
         empty_cart,
         books,
+        userId
     });
 });
 
