@@ -1,10 +1,7 @@
-input:invalid {
-    box-shadow: 0 0 1px 1px red;
+input:user-invalid {
+    box-shadow: 0 0 3px 1px red;
 }
 
-input:focus:invalid {
-    box-shadow: none;
-}
 
 #payment-content {
     display: flex;
@@ -78,6 +75,7 @@ input {
 
 /* CREDIT CARD IMAGE STYLING */
 .preload * {
+    transition: none !important;
     -webkit-transition: none !important;
     -moz-transition: none !important;
     -ms-transition: none !important;
