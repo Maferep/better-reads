@@ -28,5 +28,16 @@ router.get('/', isAuthenticated,function (req, res) {
 });
 
 
+router.get("/card_payment", isAuthenticated, function (req, res) {
+
+    res.render("card_payment", {
+        title: "Card Payment",
+        loggedIn: true,
+        do_sidebar: false,
+        username: req.session.user,
+    });
+});
+
+
 
 export default router;
