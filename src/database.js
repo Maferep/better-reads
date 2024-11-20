@@ -56,11 +56,12 @@ function createCartDB(db) {
     id INTEGER PRIMARY KEY NOT NULL,
     user_id INTEGER NOT NULL,
     book_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES insecure_users(id),
     FOREIGN KEY (book_id) REFERENCES books(id)
   )`;
   db.prepare(db_stmt).run();
-  console.log("Created cart table.");
+  console.log("Created cart table with quantity column.");
 }
 
 function addBookToCart(userId, bookId) {

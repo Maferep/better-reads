@@ -13,11 +13,19 @@
                 <h2>{{this.book_name}}</h2>
                 <p>Authors: {{this.authors}}</p>
                 <p>Genres: {{this.genre}}</p>
-                <p>Price: ${{this.price}}</p>
+                <p class="item-price" id="price-{{this.id}}">Price: ${{this.price}}</p>
+            </div>
+            <div class="quantity-controls">
+                <button class="quantity-btn decrement" onclick="updateQuantity('{{this.id}}', -1)">-</button>
+                <span class="quantity" id="quantity-{{this.id}}">1</span>
+                <button class="quantity-btn increment" onclick="updateQuantity('{{this.id}}', 1)">+</button>
             </div>
             <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}', '{{this.id}}')">Remove</button>
         </div>
         {{/each}}
+    </div>
+    <div class="cart-total">
+        <h2 id="total-price">Total: $0.00</h2>
     </div>
     <div class="cart-btns">
         <button id="buy-btn">Purchase</button>
@@ -66,72 +74,75 @@
         });
     }
 
-    // Update the DOM when a book is removed from the cart
-    socket.on('bookRemovedFromCart', (remaining_books) => {
-        const itemsDiv = document.querySelector('.items');
+    /// Actualizar el DOM cuando se elimina un libro del carrito
+    socket.on('bookRemovedFromCart', (data) => {
+        const { bookId } = data;
 
-        // Clear the existing content in the items div
-        itemsDiv.innerHTML = '';
+        // Eliminar el elemento del libro en el DOM
+        const itemElement = document.querySelector(`.item #quantity-${bookId}`).closest('.item');
+        if (itemElement) {
+            itemElement.remove();
+        }
 
-        // Check if the cart is empty
-        if (remaining_books.length === 0) {
-            window.location.href = '/cart'; // Redirect to /cart if empty
+        // Recalcular el precio total después de eliminar
+        calculateTotalPrice();
+    });
+
+
+    let cartQuantities = {}; // Para mantener el seguimiento de las cantidades de cada libro
+
+    function calculateTotalPrice() {
+        const totalPriceElement = document.getElementById('total-price'); // Asegúrate de que este elemento existe
+        let totalPrice = 0;
+
+        // Seleccionar todos los elementos `.item`
+        const items = document.querySelectorAll('.item');
+
+        items.forEach((item) => {
+            const priceElement = item.querySelector('.item-price');
+            const quantityElement = item.querySelector('.quantity');
+
+            if (!priceElement || !quantityElement) {
+                console.warn('Price or quantity element missing in an item.');
+                return;
+            }
+
+            // Obtener el precio individual y la cantidad
+            const price = parseFloat(priceElement.textContent.split('$')[1]);
+            const quantity = parseInt(quantityElement.textContent);
+
+            totalPrice += price * quantity; // Calcular el total
+        });
+
+        // Actualizar el precio total en el DOM
+        if (totalPriceElement) {
+            totalPriceElement.textContent = `Total: $${totalPrice.toFixed(2)}`;
+        } else {
+            return
+        }
+    }
+
+    
+    function updateQuantity(bookId, change) {
+        const quantityElement = document.getElementById(`quantity-${bookId}`);
+        if (!quantityElement) {
+            console.error('Quantity element not found.');
             return;
         }
 
-        // Recreate the items list with the remaining books
-        remaining_books.forEach(book => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('item');
+        let quantity = parseInt(quantityElement.textContent);
+        quantity += change;
 
-            // Create the book image element
-            const img = document.createElement('img');
-            img.src = book.image;
-            img.alt = 'Book Cover';
-            itemDiv.appendChild(img);
+        if (quantity < 1) {
+            quantity = 1;
+        }
 
-            // Create the info div
-            const infoDiv = document.createElement('div');
-            infoDiv.classList.add('info');
+        quantityElement.textContent = quantity;
 
-            // Book name
-            const bookName = document.createElement('h2');
-            bookName.textContent = book.book_name;
-            infoDiv.appendChild(bookName);
+        // Recalcular el precio total después de cambiar la cantidad
+        calculateTotalPrice();
+    }
 
-            // Description
-            const description = document.createElement('p');
-            description.id = 'description';
-            description.textContent = book.description;
-            infoDiv.appendChild(description);
-
-            // Authors
-            const authors = document.createElement('p');
-            authors.textContent = `Authors: ${book.authors}`;
-            infoDiv.appendChild(authors);
-
-            // Genre
-            const genre = document.createElement('p');
-            genre.textContent = `Genres: ${book.genre}`;
-            infoDiv.appendChild(genre);
-
-            // Price
-            const price = document.createElement('p');
-            price.textContent = `Price: $${book.price}`;
-            infoDiv.appendChild(price);
-
-            // Remove button
-            const removeButton = document.createElement('button');
-            removeButton.id = 'add-to-cart-btn';
-            removeButton.textContent = 'Remove';
-            removeButton.onclick = () => removeFromCart(book.userId, book.id);
-            
-            // Append the removeButton directly to itemDiv to ensure it's visible
-            itemDiv.appendChild(infoDiv);
-            itemDiv.appendChild(removeButton); // Ensure the button is part of the itemDiv
-
-            // Append the itemDiv to the itemsDiv
-            itemsDiv.appendChild(itemDiv);
-        });
-    });
+    // Llama a esta función cuando la página se haya cargado
+    document.addEventListener('DOMContentLoaded', calculateTotalPrice);
 </script>
