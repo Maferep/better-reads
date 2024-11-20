@@ -9,6 +9,7 @@ services:
     volumes: 
       - ./src:/app/src
       - ./public:/app/public
+      - ./database_files:/app/database_files
     ports:
       - "80:80"
 
