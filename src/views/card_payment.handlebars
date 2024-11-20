@@ -1,4 +1,10 @@
 <div id="payment-content">
+    <div id="purchase-resume">
+        {{!-- Show the total --}}
+        <h2 id="total-price">Total: ${{total_price}}</h2>
+    </div>
+
+
     <div class="payment-title">
         <h1>Payment Information</h1>
     </div>
@@ -106,7 +112,7 @@
             </div>
         </div>
     </div>
-    <form id="card-info-form" action="/test">
+    <form id="card-info-form" action="#">
         <div class="form-container">
             {{! <form id="card-info-form"> }}
                 <div class="field-container">
@@ -115,7 +121,7 @@
                 </div>
                 <div class="field-container">
                     <label for="cardnumber">Card Number</label><span id="generatecard">generate random</span>
-                    <input id="cardnumber" name="card-number" type="text" pattern="[(0-9) ]*" inputmode="numeric"
+                    <input id="cardnumber" name="card-number" type="text" pattern="[0-9 ]*" inputmode="numeric"
                         required />
                     <svg id="ccicon" class="ccicon" width="750" height="471" viewBox="0 0 750 471" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -133,14 +139,109 @@
                         required />
                 </div>
         </div>
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Pay" />
     </form>
 </div>
 
 <script>
+
+    document.getElementById('cardnumber').addEventListener('input', function (event) {
+        const cardNumber = Number(event.target.value.replaceAll(" ", ""));
+        const esNumeroTarjetaValido = validateCardNumber(cardNumber);
+
+        if (!esNumeroTarjetaValido) {
+            //Custom validity diciendo que la tarjeta no es valida
+            event.target.setCustomValidity("The card number is not valid");
+            console.log("Checksum de tarjeta no valido");
+        } else {
+            event.target.setCustomValidity("");
+            console.log("Checksum de tarjeta valido");
+        }
+        
+    });
+
     document.getElementById('card-info-form').addEventListener('submit',
-        function (event) { event.preventDefault(); alert("acá se debería enviar a algun lado"); });
+        function (event) {
+            event.preventDefault(); 
+
+            const form = event.target;
+
+            const cardOwner = form['card-owner'].value;
+            const cardNumber = Number(form['card-number'].value.replaceAll(" ", ""));
+            const expirationDate = form['expiration-date'].value;
+            const securityCode = Number(form['security-code'].value);           
+
+
+            const cardInfo = {
+                cardOwner,
+                cardNumber,
+                expirationDate,
+                securityCode
+            };
+
+            console.log(cardInfo);
+            console.log("Acá se enviaria la info al server/api de pago")
+
+            Swal.fire({
+                title: 'Payment Successful!',
+                text: 'Thank you for your purchase!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                //Rediccionar a algun otro lugar?
+                window.location.href = '/'; // Redirect to home page
+            });
+        }
+    );
+
+
+
+// source: https://learnersbucket.com/examples/javascript/credit-card-validation-in-javascript/
+    function validateCardNumber(number) {
+        //Check if the number contains only numeric value  
+        //and is of between 13 to 19 digits
+        const regex = new RegExp("^[0-9]{13,19}$");
+        if (!regex.test(number)){
+            return false;
+        }
+    
+        return luhnCheck(number);
+    }
+
+    function luhnCheck(val) {
+        let checksum = 0; // running checksum total
+        let j = 1; // takes value of 1 or 2
+
+        // Process each digit one by one starting from the last
+        for (let i = val.length - 1; i >= 0; i--) {
+        let calc = 0;
+        // Extract the next digit and multiply by 1 or 2 on alternative digits.
+        calc = Number(val.charAt(i)) * j;
+
+        // If the result is in two digits add 1 to the checksum total
+        if (calc > 9) {
+            checksum = checksum + 1;
+            calc = calc - 10;
+        }
+
+        // Add the units element to the checksum total
+        checksum = checksum + calc;
+
+        // Switch the value of j
+        if (j == 1) {
+            j = 2;
+        } else {
+            j = 1;
+        }
+        }
+    
+        //Check if it is divisible by 10 or not.
+        return (checksum % 10) == 0;
+    }
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <link rel="stylesheet" href="/static/css/card_payment_widget.css" />
 

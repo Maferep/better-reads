@@ -210,6 +210,10 @@ window.onload = function () {
         ];
         let randomNumber = Math.floor(Math.random() * testCards.length);
         cardnumber_mask.unmaskedValue = testCards[randomNumber];
+
+        //send input event to trigger card validity
+        let event = new Event('input', {});
+        cardnumber.dispatchEvent(event);
     }
     generatecard.addEventListener('click', function () {
         randomCard();
