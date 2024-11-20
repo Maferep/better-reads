@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="/static/css/style.css">
 
 <div class="stats-container">
-  <h1>Lecture Stats for {{username}}</h1>
+  <h1>Lecture Stats for {{user_stats}}</h1>
 
   {{#if stats}}
     <!-- Contenedor para el gráfico -->
@@ -36,7 +36,7 @@
       </div>
     </div>
   {{else}}
-    <p>No statistics available.</p>
+    <p>No stats available.</p>
   {{/if}}
 </div>
 
@@ -109,30 +109,41 @@ new Chart(ctx, {
 
   
  .stats-container {
-  margin-left: 270px; 
+  margin-left: 270px; /* Ajusta la distancia con el sidebar */
   font-family: Arial, sans-serif;
   margin: 20px;
   padding-left: 20px; 
   width: calc(100% - 270px); 
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Centra todos los elementos dentro del contenedor */
   padding-top: 30px; 
 }
 
-
-.chart-container {
-  margin-bottom: 40px;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto; 
+h1 {
+  text-align: center; /* Centra el título */
+  font-size: 28px; /* Tamaño del título principal */
+  margin-bottom: 30px; /* Espacio entre el título y el gráfico */
 }
 
+.chart-container {
+  width: 100%;
+  max-width: 800px; /* Limita el ancho máximo */
+  height: 400px; /* Altura fija para el gráfico */
+  margin-left: auto; /* Centra el gráfico horizontalmente */
+  margin-right: auto;
+  position: relative;
+  margin-bottom: 40px;
+}
 
 .columns-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  width: 100%; /* Asegura que ocupe todo el espacio disponible */
+  max-width: 1200px; /* Limita el ancho máximo para evitar que las columnas se estiren demasiado */
+  margin-left: auto; /* Centra las columnas horizontalmente */
+  margin-right: auto;
 }
 
 .stat-column {
@@ -144,6 +155,7 @@ new Chart(ctx, {
   flex-direction: column;
   justify-content: flex-start; 
   min-height: 300px; 
+  text-align: center; /* Centra el contenido dentro de las columnas */
 }
 
 .stat-column h2 {
@@ -185,13 +197,11 @@ new Chart(ctx, {
   font-size: 14px;
 }
 
-
 .book-separator {
   border: none;
   border-top: 1px solid #ddd; 
   margin: 10px 0; 
 }
-
 
 .stat-title {
   font-size: 22px;
@@ -225,5 +235,4 @@ new Chart(ctx, {
 .topic-link em {
   font-style: italic; 
 }
-
 </style>

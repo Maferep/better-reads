@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import {uploader} from "../uploader.js";
-import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing, getStats} from '../database.js';
+import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing, getStats, getUsernameFromId} from '../database.js';
 import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { createFollowNotification, removeFollowNotification } from '../database/notificationDatabase.js';
@@ -129,8 +129,8 @@ function processProfileRequest(req, res, isOwnProfile) {
   
   res.render("profile", { 
     do_sidebar: true,
-    my_username: req.session.user, 
-    username: isOwnProfile ? req.session.user : req.params.profileUsername, 
+    username: req.session.user, 
+    username_profile: isOwnProfile ? req.session.user : req.params.profileUsername, 
     userId: userId,
     loggedIn: true, 
     title: "Profile page",
@@ -206,6 +206,41 @@ const getStateColor = (index) => {
   }
 };
 
+router.get("/:id/stats", isAuthenticated, (req, res) => {
+  const requestedUserId = req.params.id; // Obtenemos el ID del usuario solicitado desde la URL
+
+  try {
+    // Obtener las estadísticas del usuario solicitado
+    const stats = getStats(requestedUserId); 
+
+    // Ordenar las estadísticas
+    const sortedStats = stats.sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.state.localeCompare(b.state);
+    });
+
+    // Asignar color de estado según el orden
+    sortedStats.forEach((stat, index) => {
+      stat.stateColor = getStateColor(index); 
+    });
+    const username = getUsernameFromId(requestedUserId);
+    // Renderizar las estadísticas para ese usuario
+    res.render("stats", {
+      username: req.session.user,
+      user_stats: username,
+      loggedIn: true,
+      do_sidebar: true,
+      stats: sortedStats,
+      json: JSON.stringify
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).render("error", { message: "Failed to fetch stats" });
+  }
+});
+
 
 router.get("/stats", isAuthenticated, (req, res) => {
   const userId = req.session.userId;
@@ -231,6 +266,7 @@ router.get("/stats", isAuthenticated, (req, res) => {
     
     res.render("stats", {
       username: req.session.user,
+      user_stats: req.session.user,
       loggedIn: true,
       do_sidebar: true,
       stats: sortedStats,
