@@ -68,8 +68,16 @@ function addBookToCart(userId, bookId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const insertCart = db.prepare("INSERT INTO cart (user_id, book_id) VALUES (?, ?)");
-  insertCart.run(userId, bookId);
+  const checkCart = db.prepare("SELECT 1 FROM cart WHERE user_id = ? AND book_id = ?");
+  const exists = checkCart.get(userId, bookId);
+
+  if (!exists) {
+    const insertCart = db.prepare("INSERT INTO cart (user_id, book_id) VALUES (?, ?)");
+    insertCart.run(userId, bookId);
+    console.log(`Book ${bookId} added to cart for user ${userId}.`);
+  } else {
+    console.log(`Book ${bookId} is already in the cart for user ${userId}.`);
+  }
 }
 
 function removeFromCart(userId, bookId) {

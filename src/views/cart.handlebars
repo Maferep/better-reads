@@ -84,8 +84,12 @@
             itemElement.remove();
         }
 
-        // Recalcular el precio total después de eliminar
-        calculateTotalPrice();
+
+        // Recalcular el precio total después de eliminar, solo si hay elementos en el carrito
+        // Si no hay elemento en el carrito no mostrar el precio total
+        if (document.querySelectorAll('.item').length > 0) {
+            calculateTotalPrice();
+        }
     });
 
 
@@ -144,5 +148,11 @@
     }
 
     // Llama a esta función cuando la página se haya cargado
-    document.addEventListener('DOMContentLoaded', calculateTotalPrice);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Recalcular el precio total después de eliminar, solo si hay elementos en el carrito
+        // Si no hay elemento en el carrito no mostrar el precio total
+        if (document.querySelectorAll('.item').length > 0) {
+            calculateTotalPrice();
+        }
+    });
 </script>
