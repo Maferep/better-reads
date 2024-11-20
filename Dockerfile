@@ -8,9 +8,6 @@ RUN npm install
 #COPY ./views ./views
 #COPY ./static ./static
 
-RUN mkdir ./database_files
-COPY ./database_files/books_data.csv ./database_files/
-COPY ./database_files/books_rating.csv ./database_files/
 
 EXPOSE 80
 
@@ -26,6 +23,11 @@ CMD ["npm", "run", "dev"]
 
 # production 
 FROM base AS prod
+
+RUN mkdir ./database_files
+COPY ./database_files/books_data.csv ./database_files/
+COPY ./database_files/books_rating.csv ./database_files/
+
 COPY ./public /app/public
 COPY ./src /app/src
 
