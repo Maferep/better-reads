@@ -28,5 +28,41 @@ router.get('/', isAuthenticated,function (req, res) {
 });
 
 
+router.get("/card_payment", isAuthenticated, function (req, res) {
+    const total_price = getCartTotalPrice(req.session.userId);
+
+    if(total_price === null){
+        //Redirect to cart if the cart is empty
+        res.redirect("/cart");
+        return;
+    }    
+
+    res.render("card_payment", {
+        title: "Card Payment",
+        loggedIn: true,
+        do_sidebar: false,
+        username: req.session.user,
+        userId: req.session.userId,
+        total_price
+    });
+});
+
+function getCartTotalPrice(userId) {
+    const data = retrieveFromCart(userId);
+    let books = data.map((book) => {
+        return fetchBook(book.book_id);
+    });
+    if (books.length === 0) {
+        return null;
+    }
+
+    let total = 0;
+    books.forEach((book) => {
+        total += book.price;
+    });
+    return total;
+}
+
+
 
 export default router;

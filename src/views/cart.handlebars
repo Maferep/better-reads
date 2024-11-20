@@ -28,7 +28,7 @@
         <h2 id="total-price">Total: $0.00</h2>
     </div>
     <div class="cart-btns">
-        <button id="buy-btn">Purchase</button>
+        <button id="buy-btn" onclick="goToCardPurchase()">Purchase</button>
         <button id="buy-btn" onclick="clearCart('{{userId}}')">Clear Cart</button>
     </div>
     {{/if}}
@@ -72,6 +72,10 @@
                 window.location.href = '/cart';
             }
         });
+    }
+
+    function goToCardPurchase() {
+        window.location.href = 'cart/card_payment';
     }
 
     /// Actualizar el DOM cuando se elimina un libro del carrito
