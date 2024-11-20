@@ -1,4 +1,4 @@
-import { addBookToCart,removeFromCart,retrieveFromCart,fetchBook,clearUserCart,saveBookQuantity } from "./database.js";
+import { addBookToCart,removeFromCart,retrieveFromCart,clearUserCart,saveBookQuantity } from "./database/cartAndPurchasesDatabase.js";
 
 export default io => {
     io.on('connection', socket => {
@@ -18,23 +18,10 @@ export default io => {
             clearUserCart(userId);
         });
 
-        socket.on("purchaseCart", (data) => {
-            const { userId, cart } = data;
-        
-            console.log(`Processing purchase for user: ${userId}`);
-            console.log(`Cart data: `, cart);
-        
-            try {
-    
-                for (const { bookId, quantity } of cart) {
-                    saveBookQuantity(userId, bookId, quantity); 
-                }
-        
-                socket.emit('purchaseConfirmed', { success: true });
-            } catch (error) {
-                console.error("Error processing purchase: ", error);
-                socket.emit('purchaseConfirmed', { success: false, error });
-            }
+
+        socket.on("bookQuantityChanged", (data) => {
+            const { userId, bookId, quantity } = data;
+            saveBookQuantity(userId, bookId, quantity);
         });
 
 
