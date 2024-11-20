@@ -85,6 +85,16 @@
   align-items: center;
 }
 
+.stats-container {
+  display: flex; /* Coloca los elementos en una fila */
+  gap: 30px; /* Espacio entre los elementos */
+  align-items: center; /* Alinea verticalmente los textos */
+}
+
+.stats-container h2 {
+  color: #0096c7; /* Azul más claro */
+}
+
 .profile-container img{
   width: 300px;
   height: 300px;

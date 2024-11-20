@@ -157,13 +157,17 @@ router.post("/profile", uploader.single("profile_photo"), function (req, res) {
   const bio = req.body.bio || null;
 
   // Solo actualiza `profilePhoto` si se ha subido un archivo
-  const profilePhoto = req.file ? `/uploads/${req.file.filename}` : null;
-
-  // Obtén el perfil actual del usuario para no sobreescribir `profile_photo` si no hay un archivo nuevo
+  const profilePhoto = req.file ? `/uploads/${req.file.filename}` : `/uploads/default-profile.png`;
+  
   const currentProfile = getUserProfile(userId);
+   console.log("Current Profile:", currentProfile);
+
   const updatedProfilePhoto = profilePhoto || currentProfile.profile_photo;
 
-  updateUserProfile(userId, bio, updatedProfilePhoto);
+  const updatedBio = bio || "No bio available" || currentProfile.bio;
+
+  updateUserProfile(userId, updatedBio, updatedProfilePhoto);
+
   res.redirect("/profile");
 });
 

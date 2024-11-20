@@ -36,9 +36,9 @@ a:active {
 }
 
 #main-layout {
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-right: 10%;
     display: flex;
     flex-wrap: wrap; /* Allows wrapping for smaller screens */
     flex-grow: 1;
+    justify-content: center;
 }
