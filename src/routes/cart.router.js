@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { retrieveFromCart,fetchBook } from "../database.js";
+import { retrieveFromCart,fetchBook, clearUserCart } from "../database.js";
 import { isAuthenticated } from "../authenticate.js";
 
 const router = Router();
@@ -21,6 +21,7 @@ router.get('/', isAuthenticated,function (req, res) {
     res.render("cart", {
         loggedIn: true,
         title: "Cart",
+        username: req.session.user,
         empty_cart,
         books,
         userId
@@ -45,6 +46,16 @@ router.get("/card_payment", isAuthenticated, function (req, res) {
         userId: req.session.userId,
         total_price
     });
+});
+
+
+//Route to empty the cart
+router.post("/clear", isAuthenticated, function (req, res) {
+    const userId = req.session.userId;
+    clearUserCart(userId);
+    
+    //Return ok
+    res.status(200).send();
 });
 
 function getCartTotalPrice(userId) {

@@ -188,8 +188,14 @@
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
-                //Rediccionar a algun otro lugar?
-                window.location.href = '/'; // Redirect to home page
+                //Clean cart
+                fetch('/cart/clear', {
+                    method: 'POST'
+                }).then(() => {
+                    console.log("Carrito vaciado exitosamente");
+                }).finally(() => {
+                    window.location.href = '/'; // Redirect to home page
+                });
             });
         }
     );
