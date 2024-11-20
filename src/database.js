@@ -105,6 +105,40 @@ function clearUserCart(userId) {
   clearCart.run(userId);
 }
 
+function saveBookQuantity(userId, bookId, quantity) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const checkCart = db.prepare("SELECT 1 FROM cart WHERE user_id = ? AND book_id = ?");
+  const exists = checkCart.get(userId, bookId);
+
+  if (!exists) {
+    const insertCart = db.prepare("INSERT INTO cart (user_id, book_id, quantity) VALUES (?, ?, ?)");
+    insertCart.run(userId, bookId, quantity);
+    console.log(`Book ${bookId} added to cart for user ${userId}.`);
+  } else {
+    const updateCart = db.prepare("UPDATE cart SET quantity = ? WHERE user_id = ? AND book_id = ?");
+    updateCart.run(quantity, userId, bookId);
+    console.log(`Book ${bookId} quantity updated to ${quantity} for user ${userId}.`);
+  }
+}
+
+function getCartTotalPrice(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const retrieveCart = db.prepare("SELECT * FROM cart WHERE user_id = ?");
+  const rows = retrieveCart.all(userId);
+  let total_price = 0;
+  for (const row of rows) {
+    const book = fetchBook(row.book_id);
+    total_price += book.price * row.quantity;
+  }
+  return total_price;
+}
+
+
 function createUserProfileDb(db) {
   const db_stmt = `CREATE TABLE IF NOT EXISTS user_profiles (
     user_id INTEGER PRIMARY KEY NOT NULL,
@@ -1215,5 +1249,7 @@ export {
   retrieveFromCart,
   removeFromCart,
   getPostAuthor,
-  clearUserCart
+  clearUserCart,
+  saveBookQuantity,
+  getCartTotalPrice
 };

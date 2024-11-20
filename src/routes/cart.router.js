@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { retrieveFromCart,fetchBook, clearUserCart } from "../database.js";
 import { isAuthenticated } from "../authenticate.js";
-
+import { getCartTotalPrice } from "../database.js";
 const router = Router();
 
 router.get('/', isAuthenticated,function (req, res) {
@@ -58,21 +58,6 @@ router.post("/clear", isAuthenticated, function (req, res) {
     res.status(200).send();
 });
 
-function getCartTotalPrice(userId) {
-    const data = retrieveFromCart(userId);
-    let books = data.map((book) => {
-        return fetchBook(book.book_id);
-    });
-    if (books.length === 0) {
-        return null;
-    }
-
-    let total = 0;
-    books.forEach((book) => {
-        total += book.price;
-    });
-    return total;
-}
 
 
 

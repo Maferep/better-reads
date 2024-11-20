@@ -28,7 +28,7 @@
         <h2 id="total-price">Total: $0.00</h2>
     </div>
     <div class="cart-btns">
-        <button id="buy-btn" onclick="goToCardPurchase()">Purchase</button>
+        <button id="buy-btn" onclick="goToCardPurchase('{{userId}}')">Purchase</button>
         <button id="buy-btn" onclick="clearCart('{{userId}}')">Clear Cart</button>
     </div>
     {{/if}}
@@ -74,9 +74,20 @@
         });
     }
 
-    function goToCardPurchase() {
-        window.location.href = 'cart/card_payment';
+    function goToCardPurchase(userId) {
+        // Collect book quantities
+        const items = document.querySelectorAll('.item');
+        const cartData = Array.from(items).map((item) => {
+            const bookId = item.querySelector('.quantity').id.split('-')[1];
+            const quantity = parseInt(item.querySelector('.quantity').textContent);
+            return { bookId, quantity };
+        });
+
+        // Emit the cart data to the server
+        socket.emit('purchaseCart', { userId, cart: cartData });
+        window.location.href = '/cart/card_payment';
     }
+
 
     /// Actualizar el DOM cuando se elimina un libro del carrito
     socket.on('bookRemovedFromCart', (data) => {
