@@ -180,24 +180,48 @@
                 securityCode
             };
 
+
+
             console.log(cardInfo);
             console.log("Acá se enviaria la info al server/api de pago")
 
-            Swal.fire({
-                title: 'Payment Successful!',
-                text: 'Thank you for your purchase!',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                //Clean cart
-                fetch('/cart/clear', {
-                    method: 'POST'
-                }).then(() => {
-                    console.log("Carrito vaciado exitosamente");
-                }).finally(() => {
-                    window.location.href = '/'; // Redirect to home page
-                });
-            });
+            fetch('/cart/card_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(cardInfo)
+            }).then(response => {
+                if (response.ok) {
+                    //Pago correcto, avisar a usuario y redireccionar a pagina principal
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment successful',
+                        text: 'Your payment was successful, you will be redirected to the main page',
+                    }).then(() => window.location.href = '/');
+                } else {
+                    if (status >= 500) {
+                        //Error del servidor, avisar a usuario y redireccionar a carrito
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'There was an error with the payment, please try again later',
+                        }).then(() => window.location.href = '/cart');
+                    }
+                    //Si el error es de tipo 400-499
+                    response.text().then(text => Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text,
+                    }));
+                }
+            })
+            //Error de conexion, avisar a usuario y redireccionar a carrito
+            .catch(error => Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'There was an error with the payment, please try again later',
+            }).then(() => window.location.href = '/cart'));
         }
     );
 

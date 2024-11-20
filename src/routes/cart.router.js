@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { retrieveFromCart,getCartTotalPrice, clearUserCart } from "../database/cartAndPurchasesDatabase.js";
+import { retrieveFromCart,getCartTotalPrice, clearUserCart, createPurchaseFromCart } from "../database/cartAndPurchasesDatabase.js";
 import { isAuthenticated } from "../authenticate.js";
 import {fetchBook  } from "../database.js";
 const router = Router();
@@ -53,6 +53,42 @@ router.get("/card_payment", isAuthenticated, function (req, res) {
     });
 });
 
+
+router.post("/card_payment", isAuthenticated, function (req, res) {
+
+    console.log(req.body)
+    //Recibo los datos del formulario
+    const { cardNumber, expirationDate, securityCode } = req.body;
+    const userId = req.session.userId;
+    const total_price = getCartTotalPrice(userId);
+    //Valido los datos
+    if (cardNumber === "" || expirationDate === "" || securityCode === "") {
+        res.status(400).send("All fields are required");
+        return;
+    }
+
+    if (validateExpirationDate(expirationDate) === false) {
+        res.status(400).send("Expired card");
+        return;
+    }
+
+    //Validar que tiene algun libro en el carrito
+    if (total_price === null) {
+        res.status(400).send("Cart is empty");
+        return;
+    }
+
+    //Proceso el pago
+    //Aquí debería ir la lógica de procesar el pago
+
+    //Creo la compra
+    createPurchaseFromCart(userId);
+    clearUserCart(userId);
+
+    //Responder con un ok
+    res.status(200).send();
+});
+
 router.get("/card_payment", function (req, res) {
     res.redirect("/");
 });
@@ -69,5 +105,27 @@ router.post("/clear", isAuthenticated, function (req, res) {
 
 
 
-
 export default router;
+
+function validateExpirationDate(expiration_date) {
+    //Check if the expiration date is in the format MM/YY
+    const regex = new RegExp("^(0[1-9]|1[0-2])\/[0-9]{2}$");
+    if (!regex.test(expiration_date)) {
+        return false;
+    }
+
+    const [month, year] = expiration_date.split("/");
+    const current_date = new Date();
+    const current_year = current_date.getFullYear();
+    const current_month = current_date.getMonth() + 1;
+
+    if (parseInt(year) < current_year % 100) {
+        return false;
+    }
+
+    if (parseInt(year) === current_year % 100 && parseInt(month) < current_month) {
+        return false;
+    }
+
+    return true;
+}

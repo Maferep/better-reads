@@ -42,6 +42,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/static',express.static(`${__dirname}/../public`));
 initSessions(app)
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // routes
 app.use(authRouter)
