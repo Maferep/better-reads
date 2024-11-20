@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { retrieveFromCart,fetchBook, clearUserCart } from "../database.js";
+import { retrieveFromCart,getCartTotalPrice, clearUserCart } from "../database/cartAndPurchasesDatabase.js";
 import { isAuthenticated } from "../authenticate.js";
-import { getCartTotalPrice } from "../database.js";
+import {fetchBook  } from "../database.js";
 const router = Router();
 
 router.get('/', isAuthenticated,function (req, res) {
@@ -14,6 +14,7 @@ router.get('/', isAuthenticated,function (req, res) {
         book.authors = book.authors.replace(/[\[\]"]+/g, '');
         book.genre = book.genre.replace(/[\[\]"]+/g, '');
         book.userId = req.session.userId;
+        book.quantity = data.find((element) => element.book_id === book.id).quantity;
         return book;
     });
     const empty_cart = books.length === 0;

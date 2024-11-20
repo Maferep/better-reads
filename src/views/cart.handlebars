@@ -16,9 +16,9 @@
                 <p class="item-price" id="price-{{this.id}}">Price: ${{this.price}}</p>
             </div>
             <div class="quantity-controls">
-                <button class="quantity-btn decrement" onclick="updateQuantity('{{this.id}}', -1)">-</button>
-                <span class="quantity" id="quantity-{{this.id}}">1</span>
-                <button class="quantity-btn increment" onclick="updateQuantity('{{this.id}}', 1)">+</button>
+                <button class="quantity-btn decrement" onclick="updateQuantity('{{this.id}}',{{this.userId}}, -1)">-</button>
+                <span class="quantity" id="quantity-{{this.id}}">{{quantity}}</span>
+                <button class="quantity-btn increment" onclick="updateQuantity('{{this.id}}',{{this.userId}}, 1)">+</button>
             </div>
             <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}', '{{this.id}}')">Remove</button>
         </div>
@@ -84,7 +84,6 @@
         });
 
         // Emit the cart data to the server
-        socket.emit('purchaseCart', { userId, cart: cartData });
         window.location.href = '/cart/card_payment';
     }
 
@@ -142,7 +141,7 @@
     }
 
     
-    function updateQuantity(bookId, change) {
+    function updateQuantity(bookId, userId, change) {
         const quantityElement = document.getElementById(`quantity-${bookId}`);
         if (!quantityElement) {
             console.error('Quantity element not found.');
@@ -156,7 +155,17 @@
             quantity = 1;
         }
 
+        if (quantity == 1) {
+            //Hide minus button
+            document.querySelector(`.item #quantity-${bookId}`).previousElementSibling.style.display = 'none';
+        } else {
+            //Show minus button
+            document.querySelector(`.item #quantity-${bookId}`).previousElementSibling.style.display = 'inline-block';
+        }
+
         quantityElement.textContent = quantity;
+
+        socket.emit("bookQuantityChanged", { userId, bookId, quantity });
 
         // Recalcular el precio total después de cambiar la cantidad
         calculateTotalPrice();
