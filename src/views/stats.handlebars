@@ -1,0 +1,229 @@
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="stats-container">
+  <h1>Lecture Stats for {{username}}</h1>
+
+  {{#if stats}}
+    <!-- Contenedor para el gráfico -->
+    <div class="chart-container">
+      <canvas id="statsChart"></canvas>
+    </div>
+
+    <div class="stats-list">
+      <!-- Contenedor principal de las columnas, ordenadas de acuerdo con el gráfico -->
+      <div class="columns-container">
+        {{#each stats}}
+          <div class="stat-column" style="flex: 1; min-width: 250px;">
+            <h2 class="stat-title" style="color: {{this.stateColor}};">
+              <span class="state">{{state}}</span> 
+              <span class="count">({{count}})</span>
+            </h2>
+            <div class="books-group">
+              {{#each books}}
+                <div class="item">
+                  <img src="{{this.image}}" alt="Book Cover" class="book-cover">
+                  <div class="info">
+                    <a href="/book/{{this.id}}" class="topic-link"><em>{{this.name}}</em></a>
+                    <p>Authors: {{this.authors}}</p>
+                    <p>Genres: {{this.genre}}</p>
+                  </div>
+                </div>
+                <hr class="book-separator"> <!-- Línea separadora entre libros -->
+              {{/each}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  {{else}}
+    <p>No statistics available.</p>
+  {{/if}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+ const stats = {{{json stats}}}; // Pasamos stats como JSON
+const allStates = ['reading', 'plan-to-read', 'finished']; // Asegúrate de incluir todos los estados posibles
+
+// Ordenamos las estadísticas primero por count, y luego alfabéticamente por state
+const sortedStats = allStates.map(state => {
+  const stat = stats.find(stat => stat.state === state);
+  return stat ? stat : { state, count: 0 }; // Si no hay libros para un estado, asignar 0
+}).sort((a, b) => {
+  // Primero ordenamos por count de mayor a menor
+  if (b.count !== a.count) {
+    return b.count - a.count;
+  }
+  // Si hay empate, ordenamos alfabéticamente por state
+  return a.state.localeCompare(b.state);
+});
+
+// Extraemos los datos para el gráfico de los estados ordenados
+const labels = sortedStats.map(stat => stat.state);
+const data = sortedStats.map(stat => stat.count);
+
+// Configuración del gráfico
+const ctx = document.getElementById('statsChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Books by State',
+      data: data,
+      backgroundColor: [
+        '#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0'
+      ],
+      borderColor: [
+        '#388E3C', '#1976D2', '#FFA000', '#D84315', '#7B1FA2'
+      ],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          callback: function(value) {
+            return Number.isInteger(value) ? value : '';
+          }
+        }
+      }
+    }
+  }
+});
+
+  
+</script>
+
+<style>
+
+  
+ .stats-container {
+  margin-left: 270px; 
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  padding-left: 20px; 
+  width: calc(100% - 270px); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px; 
+}
+
+
+.chart-container {
+  margin-bottom: 40px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto; 
+}
+
+
+.columns-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px;
+}
+
+.stat-column {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+  min-height: 300px; 
+}
+
+.stat-column h2 {
+  font-size: 20px;
+  color: #333;
+}
+
+.books-group {
+  display: flex;
+  flex-direction: column; 
+  gap: 30px;
+  overflow-y: auto; 
+  max-height: 350px; 
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.book-cover {
+  width: 150px;
+  height: auto;
+  border-radius: 5px;
+}
+
+.info {
+  margin-top: 10px;
+}
+
+.info h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.info p {
+  font-size: 14px;
+}
+
+
+.book-separator {
+  border: none;
+  border-top: 1px solid #ddd; 
+  margin: 10px 0; 
+}
+
+
+.stat-title {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.state {
+  text-transform: uppercase; 
+  font-size: 18px;
+}
+
+.count {
+  font-size: 20px;
+  font-weight: normal;
+  color: #333;
+  margin-left: 5px; 
+}
+
+.topic-link {
+  color: #00796b; 
+  text-decoration: none; 
+  font-weight: bold; 
+}
+
+.topic-link:hover {
+  color: #004d40; 
+  text-decoration: underline; 
+}
+
+.topic-link em {
+  font-style: italic; 
+}
+
+</style>

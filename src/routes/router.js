@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import {uploader} from "../uploader.js";
-import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing} from '../database.js';
+import { fetchBook, followUser, unfollowUser, getUserProfile, updateUserProfile, getFollowers, getFollowing, getIdFromUsername, isUserFollowing, getStats} from '../database.js';
 import { getPostsFromUserId, fetchPaginatedPosts } from "../database/paginationDatabase.js";
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { createFollowNotification, removeFollowNotification } from '../database/notificationDatabase.js';
@@ -191,6 +191,56 @@ function postsRawToFrontEndCompatible(postsRaw) {
     }
   })
 }
+
+const getStateColor = (index) => {
+  // Asignar color según el índice de la posición en el arreglo
+  switch (index) {
+    case 0:
+      return '#4CAF50'; // Verde
+    case 1:
+      return '#2196F3'; // Azul
+    case 2:
+      return '#FFC107'; // Amarillo
+    default:
+      return '#000000'; // Negro por defecto (para estados adicionales)
+  }
+};
+
+
+router.get("/stats", isAuthenticated, (req, res) => {
+  const userId = req.session.userId;
+
+  try {
+
+    const stats = getStats(userId);
+
+   
+    const sortedStats = stats.sort((a, b) => {
+ 
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+
+      return a.state.localeCompare(b.state);
+    });
+
+    sortedStats.forEach((stat, index) => {
+      stat.stateColor = getStateColor(index); 
+    });
+
+    
+    res.render("stats", {
+      username: req.session.user,
+      loggedIn: true,
+      do_sidebar: true,
+      stats: sortedStats,
+      json: JSON.stringify
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).render("error", { message: "Failed to fetch stats" });
+  }
+});
 
 //A partir de un request de un feed (no de perfil), devuelve una pagina con los posts correspondientes.
 function processFeedRequest(req, res, onlyFollowing) {

@@ -1205,6 +1205,54 @@ function getPostAuthor(post_id) {
 }
 
 
+function getStats(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `
+    SELECT 
+      bs.state, 
+      COUNT(bs.book_id) AS count,
+      b.id AS book_id,
+      b.book_name AS name,
+      b.authors,
+      b.image AS image,
+      b.genre
+    FROM book_states bs
+    JOIN books b ON bs.book_id = b.id
+    WHERE bs.user_id = ? -- Filtra por usuario
+    GROUP BY bs.state, b.id
+  `;
+
+  const rows = db.prepare(query).all(userId);
+
+  
+  const groupedStats = rows.reduce((acc, row) => {
+    if (!acc[row.state]) {
+      acc[row.state] = { state: row.state, count: 0, books: [] };
+    }
+    acc[row.state].count += 1; 
+
+
+    const authors = row.authors.replace(/[\[\]'"]/g, '').trim(); 
+    const genre = row.genre.replace(/[\[\]'"]/g, '').trim();
+
+    acc[row.state].books.push({
+      id: row.book_id,
+      name: row.name,
+      authors: authors,
+      image: row.image,
+      genre: genre
+    });
+    return acc;
+  }, {});
+
+  
+  return Object.values(groupedStats);
+}
+
+
 export {
   initDb,
   initSessions,
@@ -1251,5 +1299,6 @@ export {
   getPostAuthor,
   clearUserCart,
   saveBookQuantity,
-  getCartTotalPrice
+  getCartTotalPrice,
+  getStats
 };
