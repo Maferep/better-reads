@@ -28,6 +28,10 @@ router.get('/', isAuthenticated,function (req, res) {
     });
 });
 
+router.get("/", function (req, res) {
+    res.redirect("/");
+});
+
 
 router.get("/card_payment", isAuthenticated, function (req, res) {
     const total_price = getCartTotalPrice(req.session.userId);
@@ -46,6 +50,10 @@ router.get("/card_payment", isAuthenticated, function (req, res) {
         userId: req.session.userId,
         total_price
     });
+});
+
+router.get("/card_payment", function (req, res) {
+    res.redirect("/");
 });
 
 
