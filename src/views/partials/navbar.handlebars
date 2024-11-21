@@ -9,7 +9,23 @@
         <img id="notification-icon" src="/static/assets/notification_icon.svg" alt="Notifications">
         <span id="notification-count" class="notification-count" hidden>0</span>
       </a>
-      <a href="/logout">Logout</a>
+      <a href="#" id="logout-link">Logout</a>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const logoutLink = document.getElementById('logout-link');
+          if (logoutLink) {
+            logoutLink.addEventListener('click', function(event) {
+              event.preventDefault();
+              console.log('Logout link clicked');
+              firebase.auth().signOut();
+              fetch("/logout", {
+                method: "GET",
+              });
+              window.location.href = "/"
+            });
+          }
+        });
+      </script>
       <a href="/profile">Hello, {{username}}</a>
     {{else}}
       <a href="/login">Login</a>

@@ -35,31 +35,51 @@
   <div class="register-link">
     <a href="/register">Don't have an account? Register here</a>
   </div>
-  <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
-  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
   <script type="text/javascript">
     // FirebaseUI config.
     var uiConfig = {
-      signInSuccessUrl: '#',
+      signInFlow: "popup",
       signInOptions: [
-        // Leave the lines as is for the providers you want to offer your users.
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        //firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        firebase.auth.EmailAuthProvider.PROVIDER_ID,
       ],
-      // tosUrl and privacyPolicyUrl accept either url string or a callback
-      // function.
-      // Terms of service url/callback.
-      //tosUrl: '<your-tos-url>',
-      // Privacy policy url/callback.
-      //privacyPolicyUrl: function() {
-      //  window.location.assign('<your-privacy-policy-url>');
-      //}
+      signInSuccessUrl: '/',
+      callbacks: {
+        signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+            console.log('User signed in:', authResult.user, redirectUrl);
+        // Return true to redirect to the signInSuccessUrl
+            return true;
+        },
+      },
     };
 
     // Initialize the FirebaseUI Widget using Firebase.
-    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    //var ui = new firebaseui.auth.AuthUI(firebase.auth());
     // The start method will wait until the DOM is loaded.
     ui.start('#firebaseui-auth-container', uiConfig);
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('User logged in:', user);
+        user.getIdToken().then(idToken => {
+          console.log('ID Token:', idToken);
+          fetch('/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: idToken }),
+          }).then(response => {
+            if (response.ok) {
+              window.location.href = "/";
+              console.log('Token verified!');
+            }
+          });
+        });
+      } else {
+        console.log("no user");
+      }
+    });
   </script>
   <div id="firebaseui-auth-container"></div>
 </div>

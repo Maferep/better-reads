@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "firebase-admin": "^13.0.1",
     "firebase": "^10.0.0",
     "firebaseui": "^6.1.0",
     "axios": "^1.7.7",

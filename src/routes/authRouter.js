@@ -12,6 +12,7 @@ authRouter.get('/logout', function (req, res, next) {
   // does not have a logged in user
   req.session.user = null
   req.session.userId = null
+
   req.session.save(function (err) {
     if (err) next(err)
       
@@ -19,15 +20,15 @@ authRouter.get('/logout', function (req, res, next) {
     // guard against forms of session fixation
     req.session.regenerate(function (err) {
       if (err) next(err)
-        res.redirect('/')
+      res.redirect('/')
     })
   })
 })
-
+/*
 authRouter.get('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
-
+*/
 authRouter.get('/login', function(req, res) {
   const _hasWrongCred = req.query.wrong_cred == 1;
   console.log("Has wrong cred?", _hasWrongCred)
@@ -42,6 +43,8 @@ authRouter.get('/login', function(req, res) {
 authRouter.post('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
+
+/*
 authRouter.post('/login', function (req, res) {
   // TODO: validate input
   const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
@@ -85,7 +88,7 @@ authRouter.post('/login', function (req, res) {
     if(!res.writableEnded) res.end("Failed to log in");
   }
 })
-
+*/
 authRouter.get('/register', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
@@ -107,13 +110,13 @@ authRouter.post('/register', isAuthenticated, function(req, res) {
 
 authRouter.post('/register', function  (req, res) {
   const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
-  const id = Math.floor(Math.random()*10000000);
+  const id = req.body.uid;
   // TODO: validate input
   const username = req.body.name
-  const password = req.body.password
+  //const password = req.body.password
   // TODO check existing sql const check = db.prepare('')
   try {
-    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
+    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?)').run(id, username);
     res.redirect("/");
     return
   } catch (e) {
