@@ -1,4 +1,19 @@
 import Database from 'better-sqlite3';
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+export const firebaseConfig = {
+  apiKey: "AIzaSyDLGOsjjpnKBRTjjLqbJDjdDu-PlIMcpQo",
+  authDomain: "better-reads-1232b.firebaseapp.com",
+  projectId: "better-reads-1232b",
+  storageBucket: "better-reads-1232b.firebasestorage.app",
+  messagingSenderId: "768926573598",
+  appId: "1:768926573598:web:f8a0c7a5e2afbde44d7a0f"
+};
+
+initializeApp(firebaseConfig);
+
+const auth = getAuth();
 
 // middleware to test if authenticated
 export function isAuthenticated (req, res, next) {
@@ -8,7 +23,12 @@ export function isAuthenticated (req, res, next) {
 }
 
 export function estaAutenticado(req) {
-  return req.session.user && req.session.userId && estaEnBaseDeDatosUsuarios(req.session.userId, req.session.user);
+    console.log("Usuario firebase: ", auth.currentUser);
+    if (auth.currentUser != null) {
+        req.session.userId = auth.currentUser.uid;
+    }
+    return auth.currentUser != null;
+    //return req.session.user && req.session.userId && estaEnBaseDeDatosUsuarios(req.session.userId, req.session.user);
 }
 
 function estaEnBaseDeDatosUsuarios(userId, username) {
