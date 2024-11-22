@@ -852,6 +852,21 @@ function createComment(postId, userId, content) {
   db.prepare(incrementComments).run(postId);
 }
 
+function deleteComment(commentId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `DELETE FROM comments WHERE id=?`
+  db.prepare(operation).run(commentId);
+}
+
+function getCommentAuthor(commentId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT author_id FROM comments WHERE id=?`
+  return db.prepare(query).get(commentId).author_id;
+}
 
 function searchBooksByTitle(title, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
@@ -1207,5 +1222,7 @@ export {
   searchAuthorByName,
   genericPaginatedSearch,
   getPostAuthor,
-  getStats
+  getStats,
+  deleteComment,
+  getCommentAuthor,
 };

@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="/static/css/post.css">
 
     <div id="container">
-      
+
       <button id="back-to-feed" onclick="history.back()">⬅️ Back to Feed</button>
 
       <!-- Single Post -->
@@ -14,14 +14,15 @@
         {{#each comments}}
         <!-- Existing Comment -->
         <div class="comment">
+          {{#if is_own}}<button class="delete-comment-button" onclick="deleteComment('{{comment_id}}')">🗑</button>{{/if}}
           <div class="comment-user">
-            <a href="/{{username_comment}}/profile"><strong>@{{username_comment}}</strong></a>:
+            <a href="{{username_comment}}/profile"><strong>@{{username_comment}}</strong></a>:
           </div>
           <div class="comment-content">
             {{content}}
           </div>
         </div>
-        
+
         {{/each}}
         {{else}}
         <p>No comments yet. Add one yourself!</p>
@@ -35,6 +36,23 @@
         {{/if}}
     </div>
   </div>
+
+<script>
+  function deleteComment(comment_id) {
+    fetch(`/post/{{post_id}}/comment/${comment_id}`, {
+      method: 'DELETE',
+    }).then((response) => {
+      if (response.ok)
+        window.location.reload();
+      else 
+        response.text().then((text) => 
+          alert(`Error: ${text}`)
+        );
+    }).catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+</script>
 
 
 <script src="/static/js/updateLikes.js" type="text/javascript"></script>

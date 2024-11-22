@@ -3,7 +3,7 @@ import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
   fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
-  getRepostsCount,} from '../database.js';
+  getRepostsCount, getCommentAuthor, deleteComment} from '../database.js';
 
 import { createCommentNotification, createLikeMilestoneNotification, createRepostNotification, removeLikeMilestoneNotificacion } from '../database/notificationDatabase.js';
 
@@ -21,7 +21,9 @@ router.get('/:id', (req, res) => {
     const comments = commentsRaw.map(comment => {
       return {
         username_comment: comment.username,
-        content: comment.text_content
+        content: comment.text_content,
+        comment_id: comment.id,
+        is_own: comment.user_id == req.session.userId
       }})
   
     // console.log(postAndCommentsRaw)
@@ -213,6 +215,20 @@ router.get('/:id/repost', isAuthenticated, (req, res) => {
         can_repost: can_repost,
         repost_count: repostCount
     });
+});
+
+router.delete('/:postId/comment/:commentId', isAuthenticated, (req, res) => {
+    const commentId = req.params.commentId;
+    const userId = req.session.userId;
+
+    const commentAuthor = getCommentAuthor(commentId);
+
+    if (commentAuthor == userId) {
+        deleteComment(commentId);
+        res.sendStatus(200);
+    } else {
+        res.status(403).send("You cannot delete a comment that is not yours.");
+    }
 });
   
 
