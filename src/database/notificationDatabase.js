@@ -6,7 +6,7 @@ function createNotificationsDB(db) {
       id INTEGER PRIMARY KEY NOT NULL,
       user_id INTEGER NOT NULL, -- user to be notified
       post_id INTEGER, -- post that triggered the notification, or NULL in case of follow
-      interaction_with_user_id INTEGER, -- user that interacted with the post, null in case of like
+      interaction_with_user_id INTEGER, -- user that interacted with the post, null in case of like (because likes are anonymus)
       type TEXT NOT NULL, -- like_milestone, repost, comment, follow
       message TEXT NOT NULL, -- notification message
       date INTEGER NOT NULL, -- date of the interaction
@@ -26,6 +26,14 @@ function createNotificationsDB(db) {
   
     const message = `${commenting_username} commented on your post`;
     createNotification(user_id_to_notify, post_id, commenting_user_id, 'comment', message);
+  }
+
+  function deleteCommentNotification(post_id, commenting_user_id) {
+    const db = new Database("database_files/betterreads.db", {
+      verbose: console.log,
+    });
+    const query = /* sql */ `DELETE FROM notifications WHERE post_id=? AND interaction_with_user_id=? AND type='comment'`;
+    db.prepare(query).run(post_id, commenting_user_id);
   }
   
   function createRepostNotification(post_id, reposting_user_id) {
@@ -118,10 +126,15 @@ function createNotificationsDB(db) {
     db.prepare(query).run(notification_id);
   }
 
-
+  function deleteAllNotificationsReferringToPost(post_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `DELETE FROM notifications WHERE post_id=?`;
+    db.prepare(query).run(post_id);
+  }
 
   export { createNotificationsDB,
     createCommentNotification,
+    deleteCommentNotification,
   createRepostNotification,
   createLikeMilestoneNotification,
   removeLikeMilestoneNotificacion,
@@ -132,5 +145,6 @@ function createNotificationsDB(db) {
   deleteAllNotificationsFromUser,
   deleteNotification,
   getCountOfNotificationsForUserId,
-  getCountOfUnreadNotificationsForUserId
+  getCountOfUnreadNotificationsForUserId,
+  deleteAllNotificationsReferringToPost
    }

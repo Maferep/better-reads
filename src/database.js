@@ -852,6 +852,21 @@ function createComment(postId, userId, content) {
   db.prepare(incrementComments).run(postId);
 }
 
+function deleteComment(commentId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const operation = /* sql */ `DELETE FROM comments WHERE id=?`
+  db.prepare(operation).run(commentId);
+}
+
+function getCommentAuthor(commentId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+  const query = /* sql */ `SELECT author_id FROM comments WHERE id=?`
+  return db.prepare(query).get(commentId).author_id;
+}
 
 function searchBooksByTitle(title, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
@@ -1165,6 +1180,42 @@ function getStats(userId) {
   return Object.values(groupedStats);
 }
 
+function deleteAllLikes(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM likes WHERE post_id=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deleteAllReposts(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM reposts WHERE post_id=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deleteAllComments(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM comments WHERE parent_post=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deletePost(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM posts WHERE id=?`;
+  db.prepare(query).run(post_id);
+}
+
 
 export {
   initDb,
@@ -1207,5 +1258,11 @@ export {
   searchAuthorByName,
   genericPaginatedSearch,
   getPostAuthor,
-  getStats
+  getStats,
+  deleteComment,
+  getCommentAuthor,
+  deleteAllLikes,
+  deleteAllReposts,
+  deleteAllComments,
+  deletePost
 };

@@ -81,10 +81,17 @@
       }
       } else {
        const errorData = await response.json();
-       alert(`Error: ${errorData.error}`);
-      }
+       Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorData.error
+      })
      } catch (error) {
-      alert(`Request failed: ${error.message}`);
+      Swal.fire({
+        icon: 'error',
+        title: 'Request failed',
+        text: error.message
+      })
      }
 }
 </script>

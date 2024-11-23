@@ -43,7 +43,11 @@
       if (data.success) {
         location.reload();
       } else {
-        alert('Error al eliminar la notificación');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al eliminar la notificación'
+        });
       }
     });
   }
@@ -57,7 +61,11 @@
       if (data.success) {
         location.reload();
       } else {
-        alert('Error al eliminar todas las notificaciones');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al eliminar todas las notificaciones'
+        });
       }
     });
   }
@@ -75,7 +83,11 @@
         //Redigir a la página correspondiente
         window.location.href = redirect_to;
       } else {
-        alert('Error al marcar la notificación como leída');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al marcar la notificación como leída'
+        });
         return;
       }
     });
