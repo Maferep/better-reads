@@ -5,7 +5,7 @@ import {createPost,
   fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
   getRepostsCount, getCommentAuthor, deleteComment} from '../database.js';
 
-import { createCommentNotification, createLikeMilestoneNotification, createRepostNotification, removeLikeMilestoneNotificacion } from '../database/notificationDatabase.js';
+import { createCommentNotification, deleteCommentNotification, createLikeMilestoneNotification, createRepostNotification, removeLikeMilestoneNotificacion } from '../database/notificationDatabase.js';
 
 const router = Router();
 
@@ -220,11 +220,13 @@ router.get('/:id/repost', isAuthenticated, (req, res) => {
 router.delete('/:postId/comment/:commentId', isAuthenticated, (req, res) => {
     const commentId = req.params.commentId;
     const userId = req.session.userId;
+    const postId = req.params.postId;
 
     const commentAuthor = getCommentAuthor(commentId);
 
     if (commentAuthor == userId) {
         deleteComment(commentId);
+        deleteCommentNotification(postId, commentAuthor);
         res.sendStatus(200);
     } else {
         res.status(403).send("You cannot delete a comment that is not yours.");
