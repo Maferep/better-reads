@@ -177,7 +177,7 @@ function postsRawToFrontEndCompatible(postsRaw) {
     return {
       post_id: post_raw.post_id,
       user_id: post_raw.user_id,
-      username: post_raw.username,
+      username_post: post_raw.username,
       book_id: post_raw.book_id,
       book_name: post_raw.book_name,
       author_topic: post_raw.author_topic,
