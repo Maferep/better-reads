@@ -84,6 +84,14 @@ function createNotificationsDB(db) {
   
   }
 
+  function deleteRepostNotification(post_id, reposting_user_id) {
+    const db = new Database("database_files/betterreads.db", {
+      verbose: console.log,
+    });
+    const query = /* sql */ `DELETE FROM notifications WHERE post_id=? AND interaction_with_user_id=? AND type='repost'`;
+    db.prepare(query).run(post_id, reposting_user_id);
+  }
+
 
 
   function getNotificationsForUserId(user_id) {
@@ -146,5 +154,6 @@ function createNotificationsDB(db) {
   deleteNotification,
   getCountOfNotificationsForUserId,
   getCountOfUnreadNotificationsForUserId,
-  deleteAllNotificationsReferringToPost
+  deleteAllNotificationsReferringToPost,
+  deleteRepostNotification
    }

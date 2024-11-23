@@ -27,10 +27,14 @@ document.getElementById(event_listener_location).addEventListener("click", funct
   } else if (event.target.closest(".repost-button")) {
     event.preventDefault();
 
-    fetch(`/post/${post_id}/repost`, {
-      method: "POST",
-    })
-    .then(res => {
+    fetch(`/post/${post_id}/info`, {
+      method: "GET",
+    }).then(res => {
+      return res.json();
+    }).then(data => {
+      return fetch(`/post/${post_id}/` + (data.has_reposted?"unrepost":"repost"), {
+        method: "POST",
+    })}).then(res => {
       const posts_with_id = document.querySelectorAll(".post[post-id='"+post_id+"']");
       updateReposts(posts_with_id,post_id);
     })

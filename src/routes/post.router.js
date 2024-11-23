@@ -2,7 +2,10 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
-  fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
+  fetchPostAndComments, createComment,
+  hasLiked, hasReposted,
+  getLikesCount,  getInfoCount,
+  createRepost, deleteRepost,
   getRepostsCount, getCommentAuthor, deleteComment, getPostAuthor,
   deleteAllLikes,
   deleteAllReposts,
@@ -14,7 +17,8 @@ import { createCommentNotification,
     createLikeMilestoneNotification,
     createRepostNotification,
     removeLikeMilestoneNotificacion,
-    deleteAllNotificationsReferringToPost } from '../database/notificationDatabase.js';
+    deleteAllNotificationsReferringToPost,
+    deleteRepostNotification } from '../database/notificationDatabase.js';
 
 const router = Router();
 
@@ -191,12 +195,12 @@ router.get('/:id/info', (req, res) => {
     const userId = req.session.userId;
     
     const liked = hasLiked(postId, userId);
-    const can_repost = canRepost(postId, userId);
+    const has_reposted = hasReposted(postId, userId);
     const info = getInfoCount(postId);
     res.json({
         liked: liked,
         like_count: info.likes,
-        can_repost: can_repost,
+        has_reposted: has_reposted,
         repost_count: info.reposts,
         comment_count: info.comments
     });
@@ -207,27 +211,42 @@ router.post('/:id/repost', isAuthenticated, (req, res) => {
     const userId = req.session.userId;
 
 
-    if (canRepost(postId, userId)) {
-        createRepost(postId, userId);
-        res.sendStatus(201)
-
-        createRepostNotification(postId, userId);
-    } else {
-        res.sendStatus(403)
+    if (hasReposted(postId, userId)) {
+        res.status(403).send("You have already reposted this post");
+        return;
     }
 
+    createRepost(postId, userId);
+    createRepostNotification(postId, userId);
+    
+    res.sendStatus(201)
+});
 
+router.post('/:id/unrepost', isAuthenticated, (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+
+    if (!hasReposted(postId, userId)) {
+        res.status(403).send("You have not reposted this post");
+        return;
+    }
+
+    deleteRepostNotification(postId, userId);
+    deleteRepost(postId, userId);
+
+    res.sendStatus(200);
+    
 });
 
 router.get('/:id/repost', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const userId = req.session.userId;
 
-    const can_repost = canRepost(postId, userId);
+    const has_reposted = hasReposted(postId, userId);
     const repostCount = getRepostsCount(postId);
 
     res.json({
-        can_repost: can_repost,
+        has_reposted: has_reposted,
         repost_count: repostCount
     });
 });

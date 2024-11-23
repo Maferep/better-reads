@@ -25,7 +25,7 @@ async function updateReposts(posts, post_id) {
   }
 
   posts.forEach(post => {
-    updateRepostHtml(post, data.repost_count, data.reposted);
+    updateRepostHtml(post, data.repost_count, data.has_reposted);
   });
 }
 
@@ -35,18 +35,14 @@ function updateLikeHtml(post, like_count, liked) {
   post.querySelector(".like-counter").textContent = `${heartToUse} ${like_count}`;
 }
 
-function updateRepostHtml(post, repost_count, can_repost) {
-  modifyRespostButton(post, can_repost);
-  post.querySelector(".repost-counter").textContent = `🔁 ${repost_count}`;
-}
-
-function modifyRespostButton(post, can_repost) {
-  if (can_repost) {
-    post.querySelector(".repost-button").classList.remove("disabled");
+function updateRepostHtml(post, repost_count, has_reposted) {
+  if (has_reposted) {
+    post.querySelector(".repost-counter").textContent = `🔁desrepostear ${repost_count}`;
   } else {
-    post.querySelector(".repost-button").classList.add("disabled");
+    post.querySelector(".repost-counter").textContent = `🔁repostear ${repost_count}`;
   }
 }
+
 
 
 function updateCommentHtml(post, comment_count) {
@@ -69,7 +65,7 @@ async function updateInfo(posts, post_id) {
     
       posts.forEach(post => {
         updateLikeHtml(post, data.like_count, data.liked);
-        updateRepostHtml(post, data.repost_count, data.can_repost);
+        updateRepostHtml(post, data.repost_count, data.has_reposted);
         updateCommentHtml(post, data.comment_count);
       });
 

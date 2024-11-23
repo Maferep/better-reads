@@ -622,6 +622,19 @@ function createRepost(postId, userId) {
   db.prepare(incrementReposts).run(postId);
 }
 
+function deleteRepost(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const operation = /* sql */ `DELETE FROM reposts WHERE post_id=? AND user_id=?`
+  db.prepare(operation).run(postId, userId);
+
+  const decrementReposts = /* sql */ `UPDATE posts SET reposts=((posts.reposts)-1) WHERE id=? AND posts.reposts > 0`
+  db.prepare(decrementReposts).run(postId);
+}
+
+
 // TODO: do not return status codes, this should not be handled in the database layer. 
 // Return error / info instead
 // TODO: run inside transaction to ensure correctness
@@ -752,7 +765,7 @@ function hasLiked(postId, userId) { // TODO: run inside transaction to ensure co
   }
 }
 
-function canRepost(postId, userId) {
+function hasReposted(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
@@ -760,21 +773,12 @@ function canRepost(postId, userId) {
   console.log(postId, userId)
 
   //Si hay un registro con tal postID y UserID quiere decir que ya reposteó.
-  // Tambien quiero ver que el usuario no sea dueño del post, para no poder repostearse a si mismo
   const findRepost = db.prepare(`SELECT id FROM reposts WHERE post_id=? AND user_id=?`);
-  const findPost = db.prepare(`SELECT author_id FROM posts WHERE id=?`);
 
   const id = findRepost.get(postId, userId);
-  const post = findPost.get(postId);
-
   const yaReposteo = id != undefined;
-  const esDuenio = post.author_id == userId;
 
-  console.log(yaReposteo)
-  console.log(esDuenio)
-
-  return (!yaReposteo && !esDuenio)
-
+  return yaReposteo
 }
 
 function getLikesCount(postId) {
@@ -1234,7 +1238,7 @@ export {
   fetchPostAndComments,
   createComment,
   hasLiked,
-  canRepost,
+  hasReposted,
   getLikesCount,
   getRepostsCount,
   getInfoCount,
@@ -1242,6 +1246,7 @@ export {
   getUserProfile,
   updateUserProfile,
   createRepost,
+  deleteRepost,
   fetchPost,
   followUser,
   getFollowers,
