@@ -3,9 +3,18 @@ import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
   fetchPostAndComments, createComment, hasLiked, canRepost, getLikesCount, getInfoCount, createRepost,
-  getRepostsCount, getCommentAuthor, deleteComment} from '../database.js';
+  getRepostsCount, getCommentAuthor, deleteComment, getPostAuthor,
+  deleteAllLikes,
+  deleteAllReposts,
+  deleteAllComments,
+  deletePost} from '../database.js';
 
-import { createCommentNotification, deleteCommentNotification, createLikeMilestoneNotification, createRepostNotification, removeLikeMilestoneNotificacion } from '../database/notificationDatabase.js';
+import { createCommentNotification,
+    deleteCommentNotification,
+    createLikeMilestoneNotification,
+    createRepostNotification,
+    removeLikeMilestoneNotificacion,
+    deleteAllNotificationsReferringToPost } from '../database/notificationDatabase.js';
 
 const router = Router();
 
@@ -14,6 +23,11 @@ router.get('/:id', (req, res) => {
     const postAndCommentsRaw = fetchPostAndComments(postId);
     const postRaw = postAndCommentsRaw.post;
     const commentsRaw = postAndCommentsRaw.comments;
+
+    if (postRaw == null) {
+        res.status(404).send("Post not found");
+        return;
+    }
   
     console.log(postAndCommentsRaw)
   
@@ -35,6 +49,7 @@ router.get('/:id', (req, res) => {
       do_sidebar: estaAutenticadoBool,
       username: req.session.user,
       loggedIn: estaAutenticadoBool,
+      is_own: req.session.userId == postRaw.user_id,
       username_post: postRaw.username,
       book_id: postRaw.book_id,
       book_name: postRaw.book_name,
@@ -232,6 +247,31 @@ router.delete('/:postId/comment/:commentId', isAuthenticated, (req, res) => {
         res.status(403).send("You cannot delete a comment that is not yours.");
     }
 });
+
+router.delete('/:postId', isAuthenticated, (req, res) => {
+    const postId = req.params.postId;
+    const userId = req.session.userId;
+
+    const postAuthor = getPostAuthor(postId);
+
+    if (postAuthor == userId) {
+        deleteRepostAndPostAndComments(postId);
+        res.sendStatus(200);
+    } else {
+        res.status(403).send("You cannot delete a post that is not yours.");
+    }
+});
+
+
+function deleteRepostAndPostAndComments(postId) {
+    deleteAllNotificationsReferringToPost(postId);
+
+    deleteAllLikes(postId);   
+    deleteAllReposts(postId);
+    deleteAllComments(postId);
+
+    deletePost(postId);
+}
   
 
 export default router;

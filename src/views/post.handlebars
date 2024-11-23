@@ -39,6 +39,23 @@
 
 <script>
   function deleteComment(comment_id) {
+    Swal.fire({
+      title: 'Are you sure you want to delete this comment?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteCommentConfirmed(comment_id);
+      }
+    });
+
+  }
+
+  function deleteCommentConfirmed(comment_id) {
     fetch(`/post/{{post_id}}/comment/${comment_id}`, {
       method: 'DELETE',
     }).then((response) => {
@@ -46,7 +63,11 @@
         window.location.reload();
       else 
         response.text().then((text) => 
-          alert(`Error: ${text}`)
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error: ${text}`
+          })
         );
     }).catch((error) => {
       console.error('Error:', error);

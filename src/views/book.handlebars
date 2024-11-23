@@ -126,8 +126,6 @@
   </div>
 </div>
 
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
@@ -170,12 +168,20 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
             window.location.reload();
 
         } else {
-            alert(data.message);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: data.message,
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while submitting the review.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'An error occurred while submitting the review.',
+        });
     });
 });
 </script>

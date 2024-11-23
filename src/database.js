@@ -1180,6 +1180,42 @@ function getStats(userId) {
   return Object.values(groupedStats);
 }
 
+function deleteAllLikes(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM likes WHERE post_id=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deleteAllReposts(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM reposts WHERE post_id=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deleteAllComments(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM comments WHERE parent_post=?`;
+  db.prepare(query).run(post_id);
+}
+
+function deletePost(post_id) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `DELETE FROM posts WHERE id=?`;
+  db.prepare(query).run(post_id);
+}
+
 
 export {
   initDb,
@@ -1225,4 +1261,8 @@ export {
   getStats,
   deleteComment,
   getCommentAuthor,
+  deleteAllLikes,
+  deleteAllReposts,
+  deleteAllComments,
+  deletePost
 };

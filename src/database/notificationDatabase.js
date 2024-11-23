@@ -126,7 +126,11 @@ function createNotificationsDB(db) {
     db.prepare(query).run(notification_id);
   }
 
-
+  function deleteAllNotificationsReferringToPost(post_id) {
+    const db = new Database("database_files/betterreads.db", {verbose: console.log});
+    const query = /* sql */ `DELETE FROM notifications WHERE post_id=?`;
+    db.prepare(query).run(post_id);
+  }
 
   export { createNotificationsDB,
     createCommentNotification,
@@ -141,5 +145,6 @@ function createNotificationsDB(db) {
   deleteAllNotificationsFromUser,
   deleteNotification,
   getCountOfNotificationsForUserId,
-  getCountOfUnreadNotificationsForUserId
+  getCountOfUnreadNotificationsForUserId,
+  deleteAllNotificationsReferringToPost
    }

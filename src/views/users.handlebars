@@ -51,7 +51,11 @@
     if (userId) {
       window.location.href = `/${username}/profile`;
     } else {
-      alert("Please select a user.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please select a user to view'
+      });
     }
   }
 </script>
