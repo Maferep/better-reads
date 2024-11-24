@@ -781,6 +781,20 @@ function hasReposted(postId, userId) {
   return yaReposteo
 }
 
+function hasCommented(postId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  //Si hay un registro con tal postID y UserID quiere decir que ya comentó.
+  const findComment = db.prepare(`SELECT id FROM comments WHERE parent_post=? AND author_id=?`);
+
+  const id = findComment.get(postId, userId);
+  const yaComento = id != undefined;
+
+  return yaComento
+}
+
 function getLikesCount(postId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
@@ -1239,6 +1253,7 @@ export {
   createComment,
   hasLiked,
   hasReposted,
+  hasCommented,
   getLikesCount,
   getRepostsCount,
   getInfoCount,
