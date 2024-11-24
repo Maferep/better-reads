@@ -6,22 +6,24 @@ export default io => {
         socket.on("addBookToCart", (data) => {
             console.log("Book added to cart: ", data);
             addBookToCart(data.userId, data.bookId);
+            io.emit('cartUpdated'); // Notifica a todos los clientes
         });
-
-        socket.on("removeFromCart",(data) => {
+        
+        socket.on("removeFromCart", (data) => {
             removeFromCart(data.userId, data.bookId);
-            socket.emit("bookRemovedFromCart",{bookId:data.bookId});
+            socket.emit("bookRemovedFromCart", { bookId: data.bookId });
+            io.emit('cartUpdated'); // Notifica a todos los clientes
         });
-
-        socket.on("clearCart",(userId)=>{
-            console.log("Clearing cart for user: ", userId);
-            clearUserCart(userId);
-        });
-
-
+        
         socket.on("bookQuantityChanged", (data) => {
             const { userId, bookId, quantity } = data;
             saveBookQuantity(userId, bookId, quantity);
+            io.emit('cartUpdated'); // Notifica a todos los clientes
+        });
+        
+        socket.on("clearCart", (userId) => {
+            clearUserCart(userId);
+            io.emit('cartUpdated'); // Notifica a todos los clientes
         });
 
 

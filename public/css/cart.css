@@ -31,11 +31,17 @@
     padding: 10px;
 }
 
+.item img{
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+}
 
 .item .info{
     display: flex;
     flex-direction: column;
-    max-width: 300px;
+    width: 300px;
 }
 
 #add-to-cart-btn{
@@ -74,6 +80,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    max-width: 30%;
     width: 50%;
 }
 

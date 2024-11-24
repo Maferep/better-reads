@@ -134,7 +134,6 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-const socket = io();
 function addToCart(userId, bookId) {
   const data = {userId,bookId}
   socket.emit('addBookToCart', data);

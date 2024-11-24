@@ -103,6 +103,12 @@ router.post("/clear", isAuthenticated, function (req, res) {
     res.status(200).send();
 });
 
+router.get('/item-count', isAuthenticated, (req, res) => {
+    const cartItems = retrieveFromCart(req.session.userId);
+    const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // Suma las cantidades
+    res.json({ count: itemCount });
+});
+
 
 
 export default router;

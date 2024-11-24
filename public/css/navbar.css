@@ -68,3 +68,21 @@ height: 1.15em;
 text-align: center;
 text-size-adjust: auto;
 }
+
+.cart-badge {
+  position: absolute; /* Posiciona el número relativo al contenedor */
+  top: 5px; /* Ajusta según sea necesario para alinearlo */
+  right: 205px; /* Ajusta según sea necesario para alinearlo */
+  background-color: red; /* Color de fondo del círculo */
+  color: white; /* Color del texto */
+  font-size: 12px; /* Tamaño del texto */
+  font-weight: bold; /* Negrita para mayor visibilidad */
+  border-radius: 50%; /* Hace el círculo */
+  width: 20px; /* Tamaño del círculo */
+  height: 20px; /* Tamaño del círculo */
+  display: flex; /* Centra el texto dentro del círculo */
+  align-items: center; /* Centra el texto verticalmente */
+  justify-content: center; /* Centra el texto horizontalmente */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Añade un pequeño efecto de sombra */
+}
+

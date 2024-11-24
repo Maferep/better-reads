@@ -34,7 +34,6 @@ a:active {
 }
 
 #main-layout {
-    margin-right: 10%;
     display: flex;
     flex-wrap: wrap; /* Allows wrapping for smaller screens */
     flex-grow: 1;

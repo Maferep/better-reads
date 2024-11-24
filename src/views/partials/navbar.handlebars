@@ -4,13 +4,16 @@
   <div id="logo"><a href="/">Better Reads</a></div>
   <div class="user-actions">
     {{#if loggedIn}}
-      <a href="/cart"><img src="/static/assets/icons8-cart-48.png" alt="Cart"></a>
+      <a id="cart-button" href="/cart">
+        <img src="/static/assets/icons8-cart-48.png" alt="Cart">
+        <span id="cart-items-count" class="cart-badge" hidden>0</span>
+      </a>
       <a id="notification-button" href="/notification">
         <img id="notification-icon" src="/static/assets/notification_icon.svg" alt="Notifications">
         <span id="notification-count" class="notification-count" hidden>0</span>
       </a>
       <a href="/logout">Logout</a>
-      <a href="/profile">Hello, {{username}}</a>
+      <a href="/profile">Profile</a>
     {{else}}
       <a href="/login">Login</a>
       <a href="/register">Register</a>
@@ -18,6 +21,7 @@
   </div>
 </div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
   function updateNotificationCountElement(numberOfNotifications) {
     const notificationCountElement = document.getElementById('notification-count');
@@ -41,3 +45,32 @@
   //update number of notifications when the page loads
   updateNotificationCount();
 </script>
+<script>
+    function updateCartItemCount() {
+        fetch('/cart/item-count')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountElement = document.getElementById('cart-items-count');
+                const itemCount = data.count;
+
+                // Actualiza el texto del contador y su visibilidad
+                if (itemCount > 0) {
+                    cartCountElement.innerText = itemCount;
+                    cartCountElement.hidden = false;
+                } else {
+                    cartCountElement.hidden = true;
+                }
+            })
+            .catch(err => console.error('Error fetching cart item count:', err));
+    }
+
+    // Actualiza la cantidad de elementos al cargar la página
+    document.addEventListener('DOMContentLoaded', updateCartItemCount);
+
+    // Configura un socket para escuchar cambios en el carrito
+    const socket = io();
+    socket.on('cartUpdated', () => {
+        updateCartItemCount();
+    });
+</script>
+
