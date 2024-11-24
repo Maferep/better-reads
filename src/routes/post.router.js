@@ -3,7 +3,7 @@ import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import {createPost,
   incrementLikes, decrementLikes, 
   fetchPostAndComments, createComment,
-  hasLiked, hasReposted,
+  hasLiked, hasReposted, hasCommented,
   getLikesCount,  getInfoCount,
   createRepost, deleteRepost,
   getRepostsCount, getCommentAuthor, deleteComment, getPostAuthor,
@@ -196,13 +196,15 @@ router.get('/:id/info', (req, res) => {
     
     const liked = hasLiked(postId, userId);
     const has_reposted = hasReposted(postId, userId);
+    const has_commented = hasCommented(postId, userId);
     const info = getInfoCount(postId);
     res.json({
         liked: liked,
         like_count: info.likes,
         has_reposted: has_reposted,
         repost_count: info.reposts,
-        comment_count: info.comments
+        comment_count: info.comments,
+        has_commented
     });
 });
 

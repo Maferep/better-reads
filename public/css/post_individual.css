@@ -20,13 +20,11 @@
     color: gray;
 }
 
-.post .post-actions a:hover {
-    text-decoration: underline;
-}
 
 .post .post-actions a {
     text-decoration: none;
     color: #0077b6;
+    cursor: default;
 }
 
 .user-info {
@@ -53,15 +51,16 @@
 
 .post-actions {
     display: flex;
-    gap: 15px;
     font-size: 0.9rem;
     color: #e63946;
+    align-items: center;
+    gap: 1em;
 }
 
 
 
 .post-actions span {
-    margin-right: 8px;
+    margin-right: 0.5em;
 }
 
 .delete-post-button {
@@ -82,4 +81,57 @@
 .delete-post-button:hover {
     background-color: #e74d3c;
     color: #FFFFFF;
-  }
+}
+
+/* Colores para los SVG obtenidos con: https://codepen.io/sosuke/pen/Pjoqqp 
+Uso la propiedad "color" para indicar el color que usé para convertirlo,
+para documentar más que nada*/
+
+
+
+.post-actions img {
+    height: 1.5em;
+    vertical-align: middle;
+    /* color: #aaaaaa; */
+    filter: invert(53%) sepia(51%) saturate(0%) hue-rotate(275deg) brightness(112%) contrast(103%);
+    padding: 0.5em;
+    cursor: pointer;
+}
+
+.post-actions a div {
+    
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 50%;
+    margin: -0.5em;
+}
+
+.post-actions img.like-button-icon.liked,
+.post-actions img.like-button-icon:hover {
+    color: #e43a46;
+    filter: invert(28%) sepia(95%) saturate(2499%) hue-rotate(338deg) brightness(95%) contrast(88%);
+}
+
+.post-actions div.like-div-icon:hover {
+    background-color: #e43a4550;
+}
+
+.post-actions img.repost-button-icon.reposted,
+.post-actions img.repost-button-icon:hover {
+    color: #02ae29;
+    filter: invert(46%) sepia(36%) saturate(6576%) hue-rotate(112deg) brightness(99%) contrast(98%);
+}
+
+.post-actions div.repost-div-icon:hover {
+    background-color: #02ae2950;
+}
+
+.post-actions img.comment-button-icon.commented,
+.post-actions img.comment-button-icon:hover {
+    color: #0077b6;
+    filter: invert(50%) sepia(98%) saturate(2499%) hue-rotate(195deg) brightness(95%) contrast(88%);
+}
+
+.post-actions div.comment-div-icon:hover {
+    background-color: #0077b650;
+}
