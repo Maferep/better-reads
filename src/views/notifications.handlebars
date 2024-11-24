@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/static/css/container_style.css" />
 <link rel="stylesheet" href="/static/css/notifications_style.css" />
+<link rel="stylesheet" href="/static/css/delete_button.css"/>
 
 <div id="content">
   <div id="container">
@@ -12,7 +13,9 @@
           <div class="notification-item {{#unless read}}unread{{/unless}}" notification_id="{{id}}">
             <p>{{this.message}}</p>
             <span>{{this.date}}</span>
-            <button class="delete-button">🗑</button>
+            <button class="delete-button" onclick="deleteComment('{{comment_id}}')">
+              <img class="delete-icon" src="/static/assets/delete.svg" alt="Delete" />
+          </button>
           </div>
           </a>
         {{/each}}

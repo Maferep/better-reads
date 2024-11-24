@@ -1,0 +1,31 @@
+.delete-button {
+    background-color: transparent;
+    color: #e74d3c;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 0.6em;
+    padding: 0;
+}
+
+img.delete-icon {
+    height: 1em;
+    vertical-align: middle;
+    filter: invert(78%) sepia(58%) saturate(7448%) hue-rotate(-30deg);
+    padding: 0.5em;
+}
+
+
+img.delete-icon:hover {
+    filter: invert(100%);
+}
+
+.delete-button:hover {
+    background-color: #e74d3c;
+    color: #FFFFFF;
+}

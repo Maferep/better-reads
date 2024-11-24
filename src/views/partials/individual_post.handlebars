@@ -9,6 +9,8 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
 {{! FUENTE ESTRELLAS https://jsfiddle.net/4qqspqxh/ }}
+<link rel="stylesheet" href="/static/css/delete_button.css" />
+
 
 {{/if}}
 
@@ -16,8 +18,8 @@
 
 
 <div class="post" post-id="{{post_id}}">
-  {{#if unicoPost}}{{#if is_own}}<button class="delete-post-button" onclick="deletePost('{{post_id}}')">
-    <img class="delete-post-icon" src="/static/assets/delete.svg" alt="Delete" />
+  {{#if unicoPost}}{{#if is_own}}<button class="delete-button" onclick="deletePost('{{post_id}}')">
+    <img class="delete-icon" src="/static/assets/delete.svg" alt="Delete" />
   </button>{{/if}}{{/if}}
   <div class="user-info">
     {{#if repost_username}}<strong class="repost-indicator"><a

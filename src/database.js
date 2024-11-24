@@ -525,6 +525,35 @@ function addReview(bookId, userId, rating, reviewText) {
   db.prepare(insertReview).run(bookId, userId, rating, reviewText);
 }
 
+function deleteReview(reviewId, userId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const deleteReview = /* sql */ `DELETE FROM reviews WHERE review_id = ? AND user_id = ?`;
+  db.prepare(deleteReview).run(reviewId, userId);
+}
+
+function getPostOfReview(reviewId) {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  //tengo que primero buscar la review, obtener el libro, usuario, y puntaje. A partir de eso puedo buscar el post que tenga esas 3 cosas.
+  const fetchReview = /* sql */ `SELECT book_id, user_id, rating FROM reviews WHERE review_id = ?`;
+  const review = db.prepare(fetchReview).get(reviewId);
+
+  if (!review) return null;
+
+  const fetchPost = /* sql */ `SELECT id FROM posts WHERE book_id = ? AND author_id = ? AND review_score = ?`;
+  const postId = db.prepare(fetchPost).get(review.book_id, review.user_id, review.rating);
+
+  if (!postId) return null;
+
+  return postId["id"];
+}
+
+
 function fetchReviews(bookId, userId = null) {
   //get reviews in format {username, rating, review_text}
   //En el caso de que se provea un userId, se va a retornar todas las reviews, pero con la review de tal user ID al inicio.
@@ -534,7 +563,7 @@ function fetchReviews(bookId, userId = null) {
   });
 
   //it needs to jopin with insecure_users to get the username
-  const fetchReviews = /* sql */ `SELECT insecure_users.username, reviews.rating, reviews.review_text FROM reviews
+  const fetchReviews = /* sql */ `SELECT reviews.review_id, insecure_users.username, reviews.user_id, reviews.rating, reviews.review_text FROM reviews
                                 JOIN insecure_users ON reviews.user_id = insecure_users.id
                                 WHERE reviews.book_id = ?
                                 ORDER BY CASE WHEN reviews.user_id = ? THEN 1 ELSE 0 END DESC;`;
@@ -633,6 +662,8 @@ function deleteRepost(postId, userId) {
   const decrementReposts = /* sql */ `UPDATE posts SET reposts=((posts.reposts)-1) WHERE id=? AND posts.reposts > 0`
   db.prepare(decrementReposts).run(postId);
 }
+
+
 
 
 // TODO: do not return status codes, this should not be handled in the database layer. 
@@ -1241,6 +1272,7 @@ export {
   fetchBooks,
   fetchBook,
   addReview,
+  deleteReview,
   fetchReviews,
   userAlreadySubmitedReview,
   addBookState,
@@ -1284,5 +1316,6 @@ export {
   deleteAllLikes,
   deleteAllReposts,
   deleteAllComments,
-  deletePost
+  deletePost,
+  getPostOfReview
 };

@@ -56,7 +56,7 @@ label {
   color: #34495E;
 }
 
-input {
+input:not(#swal2-checkbox) {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;

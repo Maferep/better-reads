@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { estaAutenticado, isAuthenticated } from '../authenticate.js';
 import { addReview, fetchBook,
   fetchBookState, fetchReviews, userAlreadySubmitedReview,
-  addBookState, createPost } from '../database.js';
+  addBookState, createPost, getPostOfReview, deleteAllLikes, deleteAllReposts, deleteAllComments,
+deletePost, deleteReview } from '../database.js';
 import { getBookData } from '../processing/book.js'
+import { deleteAllNotificationsReferringToPost } from '../database/notificationDatabase.js';
+
 
 const router = Router();
 
@@ -14,11 +17,14 @@ router.get('/:id', async function (req, res) {
   const userId = req.session.userId;
   const bookState = fetchBookState(bookId, userId);
   const reviewsRows = fetchReviews(bookId, userId);
+  const reviewsFront = parseReviews(reviewsRows, userId);
   const meanText = calculateMean(reviewsRows);
   const estaAutenticadoBool = estaAutenticado(req);
   const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
   const authors = bookRow.authors;
   const genres = bookRow.genres;
+
+
   res.render("book", {
     do_sidebar: estaAutenticadoBool,
     userId: userId,
@@ -32,11 +38,23 @@ router.get('/:id', async function (req, res) {
     genres:  (genres.length ? genres : "No genres found"), 
     bookCover: bookRow.image,
     title: bookRow.book_name,
-    reviews: reviewsRows,
+    reviews: reviewsFront,
     ratingsMean: meanText,
     bookState: bookState,
   })
 });
+
+function parseReviews(reviews, user_id) {
+  return reviews.map((review) => {
+    return {
+      review_id: review.review_id,
+      username: review.username,
+      rating: review.rating * 20,
+      reviewText: review.review_text,
+      is_own: (review.user_id === user_id)
+    };
+  });
+}
 
 
 router.post('/:id/review', isAuthenticated, (req, res) => {
@@ -83,13 +101,46 @@ router.post('/:id/review', isAuthenticated, (req, res) => {
         res.status(500).json({ success: false, message: 'An error occurred while submitting the review' });
     }
 })
+
+router.delete("/:book_id/review/:review_id", isAuthenticated, (req, res) => {
+  const bookId = req.params.book_id;
+  const reviewId = req.params.review_id;
+  const userId = req.session.userId;
+
+  const userSubmittedReview = userAlreadySubmitedReview(bookId, userId);
+
+  if (!userSubmittedReview) {
+    res.status(400).json({ success: false, message: 'No se encontró la review que intenta eliminar' });
+    return;
+  }
+  
+
+  const post_id = getPostOfReview(reviewId);
+  if (post_id != null && post_id != undefined)
+    deleteRepostAndPostAndComments(post_id, userId);
+
+
+  deleteReview(reviewId, userId);
+
+  res.json({ success: true, message: 'Review eliminada correctamente!' });
+});
+
+function deleteRepostAndPostAndComments(postId) {
+  deleteAllNotificationsReferringToPost(postId);
+
+  deleteAllLikes(postId);   
+  deleteAllReposts(postId);
+  deleteAllComments(postId);
+
+  deletePost(postId);
+}
   
 router.post('/:id/state', isAuthenticated, (req, res) => {
     const bookId = req.params.id;
     const userId = req.session.userId;
     const state = req.body.bookState;
     addBookState(bookId, userId, state)
-})
+});
   
 
 

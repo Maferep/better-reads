@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/static/css/post.css">
+<link rel="stylesheet" href="/static/css/delete_button.css"/>
 
     <div id="container">
 
@@ -14,7 +15,11 @@
         {{#each comments}}
         <!-- Existing Comment -->
         <div class="comment">
-          {{#if is_own}}<button class="delete-comment-button" onclick="deleteComment('{{comment_id}}')">🗑</button>{{/if}}
+          {{#if is_own}}
+          <button class="delete-button" onclick="deleteComment('{{comment_id}}')">
+            <img class="delete-icon" src="/static/assets/delete.svg" alt="Delete" />
+          </button>
+          {{/if}}
           <div class="comment-user">
             <a href="{{username_comment}}/profile"><strong>@{{username_comment}}</strong></a>:
           </div>
