@@ -16,7 +16,9 @@
 
 
 <div class="post" post-id="{{post_id}}">
-  {{#if unicoPost}}{{#if is_own}}<button class="delete-post-button" onclick="deletePost('{{post_id}}')">🗑</button>{{/if}}{{/if}}
+  {{#if unicoPost}}{{#if is_own}}<button class="delete-post-button" onclick="deletePost('{{post_id}}')">
+    <img class="delete-post-icon" src="/static/assets/delete.svg" alt="Delete" />
+  </button>{{/if}}{{/if}}
   <div class="user-info">
     {{#if repost_username}}<strong class="repost-indicator"><a
           href="/{{repost_username}}/profile"
