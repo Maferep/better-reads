@@ -9,6 +9,10 @@ body {
   background-repeat: repeat;
 }
 
+p {
+  margin: 0.1em;
+}
+
 li { 
   list-style-type: none;
 }
