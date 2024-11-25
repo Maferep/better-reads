@@ -51,7 +51,7 @@ h1 {
   margin: .4em;
   display: flex;
   flex-direction: row;
-  flex: 0 1 0;
+  flex: 1 1 0;
   align-items: center;
   background-color: rgb(247, 248, 251);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -59,7 +59,7 @@ h1 {
   width: 10em;
   word-break: break-word;
 
-  min-width: 8em;
+  min-width: 30em;
 }
 
 .book-info:hover {
