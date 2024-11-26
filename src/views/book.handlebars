@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/static/css/style_book.css" />
 <link rel="stylesheet" href="/static/css/stars_review.css" />
 <link rel="stylesheet" href="/static/css/style_star_input.css" />
+<link rel="stylesheet" href="/static/css/cambiar_estado_libro.css" />
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -28,15 +29,27 @@
     {{#if loggedIn}}
       <div id="bookStateDropdown">
         <div class="buttons-container">
-          <div class="book-state-container">
-            <select id="bookState" name="bookState">
-                <option value="none" {{#if (eq bookState 'none')}}selected{{/if}}>Unread</option>
-                <option value="reading" {{#if (eq bookState 'reading')}}selected{{/if}}>Reading</option>
-                <option value="finished" {{#if (eq bookState 'finished')}}selected{{/if}}>Finished</option>
-                <option value="plan-to-read" {{#if (eq bookState 'plan-to-read')}}selected{{/if}}>Plan to Read</option>
-            </select>
-            <button id="saveStateButton" type="button">Save</button>
-            <button id="saveStateButton" onclick="addToCart('{{userId}}','{{bookId}}')" type="button">Add to Cart</button>
+          <div class="rating-container">
+            <div class="rating">
+              <div class="state-button planned-button {{#if (eq bookState 'plan-to-read')}}selected{{/if}}" bookState="plan-to-read">
+                <img src="/static/assets/planning.svg">
+                <p>Planned</p>
+              </div>
+              
+              <div class="state-button reading-button {{#if (eq bookState 'reading')}}selected{{/if}}" bookState="reading">
+              <img src="/static/assets/reading.svg">
+                <p>Reading</p>
+              </div>
+
+              <div class="state-button finished-button {{#if (eq bookState 'finished')}}selected{{/if}}" bookState="finished">
+                <img src="/static/assets/finished.svg">
+                <p>Finished</p>
+              </div>
+            </div>
+          </div>
+  
+          <div class="add-cart-container">
+            <button id="addToCartButton" onclick="addToCart('{{userId}}','{{bookId}}')" type="button">Add to Cart</button>
           </div>
           <div class="see-posts-container">
             <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button" class="wide-button">💬 See Posts</button></a>
@@ -185,7 +198,11 @@ function deleteReview(review_id) {
   });
 }
 
-document.getElementById('reviewForm').addEventListener('submit', function(event) {
+
+const reviewFormElement = document.getElementById('reviewForm');
+
+if (reviewFormElement != null) {
+  reviewFormElement.addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission behavior
 
 
@@ -228,11 +245,35 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
         });
     });
 });
+}
 </script>
 
 <script>
-  document.getElementById('saveStateButton').addEventListener('click', function() {
-    const selectedState = document.getElementById('bookState').value;
+  // Get all radio buttons
+const stateButtons = document.querySelectorAll('div.state-button');
+
+stateButtons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+        const currentButton = event.currentTarget;
+        let stateSelected;
+
+        // Check if the button is already selected
+        if (currentButton.classList.contains('selected')) {
+            // If selected, deselect it
+            currentButton.classList.remove('selected');
+            stateSelected = 'none';
+        } else {
+            // If not selected, deselect others and select the clicked one
+            stateButtons.forEach((btn) => btn.classList.remove('selected'));
+            currentButton.classList.add('selected');
+            stateSelected = currentButton.getAttribute('bookState');
+        }
+
+        sendState(stateSelected);
+    });
+});
+
+function sendState(selectedState) {
     fetch(window.location.pathname + "/state", {
         method: 'POST',
         headers: {
@@ -242,5 +283,5 @@ document.getElementById('reviewForm').addEventListener('submit', function(event)
           'bookState': selectedState
         })
     })
-  });
+}
 </script>

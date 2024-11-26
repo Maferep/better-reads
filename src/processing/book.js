@@ -8,8 +8,7 @@ export function getBookData(bookId) {
   const bookRow = fetchBook(bookId);
   //El libro con tal id no existe
   if (bookRow == null) {
-    res.status(404).send("Book id not found")
-    return;
+    return null;
   }
   let authors = fetchAuthorsFromBook(bookId);
   let genres = fetchGenresFromBook(bookId);

@@ -1,0 +1,113 @@
+
+.rating-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .rating-text p {
+    color: rgba(0, 0, 16, 0.8);
+    font-size: 1.3rem;
+    padding: 0.3rem;
+  }
+  
+  .rating {
+    background-color: rgba(0, 0, 16, 0.8);
+    padding: 0.4rem 0.6rem;
+    border-radius: 1.8rem;
+  
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  
+  div.state-button {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-self: auto;
+    flex-direction: column;
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+  
+  div.state-button>p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    padding: 0.1rem;
+    text-align: center;
+  }
+  
+  div.state-button>img {
+    height: 2rem;
+    margin: 0.5rem 0.5rem 0 0.5rem ;
+    position: inherit;
+    opacity: 1;
+  }
+  
+  
+  
+  #radios label {
+    position: relative;
+  }
+  
+  
+  div.state-button + img {
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s;
+  }
+  
+  div.state-button,
+  div.sate-button>img {
+    cursor: pointer;
+  }
+  
+  div.state-button.planned-button:hover>img,
+  div.state-button.planned-button.selected>img {
+    fill: rgb(0, 109, 217);
+    filter: invert(24%) sepia(81%) saturate(2287%) hue-rotate(197deg);
+  }
+  
+  /* Cuando esta seleccionado y hover, le reduzco la saturacion */
+  div.state-button.planned-button.selected:hover>img {
+    filter: invert(24%) sepia(81%) saturate(2287%) hue-rotate(197deg) saturate(50%);
+  }
+  
+  div.state-button.reading-button:hover>img,
+  div.state-button.reading-button.selected>img {
+    fill: rgb(232, 214, 0);
+    filter: invert(80%) sepia(44%) saturate(2379%) hue-rotate(9deg);
+  }
+  
+  div.state-button.reading-button.selected:hover>img {
+      filter: invert(80%) sepia(44%) saturate(2379%) hue-rotate(9deg) saturate(50%);
+    }
+    
+    div.state-button.finished-button:hover>img,
+    div.state-button.finished-button.selected>img {
+        fill: rgb(0, 204, 78);
+        filter: invert(55%) sepia(45%) saturate(2559%) hue-rotate(103deg);
+    }
+    
+    div.state-button.finished-button.selected:hover>img {
+      filter: invert(55%) sepia(45%) saturate(2559%) hue-rotate(103deg) saturate(50%);
+  }
+  
+  
+  div.state-button:hover {
+    background-color: #ffffff09;
+    border-radius: 1.3rem;
+  }
+  
+  div.state-button:hover>p,
+  div.state-button.selected>p {
+    color: #FFF
+  }
+  
+  /* Colores para los SVG obtenidos con: https://codepen.io/sosuke/pen/Pjoqqp 
+  Uso la propiedad "color" para indicar el color que usé para convertirlo,
+  para documentar más que nada*/
+  

@@ -79,8 +79,10 @@ h1 {
 }
 
 .buttons-container {
-  display: grid;
-  grid-template-columns:  1fr 1fr;
+  display: flex;
+  margin-top: 1.5em;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .see-posts-container {
@@ -94,22 +96,6 @@ h1 {
   flex-grow: 1;
 }
 
-.book-state-container {
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-  height: 2.5em;
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-
-#saveStateButton {
-  padding: 0;
-  padding-left: 1em;
-  padding-right: 1em;
-  text-align: center;
-  max-width: 5em;
-}
 #textReview {
   display: block;
 }
