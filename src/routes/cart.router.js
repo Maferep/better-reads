@@ -35,8 +35,8 @@ router.get("/", function (req, res) {
 
 
 router.get("/card_payment", isAuthenticated, function (req, res) {
-    const total_price = getCartTotalPrice(req.session.userId);
-
+    let total_price = getCartTotalPrice(req.session.userId);
+    total_price += 5.00; //Shipping cost
     if(total_price === null){
         //Redirect to cart if the cart is empty
         res.redirect("/cart");
