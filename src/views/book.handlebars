@@ -14,14 +14,18 @@
     <div class="book-info">
       <h1>{{bookName}}</h1>
       <img id="book-cover" src={{bookCover}} alt="">
-      <p>Authors: 
-        {{#each authors}}
-        <a href="/browse/author/{{.}}">{{.}}, </a>
-        {{/each}}
-      </p>
-      <p>Genres: 
-        <a href="/browse/genre/{{genres}}">{{genres}}</a>
-      </p>
+      <button id="wide-button" onclick="addToCart('{{userId}}','{{bookId}}')" type="button">Add to Cart</button>
+      
+      <div class="book-data-container">
+        <p>Authors</p> 
+          <div>
+          {{#each authors}}
+          <p><a href="/browse/author/{{.}}">{{.}}, </a></p>
+          {{/each}}
+          </div>
+        <p>Genres</p> 
+          <p><a href="/browse/genre/{{genres}}">{{genres}}</a></p>
+      </div>
       <p>{{bookDescription}}</p>
     </div>
 
@@ -36,7 +40,6 @@
                 <option value="plan-to-read" {{#if (eq bookState 'plan-to-read')}}selected{{/if}}>Plan to Read</option>
             </select>
             <button id="saveStateButton" type="button">Save</button>
-            <button id="saveStateButton" onclick="addToCart('{{userId}}','{{bookId}}')" type="button">Add to Cart</button>
           </div>
           <div class="see-posts-container">
             <a href="/?book_id={{bookId}}"><button id="seePostsButton" type="button" class="wide-button">💬 See Posts</button></a>
