@@ -22,3 +22,7 @@ h1 {
 .profile-container{
   background-color: #16A085;
 }
+
+.input-group>input {
+  width: 100%;
+}
