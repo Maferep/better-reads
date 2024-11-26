@@ -39,6 +39,12 @@ h1 {
   margin: 1em;
 }
 
+.book-data-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 1em;
+}
+
 .share-option label {
   margin-left: 5px;
   color: #34495E;
