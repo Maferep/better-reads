@@ -192,91 +192,139 @@ function postsRawToFrontEndCompatible(postsRaw) {
   })
 }
 
-const getStateColor = (index) => {
-  // Asignar color según el índice de la posición en el arreglo
-  switch (index) {
-    case 0:
-      return '#4CAF50'; // Verde
-    case 1:
-      return '#2196F3'; // Azul
-    case 2:
-      return '#FFC107'; // Amarillo
-    default:
-      return '#000000'; // Negro por defecto (para estados adicionales)
-  }
+const getStateColor = (state) => {
+  // Asignar color según el nombre del estado
+  const stateColors = {
+    "reading": "#4CAF50",       // Verde
+    "plan-to-read": "#2196F3",  // Azul
+    "finished": "#FFC107",      // Amarillo
+  };
+
+  return stateColors[state] || "#000000"; 
 };
 
 router.get("/:id/stats", isAuthenticated, (req, res) => {
-  const requestedUserId = req.params.id; // Obtenemos el ID del usuario solicitado desde la URL
+  const requestedUserId = req.params.id; 
+  const allStates = ["plan-to-read", "reading", "finished"]; 
 
   try {
-    // Obtener las estadísticas del usuario solicitado
-    const stats = getStats(requestedUserId); 
+    // Obtener estadísticas del usuario solicitado
+    const stats = getStats(requestedUserId) || [];
 
-    // Ordenar las estadísticas
-    const sortedStats = stats.sort((a, b) => {
-      if (b.count !== a.count) {
-        return b.count - a.count;
-      }
-      return a.state.localeCompare(b.state);
+    // Crear un mapa base con todos los estados y valores predeterminados
+    const baseStats = allStates.map((state) => ({
+      state,
+      count: 0,
+      books: [],
+    }));
+
+    // Mezclar estadísticas reales del usuario solicitado con los estados predeterminados
+    const combinedStats = baseStats.map((baseStat) => {
+      const userStat = stats.find((stat) => stat.state === baseStat.state);
+      return userStat || baseStat;
     });
 
-    // Asignar color de estado según el orden
-    sortedStats.forEach((stat, index) => {
-      stat.stateColor = getStateColor(index); 
+    // Asignar colores específicos a cada estado
+    combinedStats.forEach((stat) => {
+      stat.stateColor = getStateColor(stat.state);
     });
+
+    // Obtener el nombre de usuario del ID solicitado
     const username = getUsernameFromId(requestedUserId);
-    // Renderizar las estadísticas para ese usuario
+    const showStatsButton = combinedStats.some(stat => stat.count > 0);
+    // Renderizar la página con las estadísticas procesadas
     res.render("stats", {
-      username: req.session.user,
+      username: username,
       user_stats: username,
+      userId: requestedUserId,
+      showStatsButton: showStatsButton,
       loggedIn: true,
       do_sidebar: true,
-      stats: sortedStats,
-      json: JSON.stringify
+      stats: combinedStats,
+      json: JSON.stringify,
     });
   } catch (error) {
     console.error("Error fetching stats:", error);
     res.status(500).render("error", { message: "Failed to fetch stats" });
   }
 });
+
 
 
 router.get("/stats", isAuthenticated, (req, res) => {
   const userId = req.session.userId;
+  const allStates = ["plan-to-read", "reading", "finished"]; 
 
   try {
+    // Obtener estadísticas del usuario
+    const stats = getStats(userId) || [];
 
-    const stats = getStats(userId);
+    // Crear un mapa base con todos los estados y valores predeterminados
+    const baseStats = allStates.map((state) => ({
+      state,
+      count: 0,
+      books: [],
+    }));
 
-   
-    const sortedStats = stats.sort((a, b) => {
- 
-      if (b.count !== a.count) {
-        return b.count - a.count;
-      }
-
-      return a.state.localeCompare(b.state);
+    // Mezclar estadísticas reales del usuario con los estados predeterminados
+    const combinedStats = baseStats.map((baseStat) => {
+      const userStat = stats.find((stat) => stat.state === baseStat.state);
+      return userStat || baseStat;
     });
 
-    sortedStats.forEach((stat, index) => {
-      stat.stateColor = getStateColor(index); 
+    // Asignar colores específicos a cada estado
+    combinedStats.forEach((stat) => {
+      stat.stateColor = getStateColor(stat.state);
     });
-
-    
+    const showStatsButton = combinedStats.some(stat => stat.count > 0);
+    // Renderizar la página con las estadísticas procesadas
     res.render("stats", {
       username: req.session.user,
       user_stats: req.session.user,
+      userId: userId,
+      showStatsButton: showStatsButton,
       loggedIn: true,
       do_sidebar: true,
-      stats: sortedStats,
-      json: JSON.stringify
+      stats: combinedStats,
+      json: JSON.stringify,
     });
   } catch (error) {
     console.error("Error fetching stats:", error);
     res.status(500).render("error", { message: "Failed to fetch stats" });
   }
 });
+
+router.get("/:id/stats/graphs", isAuthenticated, (req, res) => {
+  const requestedUserId = req.params.id;  
+
+  try {
+    // Obtener las estadísticas del usuario solicitado
+    const stats = getStats(requestedUserId) || [];
+    const allStates = ["plan-to-read", "reading", "finished"]; 
+
+    // Crear las estadísticas combinadas
+    const combinedStats = allStates.map((state) => {
+      const stat = stats.find((s) => s.state === state);
+      return stat || { state, count: 0, books: [] };
+    });
+
+    const username = getUsernameFromId(requestedUserId);
+
+    // Renderizar la vista con los datos combinados
+    res.render("stats-graphs", {
+      username: username, 
+      stats: combinedStats,
+      json: JSON.stringify, 
+      loggedIn: true,
+      do_sidebar: true,
+    });
+  } catch (error) {
+    console.error("Error fetching stats for graphs:", error);
+    res.status(500).render("error", { message: "Failed to fetch stats" });
+  }
+});
+
+
 
 //A partir de un request de un feed (no de perfil), devuelve una pagina con los posts correspondientes.
 function processFeedRequest(req, res, onlyFollowing) {

@@ -1,13 +1,10 @@
 <link rel="stylesheet" href="/static/css/style.css">
 
 <div class="stats-container">
-  <h1>Lecture Stats for {{user_stats}}</h1>
+  <h1>{{username}}'s Books</h1>
 
   {{#if stats}}
     <!-- Contenedor para el gráfico -->
-    <div class="chart-container">
-      <canvas id="statsChart"></canvas>
-    </div>
 
     <div class="stats-list">
       <!-- Contenedor principal de las columnas, ordenadas de acuerdo con el gráfico -->
@@ -40,97 +37,59 @@
   {{/if}}
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
- const stats = {{{json stats}}}; // Pasamos stats como JSON
-const allStates = ['reading', 'plan-to-read', 'finished']; // Asegúrate de incluir todos los estados posibles
-
-// Ordenamos las estadísticas primero por count, y luego alfabéticamente por state
-const sortedStats = allStates.map(state => {
-  const stat = stats.find(stat => stat.state === state);
-  return stat ? stat : { state, count: 0 }; // Si no hay libros para un estado, asignar 0
-}).sort((a, b) => {
-  // Primero ordenamos por count de mayor a menor
-  if (b.count !== a.count) {
-    return b.count - a.count;
-  }
-  // Si hay empate, ordenamos alfabéticamente por state
-  return a.state.localeCompare(b.state);
-});
-
-// Extraemos los datos para el gráfico de los estados ordenados
-const labels = sortedStats.map(stat => stat.state);
-const data = sortedStats.map(stat => stat.count);
-
-// Configuración del gráfico
-const ctx = document.getElementById('statsChart').getContext('2d');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: 'Books by State',
-      data: data,
-      backgroundColor: [
-        '#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0'
-      ],
-      borderColor: [
-        '#388E3C', '#1976D2', '#FFA000', '#D84315', '#7B1FA2'
-      ],
-      borderWidth: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 1,
-          callback: function(value) {
-            return Number.isInteger(value) ? value : '';
-          }
-        }
-      }
-    }
-  }
-});
-
-  
-</script>
+{{#if showStatsButton}}
+  <div class="stats-button-container">
+    <a href="/{{userId}}/stats/graphs" class="see-stats-button">See Stats</a>
+  </div>
+{{/if}}
 
 <style>
+  .stats-button-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center; 
+  width: 100%;
+}
 
+.see-stats-button {
+  padding: 10px 20px;
+  background-color: white;
+  color: #B0B0B0; 
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Efecto hover */
+.see-stats-button:hover {
+  background-color: #B0B0B0;
+  color: white; 
+}
   
  .stats-container {
-  margin-left: 270px; /* Ajusta la distancia con el sidebar */
+  margin-left: 270px; 
   font-family: Arial, sans-serif;
   margin: 20px;
   padding-left: 20px; 
   width: calc(100% - 270px); 
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centra todos los elementos dentro del contenedor */
+  align-items: center; 
   padding-top: 30px; 
 }
 
 h1 {
-  text-align: center; /* Centra el título */
-  font-size: 28px; /* Tamaño del título principal */
-  margin-bottom: 30px; /* Espacio entre el título y el gráfico */
+  text-align: center; 
+  font-size: 28px; 
+  margin-bottom: 30px; 
 }
 
 .chart-container {
   width: 100%;
-  max-width: 800px; /* Limita el ancho máximo */
-  height: 400px; /* Altura fija para el gráfico */
-  margin-left: auto; /* Centra el gráfico horizontalmente */
+  max-width: 800px; 
+  height: 400px;  
+  margin-left: auto;
   margin-right: auto;
   position: relative;
   margin-bottom: 40px;
@@ -140,9 +99,9 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  width: 100%; /* Asegura que ocupe todo el espacio disponible */
-  max-width: 1200px; /* Limita el ancho máximo para evitar que las columnas se estiren demasiado */
-  margin-left: auto; /* Centra las columnas horizontalmente */
+  width: 100%; 
+  max-width: 1200px; 
+  margin-left: auto; 
   margin-right: auto;
 }
 
@@ -150,12 +109,12 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  padding: 60px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start; 
   min-height: 300px; 
-  text-align: center; /* Centra el contenido dentro de las columnas */
+  text-align: center; 
 }
 
 .stat-column h2 {

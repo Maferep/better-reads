@@ -1,0 +1,234 @@
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="stats-container">
+  <h1>{{username}}'s Stats</h1>
+
+
+  <div class="chart-container">
+    <h2>Books by State</h2>
+    <canvas id="statsChart"></canvas>
+  </div>
+
+ 
+  <div class="chart-container">
+    <h2>Combined Genres</h2>
+    <canvas id="combinedGenresChart"></canvas>
+  </div>
+
+ 
+  <div class="chart-container" id="readingGenresContainer">
+    <h2>Reading genres</h2>
+    <canvas id="readingGenresChart"></canvas>
+  </div>
+
+  <div class="chart-container" id="planToReadGenresContainer">
+    <h2>Plan-to-Read genres</h2>
+    <canvas id="planToReadGenresChart"></canvas>
+  </div>
+
+  <div class="chart-container" id="finishedGenresContainer">
+    <h2>Finished genres</h2>
+    <canvas id="finishedGenresChart"></canvas>
+  </div>
+
+  <div class="stats-button-container">
+    <a href="/stats" class="see-stats-button">Back to Books</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const stats = {{{json stats}}};
+  const labels = stats.map(stat => stat.state);
+  const data = stats.map(stat => stat.count);
+
+  const ctx = document.getElementById('statsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Books by State',
+        data: data,
+        backgroundColor: [ '#2196F3', '#4CAF50', '#FFC107'],
+        borderColor: ['#388E3C', '#1976D2', '#FFA000'],
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            callback: function(value) {
+              return Number.isInteger(value) ? value : '';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Helper function to aggregate genres by state
+  const aggregateGenres = (state) => {
+    const stat = stats.find((s) => s.state === state);
+    if (!stat || !stat.books) return {};
+    return stat.books.reduce((acc, book) => {
+      book.genre.split(', ').forEach((genre) => {
+        acc[genre] = (acc[genre] || 0) + 1;
+      });
+      return acc;
+    }, {});
+  };
+
+  // Get combined genres for all states
+  const combinedGenres = stats.reduce((acc, stat) => {
+    stat.books.forEach((book) => {
+      book.genre.split(', ').forEach((genre) => {
+        acc[genre] = (acc[genre] || 0) + 1;
+      });
+    });
+    return acc;
+  }, {});
+
+  // Prepare data for charts
+  const prepareChartData = (genres) => {
+    const labels = Object.keys(genres);
+    const data = Object.values(genres);
+    return { labels, data };
+  };
+
+  // Combined Genres Chart
+  const combinedGenresData = prepareChartData(combinedGenres);
+  const combinedCtx = document.getElementById('combinedGenresChart').getContext('2d');
+  new Chart(combinedCtx, {
+    type: 'pie',
+    data: {
+      labels: combinedGenresData.labels,
+      datasets: [{
+        data: combinedGenresData.data,
+        backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#FF9800'],
+      }]
+    },
+  });
+
+  // Reading Genres Chart (only show if there are books in "Reading")
+  const readingGenresData = prepareChartData(aggregateGenres('reading'));
+  const readingGenresContainer = document.getElementById('readingGenresContainer');
+  if (readingGenresData.labels.length > 0) {
+    const readingCtx = document.getElementById('readingGenresChart').getContext('2d');
+    new Chart(readingCtx, {
+      type: 'pie',
+      data: {
+        labels: readingGenresData.labels,
+        datasets: [{
+          data: readingGenresData.data,
+          backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#FF9800'],
+        }]
+      },
+    });
+  } else {
+    readingGenresContainer.style.display = 'none';  // Hide if no books
+  }
+
+  // Plan-to-Read Genres Chart (only show if there are books in "Plan-to-Read")
+  const planToReadGenresData = prepareChartData(aggregateGenres('plan-to-read'));
+  const planToReadGenresContainer = document.getElementById('planToReadGenresContainer');
+  if (planToReadGenresData.labels.length > 0) {
+    const planToReadCtx = document.getElementById('planToReadGenresChart').getContext('2d');
+    new Chart(planToReadCtx, {
+      type: 'pie',
+      data: {
+        labels: planToReadGenresData.labels,
+        datasets: [{
+          data: planToReadGenresData.data,
+          backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#FF9800'],
+        }]
+      },
+    });
+  } else {
+    planToReadGenresContainer.style.display = 'none';  // Hide if no books
+  }
+
+  // Finished Genres Chart (only show if there are books in "Finished")
+  const finishedGenresData = prepareChartData(aggregateGenres('finished'));
+  const finishedGenresContainer = document.getElementById('finishedGenresContainer');
+  if (finishedGenresData.labels.length > 0) {
+    const finishedCtx = document.getElementById('finishedGenresChart').getContext('2d');
+    new Chart(finishedCtx, {
+      type: 'pie',
+      data: {
+        labels: finishedGenresData.labels,
+        datasets: [{
+          data: finishedGenresData.data,
+          backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#FF9800'],
+        }]
+      },
+    });
+  } else {
+    finishedGenresContainer.style.display = 'none';  // Hide if no books
+  }
+</script>
+
+<style>
+  .stats-container {
+    margin-left: 270px;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding-left: 20px;
+    width: calc(100% - 270px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+
+  .chart-container {
+    width: 100%;
+    max-width: 800px;
+    position: relative;
+    margin-bottom: 40px;
+  }
+
+  .stats-button-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .see-stats-button {
+  padding: 10px 20px;
+  background-color: white;
+  color: #B0B0B0; 
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+.see-stats-button:hover {
+  background-color: #B0B0B0; 
+  color: white;  
+}
+  
+
+  h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+</style>

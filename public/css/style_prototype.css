@@ -9,6 +9,12 @@
   min-width: 300px;
 }
 
+#feed {
+  width: 120%;
+  padding: 10px;
+  min-width: 300px;
+}
+
 #new-post {
   background-color: white;
   padding: 15px;
