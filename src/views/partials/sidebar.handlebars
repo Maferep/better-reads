@@ -1,15 +1,15 @@
 
 <!-- Left sidebar -->
-
+<!-- TODO: separate book feed sidebar into separate partial -->
 <link rel="stylesheet" href="/static/css/style_book.css">
 <link rel="stylesheet" href="/static/css/sidebar.css">
 <div id="sidebar">
   {{!-- Si es feed de libro, se muestra info de libro en vez de menu de navegacion --}}
 {{#if book}}
   <a href="/book/{{book.id}}"><button id="goBackButton">Go back to book</button></a>
-  <div id="book-info">
+  <div class="book-info">
     <img src="{{book.cover_url}}" alt="Book cover" id="book-cover">
-    <h2>{{book.title}}</h2>
+    <h1>{{book.title}}</h1>
   </div>
 {{else if author}}
   <a href="/browse/author/{{author}}"><button id="goBackButton">Go back to author</button></a>
