@@ -15,6 +15,12 @@
   min-width: 300px;
 }
 
+#username-profile {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+
 #new-post {
   background-color: white;
   padding: 15px;

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Address</title>
+</head>
+<body>
+    <div class="cart-container">
+        <h1 class="form-title">Shipping Address</h1>
+        <form id="shipping-form" class="form">
+            <div class="form-group">
+                <label for="country" class="form-label">Country:</label>
+                <input type="text" id="country" name="country" required class="form-input" placeholder="Enter your country">
+            </div>
+            <div class="form-group">
+                <label for="city" class="form-label">City:</label>
+                <input type="text" id="city" name="city" required class="form-input" placeholder="Enter your city">
+            </div>
+            <div class="form-group">
+                <label for="address" class="form-label">Address:</label>
+                <input type="text" id="address" name="address" required class="form-input" placeholder="Enter your address">
+            </div>
+            <div class="form-group">
+                <label for="postalCode" class="form-label">Postal Code:</label>
+                <input type="text" id="postalCode" name="postalCode" required class="form-input" placeholder="Enter postal code">
+            </div>
+            <div class="form-group">
+                <label for="shippingCost" class="form-label">Shipping Cost:</label>
+                <p id="shippingCost" class="form-text">$5.00</p>
+            </div>
+            <div class="form-group">
+                <label for="totalPrice" class="form-label">Total Price:</label>
+                <p id="totalPrice" class="form-text">${{total_price}}</p> <!-- Example of final price -->
+            </div>
+            <div class="form-group">
+                <button type="button" id="go-to-payment" onclick="goToCardPurchaseWithShipping('{{userId}}')" class="btn-primary">Proceed to Payment</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    function goToCardPurchaseWithShipping(userId) {
+        // Obtener los datos de la dirección de envío
+        const address = document.getElementById('address').value;
+        const city = document.getElementById('city').value;
+        const postalCode = document.getElementById('postalCode').value;
+        const country = document.getElementById('country').value;
+
+        // Verificar si todos los campos obligatorios están llenos
+        if (!address || !city || !postalCode || !country) {
+            alert("Por favor, completa todos los campos de la dirección.");
+            return; // Detener la ejecución si falta algún campo
+        }
+
+        const shippingCost = 5.00;
+
+        // Recoger los datos del carrito (libros y cantidades)
+        const items = document.querySelectorAll('.item');
+        const cartData = Array.from(items).map((item) => {
+            const bookId = item.querySelector('.quantity').id.split('-')[1];
+            const quantity = parseInt(item.querySelector('.quantity').textContent);
+            return { bookId, quantity };
+        });
+
+        // Enviar los datos al servidor o redirigir a la página de pago
+        window.location.href = `/cart/card_payment`;
+    }
+</script>
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container for the form */
+        .cart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 50px;
+        }
+
+        /* Title */
+        .form-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        /* Form styling */
+        .form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Label styling */
+        .form-label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        /* Input field styling */
+        .form-input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Text paragraph for shipping cost */
+        .form-text {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            .cart-container {
+                margin: 20px;
+                padding: 15px;
+            }
+
+            .form-title {
+                font-size: 24px;
+            }
+
+            .form-input {
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                font-size: 14px;
+            }
+        }
+    </style>
+</body>
+</html>

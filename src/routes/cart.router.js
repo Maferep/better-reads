@@ -33,6 +33,26 @@ router.get("/", function (req, res) {
     res.redirect("/");
 });
 
+router.get("/shipping_address", isAuthenticated, function (req, res) {
+    const userId = req.session.userId;
+    let total_price = getCartTotalPrice(userId);
+    total_price += 5.00;
+    if (total_price === null) {
+        // Redirigir al carrito si el carrito está vacío
+        res.redirect("/cart");
+        return;
+    }
+
+    // Renderiza la página de dirección de envío
+    res.render("ship_address", {
+        title: "Ship Address",
+        loggedIn: true,
+        username: req.session.user,
+        userId,
+        total_price
+    });
+});
+
 
 router.get("/card_payment", isAuthenticated, function (req, res) {
     let total_price = getCartTotalPrice(req.session.userId);

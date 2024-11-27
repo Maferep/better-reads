@@ -313,6 +313,7 @@ router.get("/:id/stats/graphs", isAuthenticated, (req, res) => {
     // Renderizar la vista con los datos combinados
     res.render("stats-graphs", {
       username: username, 
+      userId: requestedUserId,
       stats: combinedStats,
       json: JSON.stringify, 
       loggedIn: true,

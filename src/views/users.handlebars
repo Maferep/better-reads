@@ -1,61 +1,103 @@
 <link rel="stylesheet" href="/static/css/container_style.css" />
-<link rel="stylesheet" href="/static/css/style.css" />
+<link rel="stylesheet" href="/static/css/browse_style.css" />
+<link rel="stylesheet" href="/static/css/style_book_list.css" />
 
-<div id="browse-container">
-  <h1>Browse Users</h1>
+<div id="browse-container" class="{{#if search}}with-results{{else}}without-results{{/if}}">
+  <h1>Browse</h1>
 
-  <div id="book-list">
-    <label for="user-select">Select a user:</label>
-    <select name="user" id="user-select" style="width: 100%;">
-      <option value="">-- Select a user --</option>
-      {{#each userEntries}}
-        <option value="{{this.id}}">{{this.username}}</option>
-      {{/each}}
-    </select>
+  <div id="user-list">
+    <label for="user-select">Search for a user!</label>
+    <div class="select-button-container">
+      <select name="user" id="user-select">
+      </select>
+      <button type="submit" onclick="return redirectToSearch(event)">🔎︎</button>
+    </div>
   </div>
+  
+  {{#if search}}
+    <div class="search-options">
+      <p>Search by:</p>
+      <a href="/browse/search/{{search}}" class="{{#if validTypes.user_name}}selected{{/if}}">Only user</a>
+    </div>
+  {{/if}}
 
-  <button type="submit" onclick="return redirectToUser(event)">View User</button>
-</div>
+  {{#if search}}
+    {{> paginated_users}}
+  {{/if}}
 
-<script>
-  $(document).ready(function() {
-    $('#user-select').select2({
-      placeholder: "-- Select a user --",
-      ajax: {
-        url: '/users/search',
-        dataType: 'json',
-        delay: 300,
-        data: function(params) {
-          return {
-            search: params.term 
-          };
-        },
-        processResults: function(data) {
-          return {
-            results: data.userEntries.map(user => ({
-            id: user.id,
-            text: user.username
-            }))
-          };
-        },
-        cache: true
-      }
-    });
-  });
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    function parseSearchAllForResults(data) {
+      console.log(data);
 
-  function redirectToUser(event) {
-    event.preventDefault();
-    const select = document.getElementById('user-select');
-    const userId = select.value;
-    const username = select.options[select.selectedIndex].text;
-    if (userId) {
-      window.location.href = `/${username}/profile`;
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please select a user to view'
+      let users = data.userEntries.map(function(user) {
+        return {
+          id: "user-" + String(user.username),
+          text: user.username
+        };
       });
+
+      console.log("Users:", users);
+
+      let finalResult = {
+        results: []
+      };
+
+      if (users.length > 0) {
+        finalResult.results.push({
+          text: "Users",
+          children: users
+        });
+      }
+
+      return finalResult;
     }
-  }
-</script>
+
+    $(document).ready(function() {
+      $('#user-select').select2({
+        placeholder: "-- Search for a user --",
+        tags: true,
+        insertTag: function(data, tag) {
+          data.unshift(tag);
+        },
+        createTag: function(params) {
+          if (params.term === '') {
+            return null;
+          }
+          return {
+            id: "custom-" + params.term,
+            text: params.term + " (See more)",
+            newOption: true
+          };
+        },
+        ajax: {
+          url: '/browse/search_all',
+          dataType: 'json',
+          delay: 100,
+          data: function(params) {
+            return {
+              search: params.term
+            };
+          },
+          processResults: parseSearchAllForResults,
+          cache: true
+        }
+      });
+    });
+
+    function redirectToSearch(event) {
+      event.preventDefault();
+      const select = document.getElementById('user-select');
+      const selectionId = select.value;
+
+      if (selectionId.startsWith("custom-")) {
+        const search = selectionId.replace("custom-", "");
+        window.location.href = `/browse/search/${search}`;
+      } else if (selectionId.startsWith("user-")) {
+        const userId = selectionId.replace("user-", "");
+        window.location.href = `/${userId}/profile`;
+      }
+    }
+  </script>
+</div>

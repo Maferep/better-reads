@@ -12,6 +12,7 @@ const router = Router();
 router.get('/', function (req, res) {
     res.render("browse", {
         username: req.session.user,
+        do_sidebar: true,
         loggedIn: true,
         title: "Browse Books"
     });

@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="/static/css/style_prototype.css">
 
   <div class="profile-container">
-    <h1>{{username_profile}}</h1>
+    <h1 id="username-profile">{{username_profile}}</h1>
 
     <!-- Mostrar foto de perfil o imagen genérica si el perfil no está completo -->
     <img src="/static/{{profile_photo}}" alt="Profile Photo">
@@ -71,7 +71,7 @@
      });
 
      if (response.ok) {
-       
+   
        button.innerText = isFollowing ? 'Follow' : 'Unfollow';
        isFollowing = !isFollowing; 
        if (isFollowing) {
@@ -86,7 +86,8 @@
         title: 'Error',
         text: errorData.error
       })
-     } catch (error) {
+     
+     } } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Request failed',

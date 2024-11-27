@@ -9,7 +9,7 @@
   <h1>Browse</h1>
 
   <div id="book-list">
-    <label for="book-select">Search for a book, genre or user!</label>
+    <label for="book-select">Search for a book, author or genre!</label>
     <div class="select-button-container">
     <select name="book" id="book-select">
     </select>
@@ -41,96 +41,74 @@
   <script>
 
     function parseSearchAllForResults(data) {
+  console.log(data);
 
-      console.log(data)
-
-      let books = data.bookEntries.map(function(book) {
-        const isCoincidenceByAuthor = book.coincidence_type === "author_name";
-        let text = book.book_name
-        if (isCoincidenceByAuthor) {
-          text += ` (by ${book.author_coincidence})`;
-        }
-
-        return {
-          id: "book-" + String(book.id),
-          text: text
-        };
-      });
-
-      console.log("Books:", books)
-
-      let authors = data.authorEntries.map(function(author) {
-        return {
-          id: "author-" + String(author.author_id),
-          text: author.author_id
-        };
-      });    
-
-
-      let genres = data.genreEntries.map(function(genre) {
-        return {
-          id: "genre-" + String(genre.genre_id),
-          text: genre.genre_id
-        };
-      });
-
-      console.log("Genres:", genres)
-
-      let users = data.userEntries.map(function(user) {
-        return {
-          id: "user-" + String(user.username),
-          text: user.username
-        };
-      });
-
-      console.log("Users:", users)
-
-      let finalResult = {
-        results: []
-      }
-
-      if (books.length > 0) {
-        finalResult.results.push({
-          text: "Books",
-          children: books
-        });
-      }
-
-      if (authors.length > 0) {
-        finalResult.results.push({
-          text: "Authors",
-          children: authors
-        });
-      }
-
-      if (genres.length > 0) {
-        finalResult.results.push({
-          text: "Genres",
-          children: genres
-        });
-      }
-
-      if (users.length > 0) {
-        finalResult.results.push({
-          text: "Users",
-          children: users
-        });
-      }
-
-      return finalResult;
+  let books = data.bookEntries.map(function(book) {
+    const isCoincidenceByAuthor = book.coincidence_type === "author_name";
+    let text = book.book_name;
+    if (isCoincidenceByAuthor) {
+      text += ` (by ${book.author_coincidence})`;
     }
 
+    return {
+      id: "book-" + String(book.id),
+      text: text
+    };
+  });
 
-    $(document).ready(function() {
+  console.log("Books:", books);
+
+  let authors = data.authorEntries.map(function(author) {
+    return {
+      id: "author-" + String(author.author_id),
+      text: author.author_id
+    };
+  });
+
+  let genres = data.genreEntries.map(function(genre) {
+    return {
+      id: "genre-" + String(genre.genre_id),
+      text: genre.genre_id
+    };
+  });
+
+  console.log("Genres:", genres);
+
+  let finalResult = {
+    results: []
+  };
+
+  if (books.length > 0) {
+    finalResult.results.push({
+      text: "Books",
+      children: books
+    });
+  }
+
+  if (authors.length > 0) {
+    finalResult.results.push({
+      text: "Authors",
+      children: authors
+    });
+  }
+
+  if (genres.length > 0) {
+    finalResult.results.push({
+      text: "Genres",
+      children: genres
+    });
+  }
+
+  return finalResult;
+}
+
+$(document).ready(function() {
   $('#book-select').select2({
     placeholder: "-- Search something --",
     tags: true,
-    //Hace que el tag custom del usuario aparezca al principio de lista
     insertTag: function(data, tag) {
       data.unshift(tag);
     },
-    //Le asigna al tag custom del usuario el id "custom",
-    //Para poder saber cuando hacer la query personalizada
     createTag: function(params) {
       if (params.term === '') {
         return null;
@@ -139,7 +117,7 @@
         id: "custom-" + params.term,
         text: params.term + " (See more)",
         newOption: true
-      }
+      };
     },
     ajax: {
       url: '/browse/search_all',
@@ -157,27 +135,24 @@
 });
 
 function redirectToSearch(event) {
-    event.preventDefault();
-    const select = document.getElementById('book-select');
-    const selectionId = select.value;
+  event.preventDefault();
+  const select = document.getElementById('book-select');
+  const selectionId = select.value;
 
-    if (selectionId.startsWith("custom-")) {
-      const search = selectionId.replace("custom-", "");
-      window.location.href = `/browse/search/${search}`;
-    } else if (selectionId.startsWith("book-")) {
-      const bookId = selectionId.replace("book-", "");
-      window.location.href = `/book/${bookId}`;
-    } else if (selectionId.startsWith("author-")) {
-      const authorId = selectionId.replace("author-", "");
-      window.location.href = `/browse/author/${authorId}`;
-    } else if (selectionId.startsWith("genre-")) {
-      const genreId = selectionId.replace("genre-", "");
-      window.location.href = `/browse/genre/${genreId}`;
-    } else if (selectionId.startsWith("user-")) {
-      const userId = selectionId.replace("user-", "");
-      window.location.href = `/${userId}/profile`;
-    }
-    
+  if (selectionId.startsWith("custom-")) {
+    const search = selectionId.replace("custom-", "");
+    window.location.href = `/browse/search/${search}`;
+  } else if (selectionId.startsWith("book-")) {
+    const bookId = selectionId.replace("book-", "");
+    window.location.href = `/book/${bookId}`;
+  } else if (selectionId.startsWith("author-")) {
+    const authorId = selectionId.replace("author-", "");
+    window.location.href = `/browse/author/${authorId}`;
+  } else if (selectionId.startsWith("genre-")) {
+    const genreId = selectionId.replace("genre-", "");
+    window.location.href = `/browse/genre/${genreId}`;
+  }
 }
+
 </script>
 

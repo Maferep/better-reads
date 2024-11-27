@@ -3,30 +3,24 @@ import { searchUsers } from '../database.js';
 
 const router = Router();
 
-router.get('/', function (req, res) {
-    const amount = 10;
-    const offset = 0;
-
-    const rows = searchUsers("", amount, offset);
-
-    res.render("users", {
-        username: req.session.user,
-        do_sidebar: true,
-        loggedIn: true,
-        title: "Browse Users",
-        userEntries: rows
-    });
+// Página principal para explorar usuarios
+router.get('/', async (req, res) => {
+    try {
+        const amount = 10; // Cantidad de usuarios por página
+        const offset = 0;  // Offset inicial
+        const rows = await searchUsers("", amount, offset); // Aseguramos que sea asíncrono
+        console.log(rows);
+        res.render("users", {
+            username: req.session.user,
+            do_sidebar: true,
+            loggedIn: true,
+            title: "Browse Users",
+            userEntries: rows
+        });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).send("An error occurred while fetching users.");
+    }
 });
-
-// New route for searching users
-router.get('/users/search', function (req, res) {
-    const searchTerm = req.query.search || "";
-    const amount = 10;
-    const offset = 0;
-
-    const rows = searchUsers(searchTerm, amount, offset);
-    res.json({ userEntries: rows });
-});
-
 
 export default router;
