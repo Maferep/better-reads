@@ -54,7 +54,7 @@ function initDb() {
 
 function createUserProfileDb(db) {
   const db_stmt = `CREATE TABLE IF NOT EXISTS user_profiles (
-    user_id INTEGER PRIMARY KEY NOT NULL,
+    user_id TEXT PRIMARY KEY NOT NULL,
     bio TEXT,
     profile_photo TEXT,
     FOREIGN KEY (user_id) REFERENCES insecure_users(id)
@@ -65,8 +65,8 @@ function createUserProfileDb(db) {
 
 function createUserFollowsDb(db) {
   const db_stmt = `CREATE TABLE IF NOT EXISTS user_follows (
-    follower_id INTEGER NOT NULL,
-    following_id INTEGER NOT NULL,
+    follower_id TEXT NOT NULL,
+    following_id TEXT NOT NULL,
     PRIMARY KEY (follower_id, following_id),
     FOREIGN KEY (follower_id) REFERENCES insecure_users(id),
     FOREIGN KEY (following_id) REFERENCES insecure_users(id)
@@ -91,7 +91,7 @@ function createUserFollowsDb(db) {
 
 
 function createInsecureUsersDatabase(db) {
-  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id INTEGER PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
+  const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id TEXT PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
@@ -296,7 +296,7 @@ function createPostDatabase(db) {
   const stmt = db.prepare(
 /*sql*/`CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY NOT NULL,
-      author_id int,
+      author_id TEXT,
       book_id int DEFAULT NULL, -- En realidad se refiere a un topic, que en esta columna sería un libro //TODO: renombrar a book_topic
       author_topic int DEFULT NULL,
       text_content TEXT NOT NULL DEFAULT '',
@@ -344,7 +344,7 @@ function createRepostsDb(db) {
     /*sql*/`CREATE TABLE IF NOT EXISTS reposts (
       id INTEGER PRIMARY KEY NOT NULL,
       post_id INTEGER NOT NULL,
-      user_id INTEGER NOT NULL,
+      user_id TEXT NOT NULL,
       date INTEGER NOT NULL,
       FOREIGN KEY(post_id) REFERENCES posts(id),
       FOREIGN KEY(user_id) REFERENCES insecure_users(id));`
@@ -384,7 +384,7 @@ function createCommentDb(db) {
     `CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY NOT NULL,
       parent_post INTEGER NOT NULL,
-      author_id INTEGER NOT NULL,
+      author_id TEXT NOT NULL,
       text_content TEXT NOT NULL,
       date INTEGER NOT NULL,
       FOREIGN KEY(parent_post) REFERENCES posts(id),
@@ -419,7 +419,7 @@ function createLikeDb(db) {
     `CREATE TABLE IF NOT EXISTS likes (
       id INTEGER PRIMARY KEY NOT NULL,
       post_id INTEGER NOT NULL,
-      user_id INTEGER NOT NULL,
+      user_id TEXT NOT NULL,
       date INTEGER NOT NULL,
       FOREIGN KEY(post_id) REFERENCES posts(id),
       FOREIGN KEY(user_id) REFERENCES insecure_users(id))`
@@ -453,7 +453,7 @@ function createReviewDb(db) {
   const db_reviews = /* sql */ `CREATE TABLE IF NOT EXISTS reviews (
                         review_id INTEGER PRIMARY KEY AUTOINCREMENT,
                         book_id INT,
-                        user_id INT,
+                        user_id TEXT,
                         rating INT,
                         review_text VARCHAR(255),
                         FOREIGN KEY (book_id) REFERENCES books(id),
@@ -467,7 +467,7 @@ function createBookStatesDb(db) {
 
   const db_book_states = `CREATE TABLE IF NOT EXISTS book_states (
                         book_id INT,
-                        user_id INT,
+                        user_id TEXT,
                         state VARCHAR(255),
                         PRIMARY KEY (book_id, user_id),
                         FOREIGN KEY (book_id) REFERENCES books(id),
@@ -692,7 +692,7 @@ function incrementLikes(postId, userId) {
         post_id, user_id, date
     ) VALUES (?,?,unixepoch('subsec'))`);
 
-    let info = addLike.run(Number(postId), userId);
+    let info = addLike.run(postId, userId);
     console.log(info.changes)
     if(!(info.changes > 0)) {
       return "fail to add like"
