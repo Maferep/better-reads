@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Database from 'better-sqlite3';
 import { sha256, isAuthenticated } from '../authenticate.js';
 import crypto from 'crypto';
+import { v4 as uuid4 } from 'uuid';
 
 const authRouter = Router()
 
@@ -112,7 +113,7 @@ authRouter.post('/register', isAuthenticated, function(req, res) {
 authRouter.post('/register', function  (req, res) {
   const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
   // TODO: validate input
-  const id = req.body.uid;
+  const id = req.body.uid ? req.body.uid : uuid4();
   const username = req.body.name
   const password = sha256(req.body.password);
   // TODO check existing sql const check = db.prepare('')

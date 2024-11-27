@@ -2,11 +2,11 @@ import Database from "better-sqlite3";
 import { getPostAuthor, getUsernameFromId } from "../database.js";
 
 function createNotificationsDB(db) {
+    db.pragma("foreign_keys = ON");
     const db_stmt = /*sql*/`CREATE TABLE IF NOT EXISTS notifications (
-      id INTEGER PRIMARY KEY NOT NULL,
-      user_id INTEGER NOT NULL, -- user to be notified
+      user_id TEXT NOT NULL, -- user to be notified
       post_id INTEGER, -- post that triggered the notification, or NULL in case of follow
-      interaction_with_user_id INTEGER, -- user that interacted with the post, null in case of like (because likes are anonymus)
+      interaction_with_user_id TEXT, -- user that interacted with the post, null in case of like (because likes are anonymus)
       type TEXT NOT NULL, -- like_milestone, repost, comment, follow
       message TEXT NOT NULL, -- notification message
       date INTEGER NOT NULL, -- date of the interaction

@@ -35,7 +35,7 @@
      <button onclick="window.location.href='/{{userId}}/stats'">View Stats</button>
 
       {{#unless isOwnProfile}}
-    <button id="follow-button" class="{{#if isFollowing}}unfollow{{/if}}" onclick="toggleFollow({{userId}})">
+    <button id="follow-button" class="{{#if isFollowing}}unfollow{{/if}}" onclick="toggleFollow('{{userId}}')">
       {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
     </button>
   {{/unless}}

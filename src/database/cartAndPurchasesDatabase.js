@@ -10,7 +10,7 @@ function createCartAndPurchasesDB(db) {
 function createCartDB(db) {
     const db_stmt = `CREATE TABLE IF NOT EXISTS cart (
       id INTEGER PRIMARY KEY NOT NULL,
-      user_id INTEGER NOT NULL,
+      user_id TEXT NOT NULL,
       book_id INTEGER NOT NULL,
       quantity INTEGER NOT NULL DEFAULT 1,
       FOREIGN KEY (user_id) REFERENCES insecure_users(id),
@@ -27,7 +27,7 @@ function createPurchases_itemsDB(db) {
       book_id INTEGER NOT NULL,
       quantity INTEGER NOT NULL DEFAULT 1,
       FOREIGN KEY (book_id) REFERENCES books(id)
-        FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id)
+      FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id)
     )`;
     db.prepare(db_stmt).run();
     console.log("Created purchases table with quantity column.");
@@ -37,7 +37,7 @@ function createPurchasesDB(db) {
     const db_stmt = `CREATE TABLE IF NOT EXISTS purchases (
         id INTEGER PRIMARY KEY NOT NULL,
         purchase_id INTEGER NOT NULL UNIQUE,
-        user_id INTEGER NOT NULL,
+        user_id TEXT NOT NULL,
         final_price REAL NOT NULL,
         purchase_date INTEGER NOT NULL,
         FOREIGN KEY (user_id) REFERENCES insecure_users(id)

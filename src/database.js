@@ -8,9 +8,11 @@ import { start } from "repl";
 import { create } from "domain";
 import { createNotificationsDB } from "./database/notificationDatabase.js";
 import { createCartAndPurchasesDB } from "./database/cartAndPurchasesDatabase.js";
+import { sha256 } from "./authenticate.js";
+import { v4 as uuid4 } from "uuid";
 
 var SqliteStore = _SqliteStore(session)
-const TEST_USER_ID = 20000000;
+const TEST_USER_ID = uuid4();
 const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
 const CANTIDAD_POSTS_PAGINADO = 7;
@@ -96,8 +98,8 @@ function createInsecureUsersDatabase(db) {
   console.log(db_stmt);
 
   const users = [
-    { id: TEST_USER_ID, username: "staff", password: "password" },
-    { id: TEST_USER_ID + 1, username: "founder", password: "founderpassword" } 
+    { id: TEST_USER_ID, username: "staff", password: sha256("password") },
+    { id: TEST_USER_ID + 1, username: "founder", password: sha256("founderpassword") } 
   ];
 
   users.forEach(user => {
@@ -362,7 +364,7 @@ function createRepostsDb(db) {
 
     insert_reposts.run(
       1,
-      20000000
+      TEST_USER_ID,
     );
   }
 }  
@@ -405,7 +407,7 @@ function createCommentDb(db) {
 
     insert_comments.run(
       1,
-      20000000, 
+      TEST_USER_ID, 
       "This post is rubbish mate"
     );
   }
@@ -437,7 +439,7 @@ function createLikeDb(db) {
 
     insert_likes.run(
       1,
-      20000000
+      TEST_USER_ID, 
     );
   }
 }
@@ -1052,6 +1054,7 @@ function followUser(followerId, followingId) {
   }
 
   const stmt = `INSERT INTO user_follows (follower_id, following_id) VALUES (?, ?)`;
+    console.log(`User ${followerId} will follow user ${followingId}.`);
   try {
     db.prepare(stmt).run(followerId, followingId);
     console.log(`User ${followerId} now follows user ${followingId}.`);
