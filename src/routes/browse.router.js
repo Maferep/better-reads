@@ -78,13 +78,18 @@ router.get('/search/:query', function (req, res) {
 
     const result = genericPaginatedSearch(queryFunction, searchTerm, 10, page);
 
+    console.log("RESULT:", result)
+
     const books = result.rows.map(book => {
-        book = getBookData(book.id);
-        book.description = book.description.substring(0, 100);
-        book.description = book.description + " (...)";
-        console.log(book.description);
-        return book
+        let book_parsed = getBookData(book.id);
+
+        book_parsed.description = book_parsed.description.substring(0, 100);
+        book_parsed.description = book_parsed.description + " (...)";
+        book_parsed.rating = (book.avg_rating)*20;
+        return book_parsed
       });
+
+      console.log("BOOKS", books)
 
     const has_more = result.has_more;
 

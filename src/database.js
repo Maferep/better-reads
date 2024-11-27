@@ -920,82 +920,64 @@ function getCommentAuthor(commentId) {
 }
 
 function searchBooksByTitle(title, limit, offset) {
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-  
-
-  const searchQuery = `
-    SELECT *, 'book_name' AS coincidence_type FROM books 
-    WHERE book_name LIKE @title
-    LIMIT @limit OFFSET @offset`;
-
-  const searchTerm = `%${title}%`;
-
-  const rows = db.prepare(searchQuery).all(
-    {
-      title: searchTerm,
-      limit: limit,
-      offset: offset
-    }
-  );
-  console.log("search results:", rows);
-
-  return rows;
+  return searchBooksGeneric(title, null, limit, offset);
 }
 
 function searchBooksByAuthor(author, limit, offset) {
-  const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
-  });
-  
-
-  const searchQuery = `
-  SELECT books.*, 'author_name' AS coincidence_type FROM books 
-  JOIN books_authors ON books.id = books_authors.book_id
-  WHERE books_authors.author_id LIKE @author
-    LIMIT @limit OFFSET @offset`;
-
-  const searchTerm = `%${author}%`;
-
-  const rows = db.prepare(searchQuery).all(
-    {
-      author: searchTerm,
-      limit: limit,
-      offset: offset
-    }
-  );
-  console.log("search results:", rows);
-
-  return rows;
+  searchBooksGeneric(null, author, limit, offset);
 }
 
 //Busca la mitad de limite por autor, y la mitad por titulo.
 function searchBooksByTitleOrAuthor(titleOrAuthor, limit, offset) {
+  return searchBooksGeneric(titleOrAuthor, titleOrAuthor, limit, offset);
+}
+
+function searchBooksGeneric(title, author, limit, offset) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
-  const searchQuery = /*sql*/`
-  SELECT *, 'book_name' AS coincidence_type, NULL AS author_coincidence FROM books 
-  WHERE book_name LIKE @query
-  UNION
-  SELECT books.*, 'author_name' AS coincidence_type, books_authors.author_id as author_coincidence FROM books 
+  
+  const avgRatingColumn = /*sql*/`(SELECT AVG(reviews.rating) FROM reviews WHERE reviews.book_id = books.id) AS avg_rating`;
+
+  const bookSearchQuery = /*sql*/`
+  SELECT books.*, ${avgRatingColumn}, 'book_name' AS coincidence_type, NULL AS author_coincidence FROM books 
+  WHERE book_name LIKE @title`
+
+  const authorSearchQuery = /*sql*/`
+  SELECT books.*, ${avgRatingColumn}, 'author_name' AS coincidence_type, books_authors.author_id as author_coincidence FROM books
   JOIN books_authors ON books.id = books_authors.book_id
-  WHERE books_authors.author_id LIKE @query
-  ORDER BY coincidence_type DESC
+  WHERE books_authors.author_id LIKE @author`
+
+
+  const orderAndLimitQuery = /*sql*/`
+  ORDER BY avg_rating DESC
   LIMIT @limit OFFSET @offset`;
-  const searchTerm = `%${titleOrAuthor}%`;
-  const rows = db.prepare(searchQuery).all({
-    query: searchTerm,
+
+
+  const searchTitle = `%${title}%`;
+  const searchAuthor = `%${author}%`;
+
+  let finalQuery = "";
+
+  if (title) {
+    finalQuery += bookSearchQuery;
+  }
+
+  if (author) {
+    if (title) {
+      finalQuery += " UNION ";
+    }
+    finalQuery += authorSearchQuery;
+  }
+
+  finalQuery += orderAndLimitQuery;
+
+  const rows = db.prepare(finalQuery).all({
+    title: searchTitle,
+    author: searchAuthor,
     limit: limit,
     offset: offset
   });
-  // console.log("search results:", rows);
-
-  // const authors = searchBooksByAuthor(titleOrAuthor, Math.ceil(limit/2), offset);
-  // const books = searchBooksByTitle(titleOrAuthor, (limit - authors.length), offset);
-
-  // return authors.concat(books);
   return rows;
 }
 

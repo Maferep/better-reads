@@ -17,9 +17,13 @@
           <div class="genre-container"><p><b>{{genres}}</b></p></div>
           <div class="author-container"><p>{{authors}}</p></div>
           <p>{{description}}</p>
-            <div class="ratings">
-              <div class="full-stars" style="width:{{rating}}%"></div>
-              <div class="empty-stars"></div>
+          
+            <div class="ratings {{#unless rating}}no-rating{{/unless}}">
+                <div class="full-stars " style="width:{{rating}}%"></div>
+                <div class="empty-stars"></div>
+                {{#unless rating}}
+                    <p class="no-rating">No ratings yet.</p>
+                {{/unless}}
             </div>
         </div>
       </div>

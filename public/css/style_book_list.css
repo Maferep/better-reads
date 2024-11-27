@@ -90,3 +90,19 @@ h1 {
   text-align: center;
   width: 7em;
 }
+
+div.no-rating>div {
+  opacity: 0.3;
+}
+
+p.no-rating {
+  position: absolute;
+    top: 0.9rem; /* Adjust this to fine-tune the vertical position */
+    left: 0; /* Adjust this to center horizontally if needed */
+    right: 0; /* Ensures it stretches across the container */
+    text-align: center;
+    font-size: 1rem;
+    font-style: italic;
+    color: rgb(42, 42, 42);
+    z-index: 2; /* Ensure it's in front of the stars */
+  }
