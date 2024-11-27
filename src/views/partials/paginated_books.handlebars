@@ -1,5 +1,6 @@
 
 <link rel="stylesheet" href="/static/css/style_book_list.css" />
+<link rel="stylesheet" href="/static/css/stars_review.css" />
 
 <div class="paginated-books">
   <div class="browse-books">
@@ -16,6 +17,10 @@
           <div class="genre-container"><p><b>{{genres}}</b></p></div>
           <div class="author-container"><p>{{authors}}</p></div>
           <p>{{description}}</p>
+            <div class="ratings">
+              <div class="full-stars" style="width:{{rating}}%"></div>
+              <div class="empty-stars"></div>
+            </div>
         </div>
       </div>
       {{/each}}

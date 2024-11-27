@@ -12,6 +12,7 @@
     <label for="book-select">Search for a book, author or genre!</label>
     <div class="select-button-container">
     <select name="book" id="book-select">
+      <option value="{{search}}">{{search}}</option>
     </select>
 
   <button type="submit" onclick="return redirectToSearch(event)">🔎︎</button>
