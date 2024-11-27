@@ -118,14 +118,14 @@
       <h2>Reviews</h2>
       {{#if reviews.length}}
 
-        <h3>Average score:</h3>
+        <h3 style="margin-bottom: 0;">Average score:</h3>
         {{! Dibujar estrellas parcialmente llenas }}
         <div class="ratings ratingsBig">
           <div class="full-stars" style="width:{{ratingsMean}}%"></div>
           <div class="empty-stars"></div>
         </div>
 
-        <h3>Reviews:</h3>
+        <h3>User reviews:</h3>
         {{#each reviews}}
           <div class="review">
             {{#if is_own}}

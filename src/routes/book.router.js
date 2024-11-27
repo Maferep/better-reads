@@ -46,11 +46,12 @@ router.get('/:id', async function (req, res) {
 
 function parseReviews(reviews, user_id) {
   return reviews.map((review) => {
+    console.log(review)
     return {
       review_id: review.review_id,
       username: review.username,
       rating: review.rating * 20,
-      reviewText: review.review_text,
+      review_text: review.review_text,
       is_own: (review.user_id === user_id)
     };
   });
