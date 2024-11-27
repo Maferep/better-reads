@@ -73,7 +73,7 @@ text-size-adjust: auto;
 .cart-badge {
   position: absolute; /* Posiciona el número relativo al contenedor */
   top: 5px; /* Ajusta según sea necesario para alinearlo */
-  right: 205px; /* Ajusta según sea necesario para alinearlo */
+  right: calc(340px + 1vw); /* Ajusta según sea necesario para alinearlo */
   background-color: red; /* Color de fondo del círculo */
   color: white; /* Color del texto */
   font-size: 12px; /* Tamaño del texto */

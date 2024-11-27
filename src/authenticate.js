@@ -39,9 +39,9 @@ export function estaAutenticado(req, res, next) {
 
     } else if (req.body.token != null) {
         const auth = getAuth();
-        console.log("TOKEN: ", req.body.token);
+        //console.log("TOKEN: ", req.body.token);
         auth.verifyIdToken(req.body.token).then(decodedToken => {
-            console.log("Decoded token: ", decodedToken);
+            //console.log("Decoded token: ", decodedToken);
             //res.status(200).send('Token is valid');
             if (!(crearUsuarioGoogleSiNoExiste(decodedToken.uid, decodedToken.name, decodedToken.picture))) {
                 console.log("Fallo al crear usuario en db");
