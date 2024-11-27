@@ -55,35 +55,38 @@ a#notification-button{
 }
 
 .notification-count {
-position: absolute;
-top: 15px;
-right: -7px;
-background-color:#F44336;
-color: white;
-border-radius: 50%;
-transform: translate(-50%, 0);
-padding: 0.2em;
-font-size: 13px;
-width: 1.15em;
-height: 1.15em;
-text-align: center;
-text-size-adjust: auto;
+  position: absolute;
+  top: 15px;
+  right: -7px;
+  background-color:#F44336;
+  color: white;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  padding: 0.2em;
+  font-size: 13px;
+  width: 1.15em;
+  height: 1.15em;
+  text-align: center;
+  text-size-adjust: auto;
+}
+
+a#cart-button {
+  position: relative;
 }
 
 .cart-badge {
   position: absolute; /* Posiciona el número relativo al contenedor */
-  top: 5px; /* Ajusta según sea necesario para alinearlo */
-  right: calc(340px + 1vw); /* Ajusta según sea necesario para alinearlo */
-  background-color: red; /* Color de fondo del círculo */
+  top: 15px; /* Ajusta según sea necesario para alinearlo */
+  right: -7px; /* Ajusta según sea necesario para alinearlo */
+  background-color:#F44336;
   color: white; /* Color del texto */
-  font-size: 12px; /* Tamaño del texto */
-  font-weight: bold; /* Negrita para mayor visibilidad */
   border-radius: 50%; /* Hace el círculo */
-  width: 20px; /* Tamaño del círculo */
-  height: 20px; /* Tamaño del círculo */
-  display: flex; /* Centra el texto dentro del círculo */
-  align-items: center; /* Centra el texto verticalmente */
-  justify-content: center; /* Centra el texto horizontalmente */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Añade un pequeño efecto de sombra */
+  transform: translate(-50%, 0);
+  padding: 0.2em;
+  font-size: 13px; /* Tamaño del texto */
+  width: 1.15em;
+  height: 1.15em;
+  text-align: center;
+  text-size-adjust: auto;
 }
 
