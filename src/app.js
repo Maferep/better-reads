@@ -51,6 +51,8 @@ app.use(express.json());
 app.use(authRouter)
 router.use(isAuthenticated);
 app.use(router)
+
+// TODO: maybe make these endpoints private
 app.use('/browse', browseRouter)
 app.use('/book', bookRouter)
 app.use('/post', postRouter)
