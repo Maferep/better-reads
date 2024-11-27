@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import crypto from 'crypto';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyDLGOsjjpnKBRTjjLqbJDjdDu-PlIMcpQo",
@@ -13,6 +14,12 @@ export const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 
+export function sha256(data) {
+    return crypto.createHash('sha256')
+                 .update(data)
+                 .digest('hex');
+} 
+
 
 // middleware to test if authenticated
 export function isAuthenticated (req, res, next) {
@@ -21,7 +28,7 @@ export function isAuthenticated (req, res, next) {
   if (estaAutenticado(req, res, next)) {
     next()
   } else {
-    res.redirect("/login");
+    next("route");
   }
 }
 
@@ -37,11 +44,14 @@ export function estaAutenticado(req, res, next) {
         auth.verifyIdToken(req.body.token).then(decodedToken => {
             console.log("Decoded token: ", decodedToken);
             //res.status(200).send('Token is valid');
-            crearUsuarioSiNoExiste(decodedToken.uid, decodedToken.email);
+            if (!(crearUsuarioGoogleSiNoExiste(decodedToken.uid, decodedToken.name, decodedToken.picture))) {
+                console.log("Fallo al crear usuario en db");
+                return false; 
+            };
 
             // store user information in session, typically a user id
             req.session.userId = decodedToken.uid;
-            req.session.user = decodedToken.email;
+            req.session.user = decodedToken.name;
             console.log("set user ", req.session.user)
             // save the session before redirection to ensure page
             // load does not happen before session is saved
@@ -64,11 +74,11 @@ export function estaAutenticado(req, res, next) {
     }
 }
 
-function crearUsuarioSiNoExiste(userId, username) {
+async function crearUsuarioGoogleSiNoExiste(userId, username, picture) {
     if (estaEnBaseDeDatosUsuarios(userId, username)) {
-        return;
+        return true;
     }
-    fetch("http://localhost/register", {
+    await fetch("http://localhost/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -76,11 +86,17 @@ function crearUsuarioSiNoExiste(userId, username) {
         body: JSON.stringify({
             "uid": userId,
             "name": username,
+            "password": crypto.randomBytes(32).toString("hex"), // random pswd
         }),
-    }).then(res => {
-        console.log("REGISTERED: ", res.ok);
+    }).then(async res => {
+        console.log("REGISTERED: ", await res.ok);
+        if (res.ok) {
+            return true;
+        }
     });
+    return false;
 }
+
 
 function estaEnBaseDeDatosUsuarios(userId, username) {
   const db = new Database('database_files/betterreads.db', { verbose: console.log });

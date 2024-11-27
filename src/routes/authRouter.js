@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Database from 'better-sqlite3';
-import { isAuthenticated } from '../authenticate.js';
+import { sha256, isAuthenticated } from '../authenticate.js';
+import crypto from 'crypto';
 
 const authRouter = Router()
 
@@ -24,11 +25,11 @@ authRouter.get('/logout', function (req, res, next) {
     })
   })
 })
-/*
+
 authRouter.get('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
-*/
+
 authRouter.get('/login', function(req, res) {
   const _hasWrongCred = req.query.wrong_cred == 1;
   console.log("Has wrong cred?", _hasWrongCred)
@@ -40,16 +41,16 @@ authRouter.get('/login', function(req, res) {
     title: "Login" })
 })
 
+
 authRouter.post('/login', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
 
-/*
 authRouter.post('/login', function (req, res) {
   // TODO: validate input
   const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
   const username = req.body.name
-  const password = req.body.password
+  const password = sha256(req.body.password);
   try {
     const rows = db.prepare('SELECT *  FROM insecure_users WHERE username=? AND insecure_password=?').all(username, password);
     if (rows.length == 0) {
@@ -88,7 +89,7 @@ authRouter.post('/login', function (req, res) {
     if(!res.writableEnded) res.end("Failed to log in");
   }
 })
-*/
+
 authRouter.get('/register', isAuthenticated, function(req, res) {
   res.redirect('/')
 })
@@ -110,13 +111,13 @@ authRouter.post('/register', isAuthenticated, function(req, res) {
 
 authRouter.post('/register', function  (req, res) {
   const db = new Database('database_files/betterreads.db', { verbose: console.log }); 
-  const id = req.body.uid;
   // TODO: validate input
+  const id = req.body.uid;
   const username = req.body.name
-  //const password = req.body.password
+  const password = sha256(req.body.password);
   // TODO check existing sql const check = db.prepare('')
   try {
-    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?)').run(id, username);
+    const run = db.prepare('INSERT INTO insecure_users VALUES (?,?,?)').run(id, username, password);
     res.redirect("/");
     return
   } catch (e) {
@@ -124,6 +125,7 @@ authRouter.post('/register', function  (req, res) {
     res.redirect("/register?username_exists=1")
   }
 })
+
 
 
 export default authRouter;

@@ -32,9 +32,8 @@
       <span>Send</span>
     </button>
   </form>
-  <div class="register-link">
-    <a href="/register">Don't have an account? Register here</a>
-  </div>
+
+  <div id="firebaseui-auth-container"></div>
   <script type="text/javascript">
     // FirebaseUI config.
     var uiConfig = {
@@ -44,10 +43,10 @@
             provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
             clientId: "768926573598-smaerp1pk33k01im9829pmir19leq14r.apps.googleusercontent.com",
         },
-        {
-            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
-        },
+        //{
+        //    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        //    signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
+        //},
       ],
       signInSuccessUrl: '/',
       callbacks: {
@@ -87,6 +86,8 @@
       }
     });
   </script>
-  <div id="firebaseui-auth-container"></div>
+  <div class="register-link">
+    <a href="/register">Don't have an account? Register here</a>
+  </div>
 </div>
 </div>
