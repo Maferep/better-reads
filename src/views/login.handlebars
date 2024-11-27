@@ -32,6 +32,60 @@
       <span>Send</span>
     </button>
   </form>
+
+  <div id="firebaseui-auth-container"></div>
+  <script type="text/javascript">
+    // FirebaseUI config.
+    var uiConfig = {
+      signInFlow: "popup",
+      signInOptions: [
+        {
+            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            clientId: "768926573598-smaerp1pk33k01im9829pmir19leq14r.apps.googleusercontent.com",
+        },
+        //{
+        //    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        //    signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
+        //},
+      ],
+      signInSuccessUrl: '/',
+      callbacks: {
+        signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+            console.log('User signed in:', authResult.user, redirectUrl);
+        // Return true to redirect to the signInSuccessUrl
+            return true;
+        },
+      },
+    };
+
+    // Initialize the FirebaseUI Widget using Firebase.
+    //var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    // The start method will wait until the DOM is loaded.
+    ui.start('#firebaseui-auth-container', uiConfig);
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('User logged in:', user);
+        user.getIdToken().then(idToken => {
+          console.log('ID Token:', idToken);
+          fetch('/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: idToken }),
+          }).then(response => {
+            if (response.ok) {
+              window.location.href = "/";
+              console.log('Token verified!');
+            }
+          });
+        });
+      } else {
+        console.log("no user");
+      }
+    });
+  </script>
   <div class="register-link">
     <a href="/register">Don't have an account? Register here</a>
   </div>

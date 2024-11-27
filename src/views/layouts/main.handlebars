@@ -7,6 +7,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/general_style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
+    <script type="text/javascript">
+      // Initialize firebase app
+      firebase.initializeApp({{{firebaseConfig}}});
+      const ui = new firebaseui.auth.AuthUI(firebase.auth());
+    </script>
 </head>
 <body>
     {{> navbar }}
