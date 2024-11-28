@@ -1142,7 +1142,7 @@ function searchGenres(query, limit, offset) {
 }
 
 // Function to paginate db request in the form of request(queryParameter, limit, offset)
-function genericPaginatedSearch(function_request, queryParameter, results_per_page, page) {
+function genericPaginatedSearch(function_request, queryParameter, results_per_page, page, eliminate_repeated = false) {
   const offset = page * results_per_page;
   const limit = results_per_page + 1;
   const rows = function_request(queryParameter, limit, offset);
@@ -1152,6 +1152,18 @@ function genericPaginatedSearch(function_request, queryParameter, results_per_pa
     rows.pop();
   }
 
+  if (eliminate_repeated) {
+    const unique_ids = new Set();
+    const unique_rows = [];
+    for (const row of rows) {
+      if (!unique_ids.has(row.id)) {
+        unique_rows.push(row);
+        unique_ids.add(row.id);
+      }
+    } 
+    return { rows: unique_rows, has_more };
+  }
+  
   return { rows, has_more };
 }
 

@@ -45,7 +45,7 @@
   console.log(data);
 
   let books = data.bookEntries.map(function(book) {
-    const isCoincidenceByAuthor = book.coincidence_type === "author_name";
+    const isCoincidenceByAuthor = (book.coincidence_type === "author_name") || (book.coincidence_type === "book_and_author_name");
     let text = book.book_name;
     if (isCoincidenceByAuthor) {
       text += ` (by ${book.author_coincidence})`;

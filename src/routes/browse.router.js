@@ -47,8 +47,46 @@ router.get('/search_all', function (req, res) {
     const userRows = searchUsers(searchTerm, results, offset);
 
 
-    res.json({ bookEntries: bookRows, authorEntries: authorRows, userEntries: userRows, genreEntries: genresRows });
+    res.json({ bookEntries: deleteRepeatedBooksByTitleOrAuthor(bookRows), authorEntries: authorRows, userEntries: userRows, genreEntries: genresRows });
 });
+
+
+function deleteRepeatedBooksByTitleOrAuthor(books) {
+    console.log("ORIGINAL BOOKS:", books);
+
+    let newBooks = {};
+
+    for (let book of books) {
+        if (!(book.id in newBooks)) {
+            newBooks[book.id] = book;
+        } else {
+            //Hay 3 opciones:
+            // 1. El libro ya esta en la lista, por una coincidencia de titulo, y el duplicado esta por coincidencia de autor:
+            //  Debo agregar la coincidencia de autor al libro ya existente
+            // 2. El libro ya esta en la lista, por una coincidencia de autor, y el duplicado esta por coincidencia de titulo:
+            //  No agrego nada, ya que el libro ya esta en la lista, y ya incluye la coincidencia de autor
+            // 3. El libro ya esta en la lista, por una coincidencia de autor, y el duplicado esta por coincidencia de autor:
+            // Tengo que agregar el nuevo autor, al campo de author_coincidence
+
+            const existingBook = newBooks[book.id];
+
+            if (existingBook.coincidence_type == "book_name" && book.coincidence_type == "author_name") {
+                existingBook.author_coincidence = book.author_coincidence;
+                existingBook.coincidence_type = "book_and_author_name";
+            } else if (existingBook.coincidence_type == "book_name" && book.coincidence_type == "book_name") {
+                //Do nothing
+            } else if (existingBook.coincidence_type == "author_name" && book.coincidence_type == "author_name") {
+                existingBook.author_coincidence += ", " + book.author_coincidence;
+            } else if (existingBook.coincidence_type == "author_name" && book.coincidence_type == "book_name") {
+                existingBook.coincidence_type = "book_and_author_name";
+            }
+        }
+    }
+
+    return Object.values(newBooks);
+}
+
+
 
 function cortarDescripcion(descripcion, longitud) {
     if (descripcion.length <= longitud) {
@@ -102,7 +140,7 @@ router.get('/search/:query', function (req, res) {
         res.status(400).send("Invalid search type");
     }
 
-    const result = genericPaginatedSearch(queryFunction, searchTerm, 10, page);
+    const result = genericPaginatedSearch(queryFunction, searchTerm, 10, page, true);
 
     console.log("RESULT:", result)
 
