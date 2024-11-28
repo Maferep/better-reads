@@ -16,8 +16,8 @@
   }
   
   .rating {
-    background-color: rgba(0, 0, 16, 0.8);
-    padding: 0.4rem 0.6rem;
+    background-color: #dddddd;
+    padding: 0.2rem 0.4rem;
     border-radius: 1.8rem;
   
     display: flex;
@@ -31,11 +31,12 @@
     align-self: auto;
     flex-direction: column;
     width: 100%;
-    aspect-ratio: 1/1;
+    justify-content: center;
+    cursor: pointer;
   }
   
   div.state-button>p {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(0,0,0, 0.5);
     font-size: 0.8rem;
     padding: 0.1rem;
     text-align: center;
@@ -43,7 +44,7 @@
   
   div.state-button>img {
     height: 2rem;
-    margin: 0.5rem 0.5rem 0 0.5rem ;
+    margin: 0.2rem 1rem 0.2rem 1rem ;
     position: inherit;
     opacity: 1;
   }
@@ -60,51 +61,51 @@
     transition: all 0.2s;
   }
   
-  div.state-button,
-  div.sate-button>img {
-    cursor: pointer;
+  div.state-button>img {
+    fill: white;
+    filter: invert(100%);
   }
   
+  /* Todas las conversiones se hacen desde invert 100% */
   div.state-button.planned-button:hover>img,
   div.state-button.planned-button.selected>img {
-    fill: rgb(0, 109, 217);
-    filter: invert(24%) sepia(81%) saturate(2287%) hue-rotate(197deg);
+    fill: #0080ff;
+    filter: invert(29%) sepia(98%) saturate(1777%) hue-rotate(196deg) brightness(101%) contrast(109%);
   }
   
-  /* Cuando esta seleccionado y hover, le reduzco la saturacion */
-  div.state-button.planned-button.selected:hover>img {
-    filter: invert(24%) sepia(81%) saturate(2287%) hue-rotate(197deg) saturate(50%);
-  }
+  
   
   div.state-button.reading-button:hover>img,
   div.state-button.reading-button.selected>img {
-    fill: rgb(232, 214, 0);
-    filter: invert(80%) sepia(44%) saturate(2379%) hue-rotate(9deg);
+    fill: #ffa600;
+    filter: invert(58%) sepia(57%) saturate(1098%) hue-rotate(1deg) brightness(106%) contrast(105%)
   }
   
-  div.state-button.reading-button.selected:hover>img {
-      filter: invert(80%) sepia(44%) saturate(2379%) hue-rotate(9deg) saturate(50%);
-    }
     
     div.state-button.finished-button:hover>img,
     div.state-button.finished-button.selected>img {
-        fill: rgb(0, 204, 78);
-        filter: invert(55%) sepia(45%) saturate(2559%) hue-rotate(103deg);
+        fill: #1ec900;
+        filter: invert(42%) sepia(89%) saturate(951%) hue-rotate(77deg) brightness(109%) contrast(101%);
     }
     
-    div.state-button.finished-button.selected:hover>img {
-      filter: invert(55%) sepia(45%) saturate(2559%) hue-rotate(103deg) saturate(50%);
+    /* Cuando esta seleccionado y hover, lo hago más parecido al fondo */
+  div.state-button.selected:hover>img {
+    opacity: 0.5;
   }
   
   
   div.state-button:hover {
-    background-color: #ffffff09;
+    background-color: #ffffffA9;
     border-radius: 1.3rem;
   }
   
   div.state-button:hover>p,
   div.state-button.selected>p {
-    color: #FFF
+    color: #000
+  }
+
+  div.state-button.selected:hover>p {
+    color: #222;
   }
   
   /* Colores para los SVG obtenidos con: https://codepen.io/sosuke/pen/Pjoqqp 
