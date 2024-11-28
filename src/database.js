@@ -924,7 +924,7 @@ function searchBooksByTitle(title, limit, offset) {
 }
 
 function searchBooksByAuthor(author, limit, offset) {
-  searchBooksGeneric(null, author, limit, offset);
+  return searchBooksGeneric(null, author, limit, offset);
 }
 
 //Busca la mitad de limite por autor, y la mitad por titulo.

@@ -50,6 +50,32 @@ router.get('/search_all', function (req, res) {
     res.json({ bookEntries: bookRows, authorEntries: authorRows, userEntries: userRows, genreEntries: genresRows });
 });
 
+function cortarDescripcion(descripcion, longitud) {
+    if (descripcion.length <= longitud) {
+        return descripcion;
+    }
+
+    
+    let nuevaDescripcion = descripcion.substring(0, longitud);
+
+    const lastSpaceIndex = nuevaDescripcion.lastIndexOf(' ');
+    const lastLineJumpIndex = nuevaDescripcion.lastIndexOf('\n');
+
+    const cutTo = Math.max(lastSpaceIndex, lastLineJumpIndex);
+
+    if (cutTo != -1) {
+        nuevaDescripcion = nuevaDescripcion.substring(0, lastSpaceIndex);
+    }
+
+    nuevaDescripcion += " (...)";
+
+    
+    console.log("Desc inicial:", descripcion.substring(0, 100) + ' (...)');
+    console.log("Desc cortada:", nuevaDescripcion);
+    
+    return nuevaDescripcion;
+}
+
 router.get('/search/:query', function (req, res) {
     req.query.page ??= 0;
     const page = Number(req.query.page);
@@ -83,8 +109,7 @@ router.get('/search/:query', function (req, res) {
     const books = result.rows.map(book => {
         let book_parsed = getBookData(book.id);
 
-        book_parsed.description = book_parsed.description.substring(0, 100);
-        book_parsed.description = book_parsed.description + " (...)";
+        book_parsed.description = cortarDescripcion(book_parsed.description, 100);
         book_parsed.rating = (book.avg_rating)*20;
         return book_parsed
       });
