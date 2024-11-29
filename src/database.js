@@ -907,8 +907,15 @@ function deleteComment(commentId) {
   const db = new Database("database_files/betterreads.db", {
     verbose: console.log,
   });
+
+  const postId = db.prepare(`SELECT parent_post FROM comments WHERE id=?`).get(commentId).parent_post;
+
   const operation = /* sql */ `DELETE FROM comments WHERE id=?`
   db.prepare(operation).run(commentId);
+
+  //reducir numero de comentarios en post
+  const decrementComments = /* sql */ `UPDATE posts SET comments=((posts.comments)-1) WHERE id=? AND posts.comments > 0`
+  db.prepare(decrementComments).run(postId);
 }
 
 function getCommentAuthor(commentId) {
