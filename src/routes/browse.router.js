@@ -41,13 +41,19 @@ router.get('/search_all', function (req, res) {
     const authorRows = searchAuthorByName(searchTerm, Math.ceil(results/2), offset);
     results -= authorRows.length;
     
-    const genresRows = searchGenres(searchTerm, Math.ceil(results/2), offset);
-    results -= genresRows.length;
-    
-    const userRows = searchUsers(searchTerm, results, offset);
+    const genresRows = searchGenres(searchTerm, results, offset);
 
 
-    res.json({ bookEntries: deleteRepeatedBooksByTitleOrAuthor(bookRows), authorEntries: authorRows, userEntries: userRows, genreEntries: genresRows });
+    res.json({ bookEntries: deleteRepeatedBooksByTitleOrAuthor(bookRows), authorEntries: authorRows, genreEntries: genresRows });
+});
+
+router.get('/search_users', function (req, res) {
+    const searchTerm = req.query.search || "";
+    const amount = 10;
+    const offset = 0;
+
+    const rows = searchUsers(searchTerm, amount, offset);
+    res.json({ userEntries: rows });
 });
 
 
