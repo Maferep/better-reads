@@ -39,4 +39,6 @@ a:active {
     flex-wrap: wrap; /* Allows wrapping for smaller screens */
     flex-grow: 1;
     justify-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
 }
