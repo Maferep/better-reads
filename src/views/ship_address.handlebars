@@ -49,7 +49,11 @@
 
         // Verificar si todos los campos obligatorios están llenos
         if (!address || !city || !postalCode || !country) {
-            alert("Por favor, completa todos los campos de la dirección.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please fill in all address fields.',
+            });
             return; // Detener la ejecución si falta algún campo
         }
 
