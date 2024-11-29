@@ -33,15 +33,12 @@
     {{/if}}
   </div>
   {{#if books}}
-    <div class="paginator">
-      {{#if prev_page includeZero=true}}
-          <a href="/{{endpoint_route}}?page={{prev_page}}{{more_link_parameters}}">< Prev</a>
-      {{/if}}
-      {{#if next_page includeZero=true}}
-          <a href="/{{endpoint_route}}?page={{next_page}}{{more_link_parameters}}">Next ></a>
-      {{else}}
-          <p>No more books.</p>
-      {{/if}}
-    </div>
+    {{> paginator}}
   {{/if}}
 </div>
+
+<script>
+  function goPage(page) {
+    window.location.href = `/{{endpoint_route}}?page=${page}{{more_link_parameters}}`;
+  }
+</script>

@@ -15,13 +15,23 @@
         {{#each posts}}
             {{> individual_post}}
         {{/each}}
-        {{#if page_number}}
-            <a href="/{{endpoint_route}}?page={{page_number}}&paginate_from={{paginate_from}}{{#if book.id includeZero=true}}&book_id={{book.id}}{{/if}}">Load more posts</a>
-        {{else}}
+        {{#unless next_page includeZero=true}}
             <p>You have reached the bottom! There are no more older posts</p>
-        {{/if}}
+        {{/unless}}
+
+        
+        {{> paginator}}
     {{else}}
         <p>No posts yet</p>
     {{/if}}
-    {{/with}}
 </div>
+
+ 
+
+<script>
+    function goPage(page) {
+        window.location.href = `/{{endpoint_route}}?page=${page}&paginate_from={{paginate_from}}{{#if book.id includeZero=true}}&book_id={{book.id}}{{/if}}`;
+    }
+</script>
+
+    {{/with}}

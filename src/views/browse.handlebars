@@ -3,8 +3,6 @@
 
 <link rel="stylesheet" href="/static/css/style_book_list.css" />
 
-<div></div>
-
 <div id="browse-container" class="{{#if search}}with-results{{else}}without-results{{/if}}">
 
   <h1>Browse</h1>
@@ -34,8 +32,15 @@
 
 
 {{#if search}}
+  <style>
+    #main-content {
+      flex-direction: column;
+    }
+  </style>
+
 {{> paginated_books}}
 {{/if}}
+
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -158,4 +163,3 @@ function redirectToSearch(event) {
 }
 
 </script>
-

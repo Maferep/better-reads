@@ -1,0 +1,7 @@
+<link rel="stylesheet" href="/static/css/paginator_style.css" />    
+
+<div class="paginator">
+    <button {{#if prev_page includeZero=true}}onclick="goPage({{prev_page}})"{{else}}class="disabled"{{/if}}><</button>
+    <p>{{num_page}}</p>
+    <button {{#if next_page includeZero=true}}onclick="goPage({{next_page}})"{{else}}class="disabled"{{/if}}>></button>
+</div>

@@ -9,15 +9,9 @@ h1 {
 }
 
 .paginated-books {
-  margin: 0 2em;
-}
-
-.browse-books {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 0em;
-  justify-content: center;
+  box-sizing: border-box;
+  width: 95%;
+  margin: 2em 2em;
 }
 
 .title-container {
@@ -52,6 +46,15 @@ h1 {
   height: 100%;
   justify-content: space-between;
 }
+
+.browse-books {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0em;
+  justify-content: center;
+}
+
 
 .book-info{
   margin: .4em;

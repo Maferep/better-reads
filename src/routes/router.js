@@ -144,7 +144,9 @@ function processProfileRequest(req, res, isOwnProfile) {
     feed: {
       posts: posts_processed,
       paginate_from: paginarDesdeFecha.toISOString(),
-      page_number: has_more ? pagina + 1 : null,
+      prev_page: pagina > 0 ? pagina - 1 : null,
+      next_page: has_more ? pagina + 1 : null,
+      num_page: has_more ? pagina + 1 : null,
       endpoint_route: isOwnProfile ? "profile" : `${req.params.profileUsername}/profile`,
     }
   });
@@ -370,6 +372,7 @@ function processFeedRequest(req, res, onlyFollowing) {
     }
   }
 
+  console.log("FECHA:",paginarDesdeFecha.toISOString())
 
   res.render("index", {
     do_sidebar: true,
@@ -383,7 +386,9 @@ function processFeedRequest(req, res, onlyFollowing) {
     feed: {
       posts: posts_processed,
       paginate_from: paginarDesdeFecha.toISOString(),
-      page_number: has_more ? pagina + 1 : null,
+      prev_page: pagina > 0 ? pagina - 1 : null,
+      next_page: has_more ? pagina + 1 : null,
+      num_page: pagina + 1,
       endpoint_route: onlyFollowing ? "following-posts" : "",
       book_id: deLibro
     }

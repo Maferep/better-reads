@@ -146,7 +146,7 @@ router.get('/search/:query', function (req, res) {
         res.status(400).send("Invalid search type");
     }
 
-    const result = genericPaginatedSearch(queryFunction, searchTerm, 10, page, true);
+    const result = genericPaginatedSearch(queryFunction, searchTerm, 20, page, true);
 
     console.log("RESULT:", result)
 
@@ -170,6 +170,7 @@ router.get('/search/:query', function (req, res) {
         books: books,
         next_page: has_more ? page + 1 : null,
         prev_page: page > 0 ? page - 1 : null,
+        num_page: page+1,
         validTypes: validTypes,
         endpoint_route: `browse/search/${searchTerm}`,
         more_link_parameters: `&type=${tipoBusqueda}`
@@ -187,7 +188,7 @@ router.get('/search_author', function (req, res) {
 
 
 function processTopicBooksRequest(res, req, topic_type, topic) {
-    const PAGINATION_LIMIT = 7;
+    const PAGINATION_LIMIT = 20;
     req.query.page ??= 0;
     const page = Number(req.query.page)
     
