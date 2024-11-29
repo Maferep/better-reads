@@ -8,6 +8,10 @@ h1 {
   text-align: center;
 }
 
+.paginated-books {
+  margin: 0 2em;
+}
+
 .browse-books {
   display: flex;
   flex-direction: row;

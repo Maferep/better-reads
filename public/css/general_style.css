@@ -31,14 +31,23 @@ a:active {
 
 #layout-sidebar {
   display: flex;
-  min-height: 90%;
+  flex-wrap: wrap; /* Allows wrapping for smaller screens */
+  justify-content: center;
 }
 
 #main-layout {
     display: flex;
-    flex-wrap: wrap; /* Allows wrapping for smaller screens */
+    flex-wrap: nowrap; /* Allows wrapping for smaller screens */
     flex-grow: 1;
     justify-content: center;
-    flex-wrap: nowrap;
+    align-items: center;
     flex-direction: column;
+}
+
+#main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
 }

@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/static/css/style.css">
 
+<div id="container">
 <div class="stats-container">
   <h1>{{username}}'s Books</h1>
 
@@ -21,8 +22,8 @@
                   <img src="{{this.image}}" alt="Book Cover" class="book-cover">
                   <div class="info">
                     <a href="/book/{{this.id}}" class="topic-link"><em>{{this.name}}</em></a>
-                    <p>Authors: {{this.authors}}</p>
-                    <p>Genres: {{this.genre}}</p>
+                    {{!-- <p>Authors: {{this.authors}}</p>
+                    <p>Genres: {{this.genre}}</p> --}}
                   </div>
                 </div>
                 <hr class="book-separator"> <!-- Línea separadora entre libros -->
@@ -42,8 +43,16 @@
     <a href="/{{userId}}/stats/graphs" class="see-stats-button">See Stats</a>
   </div>
 {{/if}}
+</div>
 
 <style>
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
   .stats-button-container {
   margin-top: 40px;
   display: flex;
@@ -109,7 +118,7 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 60px;
+  padding: 1em 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start; 

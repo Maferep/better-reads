@@ -4,6 +4,7 @@ import { getPostAuthor, getUsernameFromId } from "../database.js";
 function createNotificationsDB(db) {
     db.pragma("foreign_keys = ON");
     const db_stmt = /*sql*/`CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id TEXT NOT NULL, -- user to be notified
       post_id INTEGER, -- post that triggered the notification, or NULL in case of follow
       interaction_with_user_id TEXT, -- user that interacted with the post, null in case of like (because likes are anonymus)

@@ -160,10 +160,12 @@ a.disabled {
 }
 
 #edit-form textarea {
-    width: 100%;
+  box-sizing: border-box;  
+  width: 100%;
     min-height: 80px;
     resize: vertical;
     padding: 5px;
+
 }
 
 #edit-form input[type="file"] {

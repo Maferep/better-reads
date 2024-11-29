@@ -88,7 +88,8 @@ h1 {
   display: flex;
   margin-top: 1.5em;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 
 .see-posts-container {
