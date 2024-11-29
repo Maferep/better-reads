@@ -14,6 +14,11 @@ router.get('/:id', async function (req, res) {
   const bookId = req.params.id;
   const bookRow = getBookData(bookId);
 
+  if (bookRow == null) {
+    res.status(404).send('Book not found');
+    return;
+  }
+
   const userId = req.session.userId;
   const bookState = fetchBookState(bookId, userId);
   const reviewsRows = fetchReviews(bookId, userId);

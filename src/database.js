@@ -118,29 +118,14 @@ function loadFromCSV(path, callback) {
   fs.createReadStream(path)
     .pipe(csv())
     .on("data", (data) => {
-      (data["isbn"] = "-"), rows.push(data);
+      rows.push(data);
     })
     .on("end", () => {
-      // TODO: call here fetchISBN to fetch all
       callback(rows);
     })
     .on("error", (err) => {
       console.error("Error reading CSV file:", err);
     });
-}
-
-function fetchISBN(infoLink, callback) {
-  // TODO: fetch in batch manner, not individually
-  const url = new URL(infoLink);
-  const book_id = url.searchParams.get("id");
-  const books_api = `https://www.googleapis.com/books/v1/volumes/${book_id}`;
-  axios.get(books_api, (res) => {
-    const ISBN_10 = 0;
-    const ISBN_13 = 1;
-    console.log(res.data);
-    isbn = res.data["volumeInfo"]["industryIdentifiers"][ISBN_10]["identifier"];
-    callback(isbn);
-  });
 }
 
 function createBookDb(db, fullDatasetPath, shortDatasetPath) {
@@ -150,7 +135,6 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
       id INTEGER PRIMARY KEY NOT NULL, 
       book_name TEXT UNIQUE NOT NULL, 
       description TEXT NOT NULL, 
-      isbn TEXT, 
       authors TEXT,
       genre TEXT,
       image TEXT,
@@ -187,12 +171,11 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
           id,
           book_name, 
           description, 
-          isbn,
           authors,
           genre,
           image,
           price
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+       ) VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
     const insert_book_authors = db.prepare(
       `INSERT INTO books_authors (author_id, book_id) VALUES (?, ?)`
@@ -202,7 +185,7 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
     );
 
     // Create example book
-    insert_books.run(0, "TestBook", "test description", "0-8560-9505-2", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg", 0.0);
+    insert_books.run(0, "TestBook", "test description", "Test Author", "Test Genre", "https://thumbs.dreamstime.com/z/modern-vector-abstract-book-cover-template-teared-paper-47197768.jpg", 0.0);
 
     // Determine dataset path
     let datasetPath = "";
@@ -242,7 +225,6 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
             id,
             book["Title"],
             book["description"],
-            book["isbn"],
             JSON.stringify(book["authors"]),
             JSON.stringify(book["categories"]),
             book["image"],
