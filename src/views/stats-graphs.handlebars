@@ -30,11 +30,11 @@
     <h2>Finished genres</h2>
     <canvas id="finishedGenresChart"></canvas>
   </div>
+</div>
 
   <div class="stats-button-container">
     <a href="/{{userId}}/stats" class="see-stats-button">Back to Books</a>
   </div>
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -209,7 +209,11 @@
     width: 100%;
     max-width: 800px;
     position: relative;
-    margin-bottom: 40px;
+    padding: 20px;
+    background-color: white; /* Ensure a solid background for borders */
+    box-shadow: 0 0 0 1px #ccc; /* Simulate a border */
+    border-radius: 4px; /* Optional: Add rounded corners */
+    box-sizing: border-box; /* Ensure padding doesn't affect size */
   }
 
   .stats-button-container {
