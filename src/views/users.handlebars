@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="/static/css/style_book_list.css" />
 
 <div id="browse-container" class="{{#if search}}with-results{{else}}without-results{{/if}}">
-  <h1>Browse</h1>
+  <h1>Browse users</h1>
 
   <div id="user-list">
     <label for="user-select">Search for a user!</label>
@@ -56,6 +56,7 @@
 
     $(document).ready(function() {
       $('#user-select').select2({
+        width: "100%",
         placeholder: "-- Search for a user --",
         tags: true,
         insertTag: function(data, tag) {

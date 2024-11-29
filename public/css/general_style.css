@@ -31,6 +31,7 @@ a:active {
 
 #layout-sidebar {
   display: flex;
+  min-height: 90%;
 }
 
 #main-layout {

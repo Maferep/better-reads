@@ -138,6 +138,7 @@ fieldset {
   <script>
     $(document).ready(function() {
   $('#author-select').select2({
+    width: "100%",
     placeholder: "-- Select an author --",
     ajax: {
       url: '/browse/search_author',
@@ -162,6 +163,7 @@ fieldset {
 
 
   $('#book-select').select2({
+    width: "100%",
     placeholder: "-- Select a book --",
     ajax: {
       url: '/browse/search',
