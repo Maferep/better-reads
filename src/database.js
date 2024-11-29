@@ -959,18 +959,20 @@ function searchBooksGeneric(title, author, limit, offset) {
 
   let finalQuery = "";
 
-  if (title) {
+  if (title != null) {
     finalQuery += bookSearchQuery;
   }
 
-  if (author) {
-    if (title) {
+  if (author != null) {
+    if (title != null) {
       finalQuery += " UNION ";
     }
     finalQuery += authorSearchQuery;
   }
 
   finalQuery += orderAndLimitQuery;
+
+  console.log(finalQuery)
 
   const rows = db.prepare(finalQuery).all({
     title: searchTitle,
