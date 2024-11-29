@@ -29,6 +29,8 @@
 
 .user-info {
     font-size: 1rem;
+    position: relative;
+    z-index: 2;
 }
 
 .topic-link {

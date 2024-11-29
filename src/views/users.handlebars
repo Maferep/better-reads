@@ -86,8 +86,8 @@
         const search = selectionId.replace("custom-", "");
         window.location.href = `/browse/search/${search}`;
       } else if (selectionId.startsWith("user-")) {
-        const userId = selectionId.replace("user-", "");
-        window.location.href = `/${userId}/profile`;
+        const username = selectionId.replace("user-", "");
+        window.location.href = `/${username}/profile`;
       }
     }
   </script>
