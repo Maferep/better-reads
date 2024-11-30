@@ -1,12 +1,21 @@
 import {faker} from '@faker-js/faker';
 import { v4 as uuid4 } from "uuid";
 
-import {createUser, addReview, createPost, getRandomBookId, getRandomAuthorId} from '../database.js';
+import {createUser, addReview, createPost, getRandomBookId, getRandomAuthorId, createRepost, incrementLikes} from '../database.js';
+
+const NUMEREO_DE_POSTS = 20;
+const NUMERO_DE_USUARIOS = 10;
+const NUMERO_DE_LIBROS_A_LOS_QUE_HACER_REVIEWS = 10;
+const PROBABILIDAD_DE_HACER_REVIEW = 0.5;
+const POPORCION_DE_REPOSTS_POR_POST = 0.7;
+const PROBABILIDAD_DE_LIKEAR_POST = 0.3;
+
 
 //setear seed
 faker.seed(123);
 
 
+//Asistido por chatgpt
 const posts = [
     { post: "The plot was engaging and kept me hooked until the end.", type: "book", score: 5 },
     { post: "I felt like the pacing could have been better in some parts.", type: "book", score: 3 },
@@ -275,7 +284,7 @@ function initializeMockUsers(n) {
     }
 }
 
-initializeMockUsers(20);
+initializeMockUsers(NUMERO_DE_USUARIOS);
 
 function createMockUsers() {
     for (let user of users) {
@@ -287,16 +296,17 @@ function getRandomUser() {
     return users[Math.floor(Math.random() * users.length)];
 }
 
-function createMockReviewsAndPosts() {
-    let faltante = posts.length;
+function createMockReviewsPostsAndReposts() {
+    let faltante = NUMEREO_DE_POSTS;
 
-    for (let post of posts) {
+    for (let i = 0; i < NUMEREO_DE_POSTS && i < posts.length; i++) {
+        const post = posts[i]
         const user = getRandomUser();
 
         if (post.type === "book") {
             const bookId = getRandomBookId();
 
-            if (Math.random() < 0.5) {
+            if (Math.random() < PROBABILIDAD_DE_HACER_REVIEW) {
                 //Hacer review
                 addReview(bookId, user.id, post.score, post.post);
                 createPost(user.id, post.post, bookId, "book", post.score);
@@ -310,9 +320,27 @@ function createMockReviewsAndPosts() {
             createPost(user.id, post.post, authorId, "author");
         }
 
+        
+
+        //Probabilidad de hacer un repost de posts existentes
+        if (Math.random() < POPORCION_DE_REPOSTS_POR_POST) {
+            const user = getRandomUser();
+            //Repostear post con id entre 0 e i, favoreciendo más a los ultimos posts
+            // (ya que los primeros tienen muchas instancias de ser elegidos)
+            const postIdToRepost = Math.floor((Math.random()**2) * i+1);
+
+            console.log("Reposteando post con id", postIdToRepost, "de", user.username);
+
+            try{
+                createRepost(postIdToRepost, user.id);
+            } catch(e) {
+                console.log("repost abortado, ya se realizó");
+            }
+        }
+
         faltante -=1;
 
-        if (faltante % 20 === 0) {
+        if (faltante % Math.floor(NUMEREO_DE_POSTS/20) === 0) {
             console.log("Faltan", faltante, "posts o reviews");
         }
 
@@ -321,7 +349,7 @@ function createMockReviewsAndPosts() {
 }
 
 function createMockOnlyReviews() {
-    var hacerReviewsAPrimeros = 10;
+    var hacerReviewsAPrimeros = NUMERO_DE_LIBROS_A_LOS_QUE_HACER_REVIEWS;
     var faltante = hacerReviewsAPrimeros;
 
     for (let i = 0; i < hacerReviewsAPrimeros; i++) {
@@ -337,11 +365,33 @@ function createMockOnlyReviews() {
 
         faltante -=1;
 
-        if (i % 20 === 0) {
+        if (i % Math.max(Math.floor(hacerReviewsAPrimeros/20),1) == 0) {
             console.log("Faltan", faltante, "reviews");
         }
     }
 }
+
+function createMockLikes() {
+    const cantidadIntentosLikes = NUMEREO_DE_POSTS * users.length;
+
+    let likesIntentados = 0;
+
+    for (let user of users) {
+        for (let i = 1; i < NUMEREO_DE_POSTS; i++) {
+            if (Math.random() < PROBABILIDAD_DE_LIKEAR_POST) {
+                incrementLikes(i, user.id);
+            }
+            likesIntentados += 1;
+
+            if (likesIntentados % Math.floor(cantidadIntentosLikes/20) === 0) {
+                console.log("Falta intentar", cantidadIntentosLikes - likesIntentados, "likes");
+            }
+        }
+    }
+}
+
+function createMockComments() {
+    
     
 
 export function createAllMockData() {
@@ -349,8 +399,11 @@ export function createAllMockData() {
     createMockUsers();
 
     console.log("CREANDO REVIEWS Y POSTS MOCK");
-    createMockReviewsAndPosts();
+    createMockReviewsPostsAndReposts();
 
     console.log("CREANDO SOLO REVIEWS MOCK");
     createMockOnlyReviews();
+
+    console.log("CREANDO LIKES MOCK");
+    createMockLikes();    
 }

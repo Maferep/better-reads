@@ -23,6 +23,12 @@ const BOOK_DATA_FULL = "./database_files/books_data_full.csv";
 const BOOK_DATA_SMALL = "./database_files/books_data_prices.csv";
 
 function initDb() {
+  //Delete files of database
+  fs.unlink("database_files/betterreads.db", (err) => {});
+  fs.unlink("database_files/sessions.db", (err) => {});
+
+
+
   // Create username/password database
   console.log("Database initialization started.");
   const db = new Database("database_files/betterreads.db", {
@@ -126,7 +132,6 @@ function getRandomAuthorId() {
 function createInsecureUsersDatabase(db) {
   const db_stmt = 'CREATE TABLE IF NOT EXISTS insecure_users (id TEXT PRIMARY KEY NOT NULL, username varchar(255) UNIQUE NOT NULL, insecure_password varchar(255) NOT NULL)';
   db.prepare(db_stmt).run();
-  console.log(db_stmt);
 
   // Create test users
   try {
@@ -359,7 +364,7 @@ function createPostDatabase(db) {
   const posts_count = 'SELECT COUNT(*) FROM posts'
   let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
 
-  const NUMBER_OF_POSTS = 5
+  const NUMBER_OF_POSTS = 1
 
   if (count['COUNT(*)'] <= 0) {
 
@@ -641,12 +646,21 @@ function createPost(userId, content, topic, topic_type, rating = null) {
 
 function createRepost(postId, userId) {
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
+
+  //Check that user did not repost already
+  const findRepost = db.prepare(`SELECT id FROM reposts WHERE post_id=? AND user_id=?`);
+  let id = findRepost.get(postId, userId)
+
+  if (id != undefined) {
+    throw new Error("User already reposted this post");
+  }
 
   const operation = /* sql */ `INSERT INTO reposts (
         post_id, user_id, date
      ) VALUES (?,?,unixepoch('subsec'))`
+     
 
   db.prepare(operation).run(postId, userId);
 
@@ -681,7 +695,7 @@ function incrementLikes(postId, userId) {
   };
   }
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
 
   // check post already liked
@@ -696,7 +710,6 @@ function incrementLikes(postId, userId) {
     ) VALUES (?,?,unixepoch('subsec'))`);
 
     let info = addLike.run(postId, userId);
-    console.log(info.changes)
     if(!(info.changes > 0)) {
       return "fail to add like"
     }
@@ -704,8 +717,6 @@ function incrementLikes(postId, userId) {
     // increment counter
     const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)+1) WHERE rowid=?`
     info = db.prepare(operation).run(postId);
-    console.log("LIKE INCREMENT WAS ATTEMPTED:")
-    console.log(info.changes)
     let like_count = findLikeCount.get(postId).likes;
 
     if(!(info.changes > 0)) {
@@ -750,7 +761,6 @@ function decrementLikes(postId, userId) {
     const delLike = db.prepare(`DELETE FROM likes WHERE id=?`);
     console.log("ID ", id);
     let info = delLike.run(id);
-    console.log(info.changes)
     if(!(info.changes > 0)) {
       return "fail to remove like"
     }
@@ -758,8 +768,7 @@ function decrementLikes(postId, userId) {
     // decrement counter
     const operation = /* sql */ `UPDATE posts SET likes=((posts.likes)-1) WHERE rowid=? AND posts.likes > 0`
     info = db.prepare(operation).run(postId);
-    console.log("LIKE INCREMENT WAS ATTEMPTED:")
-    console.log(info.changes)
+
     let like_count = findLikeCount.get(postId);
 
     if(!(info.changes > 0)) {
