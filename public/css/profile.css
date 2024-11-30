@@ -1,0 +1,192 @@
+#username-profile {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-container img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+#follow-button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin: 20px auto;
+    display: block;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#follow-button.unfollow {
+    background-color: red;
+    /* Cambia el color a rojo */
+}
+
+
+#follow-button:hover {
+    background-color: #0056b3;
+}
+
+/* Efecto al hacer clic */
+#follow-button:active {
+    transform: scale(0.95);
+}
+
+#edit-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    /* Espacio entre los elementos del formulario */
+    margin-top: 15px;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#edit-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#edit-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    padding: 5px;
+
+}
+
+#edit-form input[type="file"] {
+    margin-bottom: 10px;
+}
+
+#edit-form button {
+    align-self: flex-start;
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#edit-form button:hover {
+    background-color: #0056b3;
+}
+
+
+
+/* Edit Profile and View Stats Button */
+.profile-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #1ABC9C;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+  }
+  
+  .profile-container button:hover {
+    background-color: #16A085;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-container button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Edit Form Container */
+  #edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fdfdfd;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Form Elements */
+  #edit-form label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  #edit-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    resize: vertical;
+    background-color: #fff;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  #edit-form input[type="file"] {
+    margin-top: 5px;
+    font-size: 14px;
+  }
+  
+  /* Form Submit Button */
+  #edit-form button {
+    align-self: center;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  #edit-form button:hover {
+    background-color: #0056b3;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  #edit-form button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Fade-in Animation for Edit Form */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

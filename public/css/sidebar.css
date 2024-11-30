@@ -32,3 +32,17 @@ h1 {
 #sidebar ul li a:hover {
   color: #0077b6;
 }
+
+#goBackButton {
+  width: 100%;
+  max-width: 150px;
+  padding: 15px;
+  background-color: #1ABC9C;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  margin: 10px 0;
+}
