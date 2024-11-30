@@ -10,13 +10,14 @@ import { createNotificationsDB } from "./database/notificationDatabase.js";
 import { createCartAndPurchasesDB } from "./database/cartAndPurchasesDatabase.js";
 import { sha256 } from "./authenticate.js";
 import { v4 as uuid4 } from "uuid";
+import {createAllMockData} from "./database/mockData.js";
 
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = uuid4();
 const TEST_USER_ID_2 = uuid4();
 const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
-const CANTIDAD_POSTS_PAGINADO = 7;
+const CANTIDAD_POSTS_PAGINADO = 20;
 
 const BOOK_DATA_FULL = "./database_files/books_data_full.csv";
 const BOOK_DATA_SMALL = "./database_files/books_data_prices.csv";
@@ -34,25 +35,38 @@ function initDb() {
   console.log("Created user_profiles table.");
   createUserFollowsDb(db);
   console.log("Created user_follows table.");
-  createBookDb(db, BOOK_DATA_FULL, BOOK_DATA_SMALL);
+  var csvreader = createBookDb(db, BOOK_DATA_FULL, BOOK_DATA_SMALL);
   console.log("Created books table.");
 
+  if (csvreader != undefined) {
+    csvreader.on("end", () => {
+      createReviewDb(db);
+        console.log("Created reviews table.");
+        createBookStatesDb(db);
+        console.log("Created book_states table.");
+        createPostDatabase(db);
+        console.log("Created posts table.");
+        createRepostsDb(db);
+        console.log("Created reposts table.");
+        createCommentDb(db);
+        console.log("Created comments table.");
+        createLikeDb(db);
+        console.log("Created likes table.");
+        createCartAndPurchasesDB(db);
 
-  createReviewDb(db);
-  console.log("Created reviews table.");
-  createBookStatesDb(db);
-  console.log("Created book_states table.");
-  createPostDatabase(db);
-  console.log("Created posts table.");
-  createRepostsDb(db);
-  console.log("Created reposts table.");
-  createCommentDb(db);
-  console.log("Created comments table.");
-  createLikeDb(db);
-  console.log("Created likes table.");
-  createCartAndPurchasesDB(db);
+        createNotificationsDB(db);
 
-  createNotificationsDB(db);
+        //Si solo hay 2 usuarios, se crea toda la mock data
+        if (db.prepare("SELECT COUNT(*) FROM insecure_users").get()["COUNT(*)"] <= 2) {
+          console.log("CREANDO MOCK DATA");
+          createAllMockData();
+        }
+
+        console.log("Database initialization complete.");
+    });
+  } else {
+    console.log("Database initialization complete.");
+  }
 }
 
 function createUserProfileDb(db) {
@@ -91,6 +105,22 @@ function createUserFollowsDb(db) {
   console.log(`User ${staffId} is following:`, following);
 }
 
+function getRandomBookId() {
+  const db = new Database("database_files/betterreads.db", {
+    // verbose: console.log,
+  });
+  const stmt = db.prepare("SELECT id FROM books ORDER BY RANDOM() LIMIT 1");
+  return stmt.get().id;
+}
+
+function getRandomAuthorId() {
+  const db = new Database("database_files/betterreads.db", {
+    // verbose: console.log,
+  });
+  const stmt = db.prepare("SELECT author_id FROM books_authors ORDER BY RANDOM() LIMIT 1");
+  return stmt.get().author_id;
+}
+
 
 
 function createInsecureUsersDatabase(db) {
@@ -98,25 +128,52 @@ function createInsecureUsersDatabase(db) {
   db.prepare(db_stmt).run();
   console.log(db_stmt);
 
-  const users = [
-    { id: TEST_USER_ID, username: "staff", password: sha256("password") },
-    { id: TEST_USER_ID_2, username: "founder", password: sha256("founderpassword") } 
-  ];
+  // Create test users
+  try {
+  createUser(TEST_USER_ID, "staff", "password");
+  createUser(TEST_USER_ID_2, "founder", "founderpassword");
+  } catch (e) {
+    console.log("Users already exist");
+  }
+}
 
-  users.forEach(user => {
-    try {
-      const run = db.prepare('INSERT INTO insecure_users (id, username, insecure_password) VALUES (?, ?, ?)').run(user.id, user.username, user.password);
-      console.log(`Created default test user: ${user.username}`);
-    } catch (e) {
-      console.log(`Database already contains default test user: ${user.username}`);
-    }
+function existsUserId(userId) {
+  const db = new Database("database_files/betterreads.db", {
+    // verbose: console.log,
   });
+  const stmt = db.prepare("SELECT 1 FROM insecure_users WHERE id = ?");
+  return stmt.get(userId) !== undefined;
+}
+
+function existsUsername(username) {
+  const db = new Database("database_files/betterreads.db", {
+    // verbose: console.log,
+  });
+  const stmt = db.prepare("SELECT 1 FROM insecure_users WHERE username = ?");
+  return stmt.get(username) !== undefined;
+}
+
+function createUser(userId, username, password) {
+  const db = new Database("database_files/betterreads.db", {
+    // verbose: console.log,
+  });
+
+  if (existsUserId(userId)) {
+    throw new Error("UserID already exists");
+  }
+
+  if (existsUsername(username)) {
+    throw new Error("Username already exists");
+  }
+
+  const stmt = db.prepare("INSERT INTO insecure_users (id, username, insecure_password) VALUES (?, ?, ?)");
+  stmt.run(userId, username, sha256(password));
 }
 
 function loadFromCSV(path, callback) {
   const rows = [];
 
-  fs.createReadStream(path)
+  return fs.createReadStream(path)
     .pipe(csv())
     .on("data", (data) => {
       rows.push(data);
@@ -201,7 +258,7 @@ function createBookDb(db, fullDatasetPath, shortDatasetPath) {
     }
 
     // Load and parse books from CSV
-    loadFromCSV(datasetPath, (books) => {
+    return loadFromCSV(datasetPath, (books) => {
       let id = 0;
       const cantidadLibros = books.length;
 
@@ -302,15 +359,13 @@ function createPostDatabase(db) {
   const posts_count = 'SELECT COUNT(*) FROM posts'
   let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
 
-  const NUMBER_OF_POSTS = 20
+  const NUMBER_OF_POSTS = 5
 
   if (count['COUNT(*)'] <= 0) {
 
     for (let i = 0; i < NUMBER_OF_POSTS; i++) {
       createPost(TEST_USER_ID, `This is my ${i}° post!`, TEST_BOOK_ID, "book")
       console.log(`Inserted post ${i} of ${NUMBER_OF_POSTS}`);
-
-      sleepFor(10)
     }
   }
 }
@@ -467,7 +522,7 @@ function fetchBook(bookId) {
 
 function addReview(bookId, userId, rating, reviewText) {
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
   const insertReview = /* sql */ `INSERT INTO reviews (book_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)`;
   db.prepare(insertReview).run(bookId, userId, rating, reviewText);
@@ -558,7 +613,7 @@ function addBookState(bookId, userId, state) {
 // y opcionalmente lo registra como una review con cierto rating
 function createPost(userId, content, topic, topic_type, rating = null) {
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
 
   let columnNameTopic;
@@ -1269,5 +1324,8 @@ export {
   deleteAllReposts,
   deleteAllComments,
   deletePost,
-  getPostOfReview
+  getPostOfReview,
+  createUser,
+  getRandomAuthorId,
+  getRandomBookId
 };

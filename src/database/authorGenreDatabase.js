@@ -1,6 +1,6 @@
 import Database from "better-sqlite3";
 import _SqliteStore from "better-sqlite3-session-store";
-const PAGINATION_LIMIT = 7;
+const PAGINATION_LIMIT = 20;
 
 export function fetchAuthorsFromBook(bookId) {
   const db = new Database("database_files/betterreads.db");

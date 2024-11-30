@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import _SqliteStore from "better-sqlite3-session-store";
 
-const CANTIDAD_POSTS_PAGINADO = 7;
+const CANTIDAD_POSTS_PAGINADO = 20;
 // Entrega una lista de posts, devolviedo un array de posts (paginados),
 // y un booleano que indica si existen más posts luego del ultimo devuelto
 // Filter es un diccionario, con los distintos filtros posibles.
