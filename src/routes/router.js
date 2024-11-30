@@ -119,7 +119,7 @@ function processProfileRequest(req, res, isOwnProfile) {
   const isProfileComplete = userProfile?.bio && userProfile?.profile_photo;
   const followers =  getFollowers(userId);
   const following =  getFollowing(userId);
-  const isFollowing = isOwnProfile ? undefined : isUserFollowing(req.session.userId, userId);
+  const isFollowing = isOwnProfile ? true : isUserFollowing(req.session.userId, userId);
   const profile_photo = isProfileComplete ? userProfile.profile_photo : "/uploads/default-profile.png";
 
   

@@ -15,7 +15,7 @@
 
     {{#if isOwnProfile}}
         <!-- Botón para mostrar el formulario de edición siempre que sea el perfil propio -->
-        <button onclick="document.getElementById('edit-form').style.display='flex'">Edit Profile</button>
+        <button id="edit-profile-button" onclick="openEditForm()">Edit Profile</button>
 
         <!-- Formulario de edición (oculto hasta que se haga clic en el botón) -->
         <form id="edit-form" action="/profile" method="POST" enctype="multipart/form-data" style="display: none;">
@@ -59,6 +59,15 @@
 </div>
 
 <script>
+  function openEditForm() {
+    console.log("Presiono boron")
+    document.getElementById('edit-form').style.display = 'flex';
+    document.getElementById('edit-profile-button').style.display = 'none';
+  }
+  
+  window.openEditForm = openEditForm;
+
+
   let isFollowing = {{isFollowing}}; 
   async function toggleFollow(userId) {
     const button = document.getElementById('follow-button');
