@@ -13,6 +13,7 @@ import { v4 as uuid4 } from "uuid";
 
 var SqliteStore = _SqliteStore(session)
 const TEST_USER_ID = uuid4();
+const TEST_USER_ID_2 = uuid4();
 const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
 const CANTIDAD_POSTS_PAGINADO = 7;
@@ -78,7 +79,7 @@ function createUserFollowsDb(db) {
 
   // testing
   const staffId = TEST_USER_ID; 
-  const founderId = TEST_USER_ID + 1; 
+  const founderId = TEST_USER_ID_2; 
 
   followUser(staffId, founderId);
   followUser(founderId, staffId);
@@ -99,7 +100,7 @@ function createInsecureUsersDatabase(db) {
 
   const users = [
     { id: TEST_USER_ID, username: "staff", password: sha256("password") },
-    { id: TEST_USER_ID + 1, username: "founder", password: sha256("founderpassword") } 
+    { id: TEST_USER_ID_2, username: "founder", password: sha256("founderpassword") } 
   ];
 
   users.forEach(user => {
@@ -301,25 +302,16 @@ function createPostDatabase(db) {
   const posts_count = 'SELECT COUNT(*) FROM posts'
   let count = db.prepare(posts_count).get(); // { 'COUNT(*)': 0 }
 
+  const NUMBER_OF_POSTS = 20
+
   if (count['COUNT(*)'] <= 0) {
-    const insert_posts = db.prepare(
-      `INSERT INTO posts (
-          author_id, book_id, text_content, date, likes
-       ) VALUES (?,?,?,unixepoch('subsec'), 0)`
-    );
 
-    const insert_many_posts = db.transaction((n) => {
-      for (let i = 0; i < n; i++) {insert_posts.run(TEST_USER_ID, 
-        TEST_BOOK_ID, 
-        `This is my ${i}° post!!!!!!!!!!!!!!`);
+    for (let i = 0; i < NUMBER_OF_POSTS; i++) {
+      createPost(TEST_USER_ID, `This is my ${i}° post!`, TEST_BOOK_ID, "book")
+      console.log(`Inserted post ${i} of ${NUMBER_OF_POSTS}`);
 
-        console.log(`Inserted post ${i} of ${n}`);
-
-        sleepFor(10)
-      }
-      })
-  
-    insert_many_posts(20)
+      sleepFor(10)
+    }
   }
 }
 
@@ -338,16 +330,7 @@ function createRepostsDb(db) {
   count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
 
   if (count['COUNT(*)'] <= 0) {
-    const insert_reposts = db.prepare(
-      `INSERT INTO reposts (
-          post_id, user_id, date
-       ) VALUES (?,?,unixepoch('subsec'))`
-    );
-
-    insert_reposts.run(
-      1,
-      TEST_USER_ID,
-    );
+    createRepost(1, TEST_USER_ID);
   }
 }  
   
@@ -381,17 +364,7 @@ function createCommentDb(db) {
   count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
 
   if (count['COUNT(*)'] <= 0) {
-    const insert_comments = db.prepare(
-      `INSERT INTO comments (
-          parent_post, author_id, text_content, date
-       ) VALUES (?,?,?,unixepoch('subsec'))`
-    );
-
-    insert_comments.run(
-      1,
-      TEST_USER_ID, 
-      "This post is rubbish mate"
-    );
+    createComment(1, TEST_USER_ID, "This post is rubbish mate");
   }
 }
 
@@ -413,16 +386,7 @@ function createLikeDb(db) {
   count = db.prepare(count).get(); // { 'COUNT(*)': 0 }
 
   if (count['COUNT(*)'] <= 0) {
-    const insert_likes = db.prepare(
-      `INSERT INTO likes (
-          post_id, user_id, date
-       ) VALUES (?,?,unixepoch('subsec'))`
-    );
-
-    insert_likes.run(
-      1,
-      TEST_USER_ID, 
-    );
+    incrementLikes(1, TEST_USER_ID)
   }
 }
 
