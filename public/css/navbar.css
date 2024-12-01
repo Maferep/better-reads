@@ -6,12 +6,15 @@ body {
 }
 
 #navbar {
+  position:fixed;
+  z-index: 1000;
+  width: 100vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #0077b6;
   height: 2.5em;
-  padding: 10px 20px;
+  padding: .5em 0;
   color: white;
 }
 

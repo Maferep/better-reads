@@ -1,7 +1,9 @@
 
 #sidebar {
+  position: fixed;
   height: fit-content;
   background-color: #f4f4f4;
+  margin-top: 3.5em;
   padding-left: 3em;
   padding-right: 3em;
   padding-top: 1em;
