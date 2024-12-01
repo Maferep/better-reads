@@ -19,13 +19,17 @@ const TEST_BOOK_ID = 0;
 const TEST_POST_ID = 1;
 const CANTIDAD_POSTS_PAGINADO = 20;
 
+const RESET_DATABASE = false;
+
 const BOOK_DATA_FULL = "./database_files/books_data_full.csv";
 const BOOK_DATA_SMALL = "./database_files/books_data_prices.csv";
 
 function initDb() {
   //Delete files of database
-  fs.unlink("database_files/betterreads.db", (err) => {});
-  fs.unlink("database_files/sessions.db", (err) => {});
+  if (RESET_DATABASE) {
+    fs.unlink("database_files/betterreads.db", (err) => {});
+    fs.unlink("database_files/sessions.db", (err) => {});
+  }
 
 
 
@@ -601,7 +605,7 @@ function fetchBookState(bookId, userId) {
 
 function addBookState(bookId, userId, state) {
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
   if (state === "none") {
     const operation = /* sql */ `DELETE FROM book_states WHERE book_id = ? AND user_id = ?`;
@@ -902,7 +906,7 @@ function fetchComments(postId) {
 
 function createComment(postId, userId, content) {
   const db = new Database("database_files/betterreads.db", {
-    verbose: console.log,
+    // verbose: console.log,
   });
   const operation = /* sql */ `INSERT INTO comments (
         parent_post, author_id, text_content, date
@@ -1281,6 +1285,16 @@ function deletePost(post_id) {
   db.prepare(query).run(post_id);
 }
 
+function numberOfBooks() {
+  const db = new Database("database_files/betterreads.db", {
+    verbose: console.log,
+  });
+
+  const query = /* sql */ `SELECT COUNT(*) FROM books`;
+  const result = db.prepare(query).get();
+  return result['COUNT(*)'];
+}
+
 
 export {
   initDb,
@@ -1336,5 +1350,6 @@ export {
   getPostOfReview,
   createUser,
   getRandomAuthorId,
-  getRandomBookId
+  getRandomBookId,
+  numberOfBooks
 };

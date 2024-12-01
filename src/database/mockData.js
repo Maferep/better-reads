@@ -1,15 +1,18 @@
 import {faker} from '@faker-js/faker';
 import { v4 as uuid4 } from "uuid";
 
-import {createUser, addReview, createPost, getRandomBookId, getRandomAuthorId, createRepost, incrementLikes} from '../database.js';
+import {createUser, addReview, createPost, getRandomBookId, getRandomAuthorId, createRepost, incrementLikes, createComment, addBookState} from '../database.js';
 
-const NUMEREO_DE_POSTS = 20;
+const NUMEREO_DE_POSTS = 60;
 const NUMERO_DE_USUARIOS = 10;
 const NUMERO_DE_LIBROS_A_LOS_QUE_HACER_REVIEWS = 10;
 const PROBABILIDAD_DE_HACER_REVIEW = 0.5;
 const POPORCION_DE_REPOSTS_POR_POST = 0.7;
 const PROBABILIDAD_DE_LIKEAR_POST = 0.3;
-
+const PROBABILIDAD_DE_COMENTAR_POST = 0.5;
+const MAX_LIBROS_A_LEER = 5;
+const MAX_LIBROS_LEYENDO = 3;
+const MAX_LIBROS_LEIDOS = 10;
 
 //setear seed
 faker.seed(123);
@@ -272,11 +275,106 @@ const posts = [
     { post: "The author’s storytelling feels so effortless and natural.", type: "author" },
 ]
 
+const postComments = [
+    "I completely agree; this book was a masterpiece!",
+    "I had a similar experience with this book. The themes were so powerful.",
+    "I loved the character development, but the pacing was a bit slow for me.",
+    "The ending totally caught me off guard. I didn’t see that coming!",
+    "This book has been on my to-read list forever. Definitely bumping it up now.",
+    "I felt the same way about the world-building—it was absolutely incredible.",
+    "Not sure I would rate it that highly, but I respect your perspective.",
+    "This book is an emotional journey. It left me in tears too.",
+    "The plot twists were insane! I couldn’t put it down.",
+    "I struggled with the pacing, but the story made up for it.",
+    "I’ve read this author’s other works and loved them. Adding this one to my list.",
+    "Do you think the protagonist was relatable? I had mixed feelings.",
+    "The dialogue felt so real. It’s like the characters were alive.",
+    "I actually felt the ending was a bit rushed. What did you think?",
+    "I totally agree—this book was a rollercoaster of emotions.",
+    "I had a hard time connecting with the protagonist. Anyone else feel the same?",
+    "This book really made me think about my own values. It’s a must-read.",
+    "I loved how the story blended humor with serious themes. So unique!",
+    "The plot twist halfway through was absolutely brilliant.",
+    "I didn’t love the pacing, but the prose was stunning.",
+    "I’ve been looking for a book like this! Thanks for sharing your thoughts.",
+    "This book really stayed with me long after I finished it.",
+    "I felt like the subplots were unnecessary, but the main story was gripping.",
+    "The way this book handled sensitive topics was truly commendable.",
+    "I couldn’t agree more—the atmosphere in this book was so immersive.",
+    "I’m curious, what was your favorite moment in the book?",
+    "The narrative style wasn’t for me, but I see why people love it.",
+    "The themes in this book felt so relevant. It really spoke to me.",
+    "I’ve heard mixed reviews about this one. Would you recommend it?",
+    "I wish there was a sequel! The world-building was amazing.",
+    "This book felt so different from anything I’ve read before.",
+    "I found the prose beautiful but a bit hard to follow at times.",
+    "The relationships between the characters were so authentic and touching.",
+    "I loved how the story explored complex moral dilemmas.",
+    "I had to reread some parts to fully grasp them, but it was worth it.",
+    "I felt the same way about the ending. It left me wanting more closure.",
+    "This is one of those books you can’t stop thinking about.",
+    "I couldn’t connect with the protagonist, but the plot kept me hooked.",
+    "This book deserves all the praise it’s getting. Truly unforgettable.",
+    "I loved how the author tackled such difficult topics with grace.",
+    "The twists were great, but the pacing felt uneven to me.",
+    "The imagery in this book was breathtaking. I could picture every scene.",
+    "I was completely immersed in the world the author created.",
+    "The character arcs were incredible. They felt so real to me.",
+    "I didn’t love the writing style, but the story was compelling.",
+    "This book had such a unique voice. I haven’t read anything like it.",
+    "I wasn’t expecting to love this book, but it totally won me over.",
+    "I wish the author had explored some of the side characters more.",
+    "The emotions in this book hit me harder than I expected.",
+    "This is the kind of book that makes you appreciate storytelling.",
+    "The cultural elements in this book were so fascinating to read about.",
+    "I couldn’t help but binge-read this in one sitting.",
+    "The resolution felt a bit weak, but the journey was worth it.",
+    "I didn’t expect to learn so much from this book. It was eye-opening.",
+    "The story was great, but the dialogue didn’t feel very natural to me.",
+    "I agree about the pacing, but the ending totally made up for it.",
+    "I’m so glad someone else appreciates this book as much as I do!",
+    "The mix of humor and sadness was so well done in this book.",
+    "The symbolism in this book added so much depth to the story.",
+    "I was hooked from the first chapter. What a fantastic read!",
+    "I’ve never read anything by this author before, but now I’m intrigued.",
+    "The way this book explores human nature is just brilliant.",
+    "I’m curious, did you relate to any of the characters personally?",
+    "This book felt like a love letter to its genre. I adored it.",
+    "I wish the ending had tied things up more cleanly, though.",
+    "The way the author used flashbacks was really effective, in my opinion.",
+    "I found the middle a bit slow, but the climax was worth it.",
+    "I can’t wait to see if they adapt this into a movie or show!",
+    "The emotions in this book felt so raw and genuine.",
+    "I loved how the author painted such a vivid picture of the setting.",
+    "This book definitely made me see the world a bit differently.",
+    "I wasn’t a fan of the main character at first, but they grew on me.",
+    "The themes of love and sacrifice were beautifully explored in this book.",
+    "I think I need to reread this one to fully appreciate it.",
+    "I’ve been in a book slump, and this was the perfect story to break it.",
+    "The characters felt like real people I could know in real life.",
+    "I wasn’t a fan of the ending, but the journey was unforgettable.",
+    "The author’s attention to detail really brought the story to life.",
+    "This book was both heartwarming and heartbreaking at the same time.",
+    "The twists in this story kept me guessing until the very end.",
+    "I love how this book challenged me to think outside the box.",
+    "The relationships between the characters felt so authentic.",
+    "I’m adding this to my list immediately. Thanks for sharing!",
+    "The themes were great, but I found the story a bit hard to follow.",
+    "The writing style wasn’t my favorite, but the story was so worth it.",
+    "This book reminded me why I fell in love with reading in the first place.",
+    "I loved how this book explored the passage of time so beautifully.",
+    "I felt like I was right there with the characters throughout the story.",
+    "The subtle details in this book made it even more enjoyable for me.",
+    "I can’t wait to see what this author writes next!",
+    "I wish more people knew about this book—it’s such a hidden gem.",
+    "The moral dilemmas in this story were so thought-provoking.",
+    "This book is going to stick with me for a long, long time.",
+  ];
+
 
 posts.sort(() => Math.random() - 0.5);
 
 var users = []
-
 
 function initializeMockUsers(n) {
     for (let i = 0; i < n; i++) {
@@ -371,15 +469,21 @@ function createMockOnlyReviews() {
     }
 }
 
-function createMockLikes() {
+function createMockLikesAndComments() {
     const cantidadIntentosLikes = NUMEREO_DE_POSTS * users.length;
 
     let likesIntentados = 0;
 
     for (let user of users) {
         for (let i = 1; i < NUMEREO_DE_POSTS; i++) {
+            const postid = i;
+
             if (Math.random() < PROBABILIDAD_DE_LIKEAR_POST) {
-                incrementLikes(i, user.id);
+                incrementLikes(postid, user.id);
+            }
+
+            if (Math.random() < PROBABILIDAD_DE_COMENTAR_POST) {
+                createComment(postid, user.id, postComments[Math.floor(Math.random() * postComments.length)]);
             }
             likesIntentados += 1;
 
@@ -391,7 +495,57 @@ function createMockLikes() {
 }
 
 function createMockComments() {
-    
+    const cantidadIntentosComentarios = NUMEREO_DE_POSTS * users.length;
+
+    let comentariosIntentados = 0;
+
+    for (let user of users) {
+        for (let i = 1; i < NUMEREO_DE_POSTS; i++) {
+            if (Math.random() < PROBABILIDAD_DE_COMENTAR_POST) {
+                createComment(user.id, i, faker.lorem.sentence());
+            }
+            comentariosIntentados += 1;
+
+            if (comentariosIntentados % Math.floor(cantidadIntentosComentarios/20) === 0) {
+                console.log("Falta intentar", cantidadIntentosComentarios - comentariosIntentados, "comentarios");
+            }
+        }
+    }
+}
+
+function createMockBookStates() {
+    let cantidadUsuariosRestantes = users.length;
+
+    for (let user of users) {
+        //Libros por leer
+        const librosPorLeer = Math.floor(Math.random() * MAX_LIBROS_A_LEER);
+        for (let i = 0; i < librosPorLeer; i++) {
+            const bookId = getRandomBookId();
+            addBookState(bookId, user.id, "plan-to-read");
+        }
+
+        //Libros leyendo
+        const librosLeyendo = Math.floor(Math.random() * MAX_LIBROS_LEYENDO);
+        for (let i = 0; i < librosLeyendo; i++) {
+            const bookId = getRandomBookId();
+            addBookState(bookId, user.id, "reading");
+        }
+
+        //Libros leidos
+        const librosLeidos = Math.floor(Math.random() * MAX_LIBROS_LEIDOS);
+        for (let i = 0; i < librosLeidos; i++) {
+            const bookId = getRandomBookId();
+            addBookState(bookId, user.id, "finished");
+        }
+
+        if (cantidadUsuariosRestantes % Math.floor(Math.max(users.length/20, 1)) === 0) {
+            console.log("Faltan", cantidadUsuariosRestantes, "usuarios");
+        }
+
+        cantidadUsuariosRestantes -= 1;
+    }
+}
+
     
 
 export function createAllMockData() {
@@ -404,6 +558,9 @@ export function createAllMockData() {
     console.log("CREANDO SOLO REVIEWS MOCK");
     createMockOnlyReviews();
 
-    console.log("CREANDO LIKES MOCK");
-    createMockLikes();    
+    console.log("CREANDO LIKES Y COMENTARIOS MOCK");
+    createMockLikesAndComments();  
+    
+    console.log("CREANDO ESTADOS DE LIBROS MOCK");
+    createMockBookStates();
 }
