@@ -23,6 +23,7 @@ router.get('/', isAuthenticated,function (req, res) {
         loggedIn: true,
         title: "Cart",
         username: req.session.user,
+        do_sidebar: true,
         empty_cart,
         books,
         userId
