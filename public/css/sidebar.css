@@ -53,11 +53,7 @@ h1 {
   margin: 10px 0;
 }
 
-#sidebar {
-  visibility: hidden;
-}
-
 /* see https://css-tricks.com/the-checkbox-hack */
 #burger-checkbox:checked ~ #sidebar {
-  visibility: visible;
+  visibility: hidden;
 }
