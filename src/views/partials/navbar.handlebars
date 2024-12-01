@@ -1,10 +1,14 @@
 <link rel="stylesheet" href="/static/css/navbar.css" />
 
 <div id="navbar">
+  <div class="user-actions">
   <label for="burger-checkbox">
-    <span id="burger-button">BORGOR</span>
+    <span id="burger-button">
+      <img id="burger-icon" src="/static/assets/burger-menu.svg" alt="Burger menu">
+    </span>
   </label>
   <div id="logo"><a href="/">Better Reads</a></div>
+  </div>
   <div class="user-actions">
     {{#if loggedIn}} 
       <a id="cart-button" href="/cart">

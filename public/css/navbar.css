@@ -20,13 +20,18 @@ body {
 }
 
 .user-actions img {
-  height: 35px;
+  height: 2em;
+  display: block;
 }
 
 
 #navbar a {
   color: white;
   padding: 0 10px;
+}
+
+#burger-icon {
+  margin-right: 1em;
 }
 
 #logo {
@@ -94,3 +99,8 @@ a#cart-button {
   text-size-adjust: auto;
 }
 
+
+
+label[for="burger-checkbox"] {
+  margin: 0;
+}
