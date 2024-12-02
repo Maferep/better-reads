@@ -28,7 +28,6 @@ router.get('/', isAuthenticated , function (req, res) {
 
     res.render("notifications",
         {
-            do_sidebar: estaAutenticadoBool,
             username: req.session.user,
             loggedIn: estaAutenticadoBool,
             title: "Notifications",

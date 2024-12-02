@@ -2,11 +2,13 @@
 
 <div id="navbar">
   <div class="user-actions">
-  <label for="burger-checkbox">
-    <span id="burger-button">
-      <img id="burger-icon" src="/static/assets/burger-menu.svg" alt="Burger menu">
-    </span>
-  </label>
+    {{#if loggedIn}}
+      <label for="burger-checkbox">
+        <span id="burger-button">
+          <img id="burger-icon" src="/static/assets/burger-menu.svg" alt="Burger menu">
+        </span>
+      </label>
+    {{/if}}
   <div id="logo"><a href="/">Better Reads</a></div>
   </div>
   <div class="user-actions">
