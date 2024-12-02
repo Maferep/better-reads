@@ -151,14 +151,7 @@
 
         if (quantity < 1) {
             quantity = 1;
-        }
-
-        if (quantity == 1) {
-            //Hide minus button
-            document.querySelector(`.item #quantity-${bookId}`).previousElementSibling.style.display = 'none';
-        } else {
-            //Show minus button
-            document.querySelector(`.item #quantity-${bookId}`).previousElementSibling.style.display = 'inline-block';
+            return;
         }
 
         quantityElement.textContent = quantity;
