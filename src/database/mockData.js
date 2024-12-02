@@ -408,9 +408,11 @@ function createMockReviewsPostsAndReposts() {
                 //Hacer review
                 addReview(bookId, user.id, post.score, post.post);
                 createPost(user.id, post.post, bookId, "book", post.score);
+                addBookState(bookId, user.id, "finished");
             } else {
                 //Hacer solo post
                 createPost(user.id, post.post, bookId, "book");
+                addBookState(bookId, user.id, "reading");
             }
         }else if (post.type === "author") {
             
@@ -459,6 +461,7 @@ function createMockOnlyReviews() {
             const user = getRandomUser();
             const post = posts[Math.floor(Math.random() * posts.length)];
             addReview(book_id, user.id, post.score, post.post);
+            addBookState(book_id, user.id, "finished");
         }
 
         faltante -=1;
