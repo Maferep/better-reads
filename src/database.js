@@ -533,6 +533,13 @@ function addReview(bookId, userId, rating, reviewText) {
   const db = new Database("database_files/betterreads.db", {
     // verbose: console.log,
   });
+  //test if already has review
+  const query = /* sql */ `SELECT 1 FROM reviews WHERE book_id = ? AND user_id = ?`;
+  const rows = db.prepare(query).all(bookId, userId);
+  if (rows.length > 0) {
+    throw new Error("User already reviewed this book");
+  }
+
   const insertReview = /* sql */ `INSERT INTO reviews (book_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)`;
   db.prepare(insertReview).run(bookId, userId, rating, reviewText);
 }

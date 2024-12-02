@@ -406,9 +406,14 @@ function createMockReviewsPostsAndReposts() {
 
             if (Math.random() < PROBABILIDAD_DE_HACER_REVIEW) {
                 //Hacer review
+                try {
                 addReview(bookId, user.id, post.score, post.post);
                 createPost(user.id, post.post, bookId, "book", post.score);
                 addBookState(bookId, user.id, "finished");
+                } catch(e) {
+                    console.log("review abortado, ya se realizó");
+                }
+            
             } else {
                 //Hacer solo post
                 createPost(user.id, post.post, bookId, "book");
@@ -460,8 +465,12 @@ function createMockOnlyReviews() {
         for (let j = 0; j < numeroReviews; j++) {
             const user = getRandomUser();
             const post = posts[Math.floor(Math.random() * posts.length)];
-            addReview(book_id, user.id, post.score, post.post);
-            addBookState(book_id, user.id, "finished");
+            try{
+                addReview(book_id, user.id, post.score, post.post);
+                addBookState(book_id, user.id, "finished");
+            } catch(e) {
+                console.log("review abortado, ya se realizó");
+            }
         }
 
         faltante -=1;

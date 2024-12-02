@@ -232,12 +232,12 @@ router.get("/:id/stats", isAuthenticated, (req, res) => {
     });
 
     // Obtener el nombre de usuario del ID solicitado
-    const username = getUsernameFromId(requestedUserId);
+    const stats_username = getUsernameFromId(requestedUserId);
     const showStatsButton = combinedStats.some(stat => stat.count > 0);
     // Renderizar la página con las estadísticas procesadas
     res.render("stats", {
-      username: username,
-      user_stats: username,
+      username: req.session.user,
+      stats_username: stats_username,
       userId: requestedUserId,
       showStatsButton: showStatsButton,
       loggedIn: true,
@@ -260,6 +260,7 @@ router.get("/stats", isAuthenticated, (req, res) => {
   try {
     // Obtener estadísticas del usuario
     const stats = getStats(userId) || [];
+    const stats_username = getUsernameFromId(userId);
 
     // Crear un mapa base con todos los estados y valores predeterminados
     const baseStats = allStates.map((state) => ({
@@ -287,6 +288,7 @@ router.get("/stats", isAuthenticated, (req, res) => {
       showStatsButton: showStatsButton,
       loggedIn: true,
       do_sidebar: true,
+      stats_username: stats_username,
       stats: combinedStats,
       json: JSON.stringify,
     });
@@ -304,18 +306,19 @@ router.get("/:id/stats/graphs", isAuthenticated, (req, res) => {
     const stats = getStats(requestedUserId) || [];
     const allStates = ["plan-to-read", "reading", "finished"]; 
 
+    const stats_username = getUsernameFromId(requestedUserId);
+
     // Crear las estadísticas combinadas
     const combinedStats = allStates.map((state) => {
       const stat = stats.find((s) => s.state === state);
       return stat || { state, count: 0, books: [] };
     });
 
-    const username = getUsernameFromId(requestedUserId);
-
     // Renderizar la vista con los datos combinados
     res.render("stats-graphs", {
-      username: username, 
+      username: req.session.user, 
       userId: requestedUserId,
+      stats_username: stats_username,
       stats: combinedStats,
       json: JSON.stringify, 
       loggedIn: true,
