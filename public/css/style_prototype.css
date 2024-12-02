@@ -1,3 +1,9 @@
+
+
+body {
+  color: #27272a;
+}
+
 #container {
   flex-grow: 1;
   width: 90%;

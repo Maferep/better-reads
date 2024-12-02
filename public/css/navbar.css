@@ -34,8 +34,16 @@ body {
   margin-right: 1em;
 }
 
+@font-face {
+  font-family: 'Playwrite HR Lijeva';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/playwritehrlijeva/v1/gNMvW2dhS5-p7HvxrBYiWN2SsKqLWCrYiDBAvbRl82ZY0d4zBsaR.woff2) format('woff2');
+}
+
 #logo {
   color: lavender;
+  font-family: "Playwrite HR Lijeva", cursive;
 }
 
 
