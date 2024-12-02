@@ -1,9 +1,15 @@
 <link rel="stylesheet" href="/static/css/style.css">
 
 <div id="container">
+
 <div class="stats-container">
   <h1>{{username}}'s Books</h1>
 
+{{#if showStatsButton}}
+  <div class="stats-button-container">
+    <a href="/{{userId}}/stats/graphs" class="see-stats-button">Reading stats</a>
+  </div>
+{{/if}}
   {{#if stats}}
     <!-- Contenedor para el gráfico -->
 
@@ -38,11 +44,6 @@
   {{/if}}
 </div>
 
-{{#if showStatsButton}}
-  <div class="stats-button-container">
-    <a href="/{{userId}}/stats/graphs" class="see-stats-button">See Stats</a>
-  </div>
-{{/if}}
 </div>
 </div>
 
@@ -59,16 +60,16 @@
   width: 80%;
 }
 
-  .stats-button-container {
-  margin-top: 40px;
+.stats-button-container {
   display: flex;
   justify-content: center; 
+  margin: 1em 0;
 }
 
 .see-stats-button {
   padding: 10px 20px;
   background-color: white;
-  color: #B0B0B0; 
+  color: #5d8188; 
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
@@ -92,7 +93,6 @@
 h1 {
   text-align: center; 
   font-size: 28px; 
-  margin-bottom: 30px; 
 }
 
 .chart-container {
