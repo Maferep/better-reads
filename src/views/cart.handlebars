@@ -16,9 +16,9 @@
                 <p class="item-price" id="price-{{this.id}}">Price: ${{this.price}}</p>
             </div>
             <div class="quantity-controls">
-                <button class="quantity-btn decrement" onclick="updateQuantity('{{this.id}}',{{this.userId}}, -1)">-</button>
+                <button class="quantity-btn decrement" onclick="updateQuantity('{{this.id}}','{{this.userId}}', -1)">-</button>
                 <span class="quantity" id="quantity-{{this.id}}">{{quantity}}</span>
-                <button class="quantity-btn increment" onclick="updateQuantity('{{this.id}}',{{this.userId}}, 1)">+</button>
+                <button class="quantity-btn increment" onclick="updateQuantity('{{this.id}}','{{this.userId}}', 1)">+</button>
             </div>
             <button id="add-to-cart-btn" onclick="removeFromCart('{{this.userId}}', '{{this.id}}')">Remove</button>
         </div>
@@ -139,6 +139,7 @@
 
     
     function updateQuantity(bookId, userId, change) {
+        console.log('Updating quantity for book', bookId, 'by', change);
         const quantityElement = document.getElementById(`quantity-${bookId}`);
         if (!quantityElement) {
             console.error('Quantity element not found.');
@@ -175,5 +176,8 @@
         if (document.querySelectorAll('.item').length > 0) {
             calculateTotalPrice();
         }
+
+        //Hacer lo anterior, pero para cada uno de los 
+
     });
 </script>
