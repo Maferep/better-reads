@@ -12,7 +12,6 @@ router.get('/', async (req, res) => {
         console.log(rows);
         res.render("users", {
             username: req.session.user,
-            do_sidebar: true,
             loggedIn: true,
             title: "Browse Users",
             userEntries: rows

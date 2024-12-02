@@ -128,7 +128,6 @@ function processProfileRequest(req, res, isOwnProfile) {
   const has_more = all_raw.has_more;
   
   res.render("profile", { 
-    do_sidebar: true,
     username: req.session.user, 
     username_profile: isOwnProfile ? req.session.user : req.params.profileUsername, 
     userId: userId,
@@ -241,7 +240,7 @@ router.get("/:id/stats", isAuthenticated, (req, res) => {
       userId: requestedUserId,
       showStatsButton: showStatsButton,
       loggedIn: true,
-      do_sidebar: true,
+      
       stats: combinedStats,
       json: JSON.stringify,
     });
@@ -287,7 +286,6 @@ router.get("/stats", isAuthenticated, (req, res) => {
       userId: userId,
       showStatsButton: showStatsButton,
       loggedIn: true,
-      do_sidebar: true,
       stats_username: stats_username,
       stats: combinedStats,
       json: JSON.stringify,
@@ -322,7 +320,7 @@ router.get("/:id/stats/graphs", isAuthenticated, (req, res) => {
       stats: combinedStats,
       json: JSON.stringify, 
       loggedIn: true,
-      do_sidebar: true,
+      
     });
   } catch (error) {
     console.error("Error fetching stats for graphs:", error);
@@ -378,7 +376,7 @@ function processFeedRequest(req, res, onlyFollowing) {
   console.log("FECHA:",paginarDesdeFecha.toISOString())
 
   res.render("index", {
-    do_sidebar: true,
+    
     username: req.session.user,
     loggedIn: true,
     title: "Home page",

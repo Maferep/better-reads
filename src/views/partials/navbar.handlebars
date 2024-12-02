@@ -1,9 +1,17 @@
 <link rel="stylesheet" href="/static/css/navbar.css" />
-
 <div id="navbar">
-  <div id="logo"><a href="/">Better Reads</a></div>
   <div class="user-actions">
     {{#if loggedIn}}
+      <label for="burger-checkbox">
+        <span id="burger-button">
+          <img id="burger-icon" src="/static/assets/burger-menu.svg" alt="Burger menu">
+        </span>
+      </label>
+    {{/if}}
+  <div id="logo"><a href="/">BetterReads</a></div>
+  </div>
+  <div class="user-actions">
+    {{#if loggedIn}} 
       <a id="cart-button" href="/cart">
         <img src="/static/assets/icons8-cart-48.png" alt="Cart">
         <span id="cart-items-count" class="cart-badge" hidden>0</span>

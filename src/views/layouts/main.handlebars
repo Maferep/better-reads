@@ -19,14 +19,12 @@
 </head>
 <body>
     {{> navbar }}
-    <div id="layout-sidebar">
-        {{#if do_sidebar}}
-            {{> sidebar}}
-        {{/if}}
-        <div id="main-layout">
-            <div id="main-content">
-                {{{body}}}
-            </div>
+    {{#if loggedIn}}
+        {{> sidebar}}
+    {{/if}}
+    <div id="main-layout">
+        <div id="main-content">
+            {{{body}}}
         </div>
     </div>
 </body>

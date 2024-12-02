@@ -10,12 +10,15 @@
   <div id="book-list">
     <label for="book-select">Search for a book, author or genre!</label>
     <div class="select-button-container">
-    <select name="book" id="book-select">
-      <option value="{{search}}">{{search}}</option>
-    </select>
+      {{!-- this select will get hidden by some js --}}
+      <select name="book" id="book-select">
+        <option value="{{search}}">{{search}}</option>
+      </select>
 
-  <button type="submit" onclick="return redirectToSearch(event)">🔎︎</button>
-  </div>
+      {{!-- a fake select (actually a morass of nested span) will be added here by some js --}}
+
+      <button type="submit" onclick="return redirectToSearch(event)">🔎︎</button>
+    </div>
   </div>
   {{#if search}}
 {{!-- links to search by author and book, by only book, by only author --}}

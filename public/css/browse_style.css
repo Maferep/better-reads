@@ -9,9 +9,10 @@
     gap: 10px;
   }
   
-  #book-select {
-    width: 100%;
-  }
+.select2 {
+  flex-grow: 1;
+  max-width: 90%;
+}
 
 button{
     margin: 0;

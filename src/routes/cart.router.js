@@ -22,7 +22,7 @@ router.get('/', isAuthenticated,function (req, res) {
     res.render("cart", {
         loggedIn: true,
         title: "Cart",
-        username: req.session.user,
+        username: req.session.user,   
         empty_cart,
         books,
         userId
@@ -66,7 +66,7 @@ router.get("/card_payment", isAuthenticated, function (req, res) {
     res.render("card_payment", {
         title: "Card Payment",
         loggedIn: true,
-        do_sidebar: false,
+        
         username: req.session.user,
         userId: req.session.userId,
         total_price

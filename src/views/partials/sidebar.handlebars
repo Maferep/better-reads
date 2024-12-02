@@ -3,6 +3,7 @@
 <!-- TODO: separate book feed sidebar into separate partial -->
 <link rel="stylesheet" href="/static/css/style_book.css">
 <link rel="stylesheet" href="/static/css/sidebar.css">
+<input id="burger-checkbox" type="checkbox" style="display: none;">
 <div id="sidebar">
   {{!-- Si es feed de libro, se muestra info de libro en vez de menu de navegacion --}}
 {{#if book}}
@@ -23,11 +24,11 @@
   </div> 
 {{else}}
   <ul>
-    <li><a href="/browse">Browse</a></li>
-    <li><a href="/profile">My Posts</a></li>
-    <li><a href="/following-posts">Following</a></li>
     <li><a href="/stats">My books</a></li>
-    <li><a href="/users">Browse Users</a></li>
+    <li><a href="/browse">Browse</a></li>
+    <li><a href="/profile">My posts</a></li>
+    <li><a href="/following-posts">Following</a></li>
+    <li><a href="/users">Browse users</a></li>
   </ul>
 {{/if}}
 </div>
