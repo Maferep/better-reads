@@ -71,6 +71,9 @@ h1 {
 .username {
   font-weight: bold;
 }
+.username a {
+  color: #0077b6;
+}
 .stars {
   font-size: 2em;
   font-family: FontAwesome;
