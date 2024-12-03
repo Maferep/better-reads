@@ -17,6 +17,14 @@
     border-radius: 50%;
 }
 
+.bio {
+    font-size: 18px;
+    color: #333;
+    margin-top: 20px;
+    text-align: center;
+    width: 70%;
+}
+
 #follow-button {
     font-size: 18px;
     padding: 10px 20px;
